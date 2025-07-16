@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowOps - Bienvenue</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Importation de la police */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Définition des couleurs de la palette "nude" via variables CSS */
+        :root {
+            --primary-color: #A08D80; /* Muted brown/taupe */
+            --secondary-color: #D4CCC1; /* Lighter, subtle shade for accents */
+            --text-color-dark: #3F3C3A; /* Darker brown/grey for main text */
+            --text-color-medium: #6E6864; /* Medium brown/grey */
+            --text-color-light: #9C9591; /* Lighter grey/brown for subtle text */
+            --bg-light: #FBF9F7; /* Very light, warm off-white */
+            --bg-white: #FFFFFF;
+            --border-color: #EBE5E0; /* Soft, warm border */
+
+            /* Couleurs pour les statuts (non utilisées directement sur cette page, mais incluses pour la cohérence) */
+            --status-active-bg: #EAE6DF;
+            --status-active-text: #6E6864;
+            --status-inactive-bg: #F7EAE3;
+            --status-inactive-text: #A08D80;
+
+            /* Couleurs de navigation et boutons */
+            --nav-active-bg: #A08D80;
+            --nav-active-text: #FFFFFF;
+            --nav-hover-bg: #F0EDE9;
+            --button-bg-light: #F0EDE9;
+
+            /* Couleurs pour les barres d'availability (non utilisées sur cette page) */
+            --availability-bar-color: #D4A88D;
+            --availability-bar-bg: #EBE5E0;
+            --availability-dot-color: #D4A88D;
+
+            /* Couleurs pour les boutons d'action (non utilisées sur cette page) */
+            --action-button-primary-bg: var(--primary-color);
+            --action-button-primary-text: var(--bg-white);
+            --action-button-delete-bg: #F7EAE3;
+            --action-button-delete-text: #A08D80;
+
+            --shadow-light: rgba(0, 0, 0, 0.03); /* Ombre très légère */
+        }
+
+        /* Styles généraux */
+        body {
+            font-family: 'Inter', 'Noto Sans', sans-serif;
+            color: var(--text-color-dark);
+        }
+
+        /* Styles de la barre de navigation principale (header) */
+        header {
+            background-color: var(--bg-white);
+            box-shadow: 0 2px 5px var(--shadow-light);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Style du bouton "Se connecter" (header sur la page d'accueil) */
+        .header-button {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .header-button:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Section Hero (page d'accueil) */
+        .hero-section {
+            min-height: 400px;
+            background-image: url('https://assets.refine.dev/refine/abstract-bg-1.jpg'); /* Exemple d'image de fond */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.9); /* Fond semi-transparent pour le contenu */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .primary-button {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .primary-button:hover {
+            background-color: #8C7B71; /* Une teinte légèrement plus foncée */
+        }
+
+        /* Section Fonctionnalités (page d'accueil) */
+        .features-section {
+            padding: 60px 20px;
+            background-color: var(--bg-light);
+        }
+
+        .feature-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+            padding: 24px;
+            background-color: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px var(--shadow-light), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card .icon-container {
+            background-color: var(--nav-hover-bg); /* Couleur de fond pour l'icône */
+            border-radius: 50%;
+            padding: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card .icon-container svg {
+            color: var(--primary-color);
+            width: 28px;
+            height: 28px;
+        }
+
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-color-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            font-size: 0.875rem;
+            color: var(--text-color-medium);
+            line-height: 1.5;
+        }
+
+        /* Section CTA (page d'accueil) */
+        .cta-section {
+            background-color: var(--bg-light);
+            padding: 60px 20px;
+        }
+
+        /* Footer (page d'accueil) */
+        footer {
+            background-color: var(--bg-white);
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--text-color-medium);
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
+    <div class="layout-container flex h-full grow flex-col">
+        <div class="w-full px-6 py-2">
+            <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+                <header class="flex items-center justify-between whitespace-nowrap px-10 py-3">
+                    <div class="flex items-center gap-4 text-[#191610]">
+                        <div class="size-4">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">FlowOps</h2>
+                    </div>
+                    <button class="header-button">Se connecter</button>
+                </header>
+
+                <div class="hero-section flex flex-col items-center justify-center text-center p-20">
+                    <div class="hero-content bg-white rounded-xl shadow-md p-10">
+                        <h1 class="text-4xl font-bold leading-tight tracking-[-0.015em] mb-4 text-[#191610]">Bienvenue sur FlowOps</h1>
+                        <p class="text-lg font-normal leading-normal text-[#8c7e5a] mb-8">Suivez vos projets, vos ressources et vos tickets en un seul endroit.</p>
+                        <button class="primary-button">Commencer</button>
+                    </div>
+                </div>
+
+                <div class="features-section p-10 flex flex-col items-center">
+                    <h2 class="text-3xl font-bold leading-tight tracking-[-0.015em] mb-8 text-[#191610]">Fonctionnalités clés</h2>
+                    <p class="text-lg font-normal leading-normal text-[#8c7e5a] mb-12 max-w-2xl text-center">
+                        FlowOps propose une suite complète d'outils pour optimiser vos opérations et stimuler la croissance.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl">
+                        <div class="feature-card">
+                            <div class="icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-88a8,8,0,0,1-8,8H136v32a8,8,0,0,1-16,0V136H96a8,8,0,0,1,0-16h32V88a8,8,0,0,1,16,0v32h32A8,8,0,0,1,168,128Z"></path></svg>
+                            </div>
+                            <h3 class="feature-title">Automatisation du flux de travail</h3>
+                            <p class="feature-description">Automatisez les tâches répétitives et rationalisez vos flux de travail avec notre générateur intuitif par glisser-déposer.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M224,208a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H216a8,8,0,0,1,8,8ZM48,200H208V56H48Z"></path></svg>
+                            </div>
+                            <h3 class="feature-title">Analyse des performances</h3>
+                            <p class="feature-description">Obtenez des informations sur les performances de votre entreprise grâce à des tableaux de bord en temps réel et des rapports personnalisables.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M224,72a8,8,0,0,0-8-8H40a8,8,0,0,0-8,8V184a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8ZM48,80H208V176H48Z"></path></svg>
+                            </div>
+                            <h3 class="feature-title">Collaboration d'équipe</h3>
+                            <p class="feature-description">Favorisez la collaboration et la communication au sein de votre équipe avec la messagerie intégrée et la gestion des tâches.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M208,80H48A16,16,0,0,0,32,96v64a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM48,96H208V160H48Z"></path></svg>
+                            </div>
+                            <h3 class="feature-title">Sécurité et conformité</h3>
+                            <p class="feature-description">Assurez la sécurité et la conformité de vos données avec nos mesures de sécurité avancées et nos certifications conformes aux normes de l'industrie.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section flex flex-col items-center justify-center text-center p-10 mt-10">
+                    <h2 class="text-3xl font-bold leading-tight tracking-[-0.015em] mb-4 text-[#191610]">Prêt à transformer vos opérations?</h2>
+                    <p class="text-lg font-normal leading-normal text-[#8c7e5a] mb-8">Inscrivez-vous pour un essai gratuit et découvrez la puissance de FlowOps.</p>
+                    <button class="primary-button">Commencer</button>
+                </div
+            </main>
+        </div>
+    </div>
+    <footer class="flex flex-col items-center justify-center p-10 text-center gap-4 text-sm text-[#8c7e5a] border-t border-solid border-t-[#f1efe9] mt-auto">
+        <div class="flex gap-6">
+            <a href="#" class="hover:underline">Politique de confidentialité</a>
+            <a href="#" class="hover:underline">Conditions d'utilisation</a>
+            <a href="#" class="hover:underline">Nous contacter</a>
+        </div>
+        <p>© 2023 FlowOps. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>
