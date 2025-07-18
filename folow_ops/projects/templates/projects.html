@@ -13,6 +13,49 @@
       border-bottom: 2px solid #191610;
       font-weight: 500;
     }
+    :root {
+        --primary-color: #A08D80;
+        --secondary-color: #D4CCC1;
+        --text-color-dark: #3F3C3A;
+        --text-color-medium: #6E6864;
+        --text-color-light: #9C9591;
+        --bg-light: #FBF9F7;
+        --bg-white: #FFFFFF;
+        --border-color: #EBE5E0;
+        --status-active-bg: #EAE6DF;
+        --status-active-text: #6E6864;
+        --status-inactive-bg: #F7EAE3;
+        --status-inactive-text: #A08D80;
+        --nav-link-color: #191610;
+        --nav-link-hover-bg: #f1efe9;
+        --nav-link-active-bg: #f1efe9;
+        --nav-link-active-color: #191610;
+        --button-bg-light: #F0EDE9;
+        --shadow-light: rgba(0, 0, 0, 0.03);
+    }
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        color: var(--nav-link-color);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 9999px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        white-space: nowrap;
+    }
+    .nav-link:hover {
+        background-color: var(--nav-link-hover-bg);
+    }
+    .nav-link-active {
+        background-color: var(--nav-link-active-bg);
+        color: var(--nav-link-active-color);
+    }
+    .nav-link-active:hover {
+        background-color: var(--nav-link-active-bg);
+        color: var(--nav-link-active-color);
+    }
   </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
@@ -27,18 +70,10 @@
               </div>
               <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
               <nav class="flex items-center gap-4">
-                <a href="#" class="flex items-center gap-2 px-3 py-2 text-[#191610] text-sm font-medium hover:bg-[#f1efe9] rounded-full">
-                  <span>Tableau de bord</span>
-                </a>
-                <a href="#" class="flex items-center gap-2 px-3 py-2 text-[#191610] text-sm font-medium hover:bg-[#f1efe9] rounded-full">
-                  <span>Tickets</span>
-                </a>
-                <a href="#" class="flex items-center gap-2 px-3 py-2 text-[#191610] text-sm font-medium bg-[#f1efe9] rounded-full">
-                  <span>Projets</span>
-                </a>
-                <a href="#" class="flex items-center gap-2 px-3 py-2 text-[#191610] text-sm font-medium hover:bg-[#f1efe9] rounded-full">
-                  <span>Ressources</span>
-                </a>
+                <a href="/dashboard/" class="nav-link">Tableau de bord</a>
+                <a href="/ressources/" class="nav-link">Ressources</a>
+                <a href="/projects/" class="nav-link nav-link-active">Projets</a>
+                <a href="/tickets/" class="nav-link">Tickets</a>
               </nav>
             </div>
             <div class="flex items-center gap-8">
