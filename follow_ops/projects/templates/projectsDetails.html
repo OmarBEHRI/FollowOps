@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowOps - Détails du Projet</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        :root {
+            --primary-color: #A08D80;
+            --secondary-color: #D4CCC1;
+            --text-color-dark: #3F3C3A;
+            --text-color-medium: #6E6864;
+            --text-color-light: #9C9591;
+            --bg-light: #FBF9F7;
+            --bg-white: #FFFFFF;
+            --border-color: #EBE5E0;
+            --status-active-bg: #EAE6DF;
+            --status-active-text: #6E6864;
+            --status-inactive-bg: #F7EAE3;
+            --status-inactive-text: #A08D80;
+            --nav-link-color: #191610;
+            --nav-link-hover-bg: #f1efe9;
+            --nav-link-active-bg: #f1efe9;
+            --nav-link-active-color: #191610;
+            --button-bg-light: #F0EDE9;
+            --shadow-light: rgba(0, 0, 0, 0.03);
+            --card-bg: #FBF9F7;
+            --card-border: #EBE5E0;
+            --light-text: #9C9591;
+            --dark-text: #191610;
+            --tab-inactive-bg: transparent;
+            --tab-inactive-text: #6E6864;
+            --tab-active-bg: #FBF9F7; /* Matches card background */
+            --tab-active-text: #191610;
+            --tag-bg: #EAE6DF;
+            --tag-text: #6E6864;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans', sans-serif;
+            background-color: #f7f5f3;
+            color: var(--dark-text);
+        }
+        .layout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        header {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2.5rem;
+            box-shadow: 0 1px 3px var(--shadow-light);
+        }
+        header .flex-1 {
+            flex-grow: 1;
+        }
+        header .size-4 {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        header h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-right: 2rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: #191610;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-link:hover {
+            background-color: #f1efe9;
+        }
+        .nav-link-active {
+            background-color: #f1efe9;
+            color: #191610;
+        }
+        .nav-link-active:hover {
+            background-color: #f1efe9;
+            color: #191610;
+        }
+        .search-input-container {
+            border-radius: 9999px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            height: 2.5rem;
+        }
+        .search-input-container svg {
+            color: var(--text-color-light);
+        }
+        .search-input {
+            background-color: transparent;
+            border: none;
+            padding-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--dark-text);
+            height: 100%;
+        }
+        .search-input::placeholder {
+            color: var(--text-color-light);
+        }
+        .profile-icon-header {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            padding: 1rem 2.5rem;
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-color-medium);
+        }
+        .breadcrumbs a {
+            color: var(--text-color-medium);
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main content area */
+        .content-area {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            background-color: #f7f5f3;
+        }
+
+        /* Project Header */
+        .project-header-section {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .project-title-group h1 {
+            font-size: 1.6rem; /* text-2xl */
+            font-weight: 700;
+            color: var(--dark-text);
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+        .project-title-group p {
+            font-size: 0.9375rem; /* text-base */
+            color: var(--text-color-medium);
+            line-height: 1.4;
+        }
+        .modify-button {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 9999px;
+            background-color: transparent;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modify-button:hover {
+            background-color: var(--status-inactive-bg);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--tab-inactive-text);
+            background-color: var(--tab-inactive-bg);
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .tab-button:hover {
+            color: var(--dark-text);
+        }
+        .tab-button.active {
+            color: var(--tab-active-text);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Section Card */
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px var(--shadow-light);
+        }
+
+        /* General Information Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem 2.5rem;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-color-medium);
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        /* Estimated Load */
+        .estimated-load {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-top: 2rem; /* Spacing from info grid */
+        }
+        .estimated-load span {
+            font-weight: 400; /* Lighter for "heures" */
+        }
+
+        /* Progress Graph */
+        .graph-container {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Fixed height for the graph area */
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Ensure image fits */
+            margin-top: 1.5rem;
+        }
+        .graph-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Ensure image scales within bounds */
+        }
+
+        /* Tags/Categories */
+        .tags-container {
+            margin-top: 2rem;
+        }
+        .tags-container h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+        }
+
+        /* Calendar Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px var(--shadow-light);
+        }
+        .calendar-day-header {
+            font-weight: 600;
+            color: var(--text-color-medium);
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+        .calendar-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px; /* Ensure cells have a minimum height */
+            border-radius: 0.375rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            position: relative;
+        }
+        .calendar-cell.inactive {
+            background-color: var(--bg-light);
+            color: var(--text-color-light);
+            cursor: not-allowed;
+        }
+        .calendar-cell.today {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            font-weight: 700;
+        }
+        .calendar-date {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        .event-badge {
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--bg-white);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .event-badge.inprogress {
+            background-color: var(--primary-color);
+        }
+        .event-badge.completed {
+            background-color: #4CAF50; /* Green */
+        }
+        .event-badge.planned {
+            background-color: #2196F3; /* Blue */
+        }
+        /* Commentaires Projet */
+        .comments-section {
+            margin-top: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .comment-bubble {
+            background-color: #fff;
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 1px 3px #eae6df;
+            border: 1px solid #ebe5e0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            max-width: 600px;
+        }
+        .comment-avatar {
+            min-width: 44px;
+            min-height: 44px;
+            max-width: 44px;
+            max-height: 44px;
+            border-radius: 9999px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 2px solid #eae6df;
+        }
+        .comment-meta {
+            font-size: 0.95rem;
+            color: #8c7e5a;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        .comment-author {
+            font-weight: 700;
+            color: #191610;
+            font-size: 1rem;
+        }
+        .comment-text {
+            color: #3F3C3A;
+            font-size: 0.97rem;
+            margin-top: 0.1rem;
+        }
+        .comment-input-container {
+            background-color: #fff;
+            border-radius: 14px;
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            border: 1px solid #ebe5e0;
+            box-shadow: 0 1px 3px #eae6df;
+            max-width: 600px;
+            margin-top: 1.2rem;
+        }
+        .comment-input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 0.6rem;
+            font-size: 1rem;
+            color: #3F3C3A;
+            background-color: transparent;
+        }
+        .send-button {
+            background-color: #A08D80;
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: background 0.15s;
+        }
+        .send-button:hover {
+            background-color: #8C7B71;
+        }
+        @media (max-width: 700px) {
+            .comment-bubble, .comment-input-container { max-width: 100%; padding: 0.7rem 0.5rem; }
+            .comment-avatar { min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; }
+        }
+    </style>
+</head>
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
+    <div class="w-full px-6 py-2">
+        <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+            <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
+                <div class="flex items-center justify-between whitespace-nowrap pb-3">
+                    <div class="flex items-center gap-4 text-[#191610] flex-1">
+                        <div class="size-4">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
+                        <nav class="flex items-center gap-4">
+                            <a href="/dashboard/" class="nav-link">Tableau de bord</a>
+                            <a href="/ressources/" class="nav-link">Ressources</a>
+                            <a href="/projects/" class="nav-link nav-link-active">Projets</a>
+                            <a href="/tickets/" class="nav-link">Tickets</a>
+                        </nav>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <label class="flex flex-col min-w-40 !h-10 max-w-64">
+                            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                                <div class="text-[#8c7e5a] flex border-none bg-[#f1efe9] items-center justify-center pl-4 rounded-l-xl border-r-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+                                </div>
+                                <input type="search" placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#191610] focus:outline-0 focus:ring-0 border-none bg-[#f1efe9] focus:border-none h-full placeholder:text-[#8c7e5a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal">
+                            </div>
+                        </label>
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 text-[#8c7e5a] text-sm font-medium mt-2">
+                    <a href="/projects/" class="hover:underline">Projets</a>
+                    <span>/</span>
+                    <span>Détails du projet</span>
+                </div>
+            </header>
+            <div class="px-10 py-6 flex flex-col gap-8">
+                <!-- Ton contenu spécifique ici (titre, onglets, infos, graphique, tags, etc.) -->
+                <div class="project-header-section">
+                    <div class="project-title-group">
+                        <h1 class="text-[#191610] text-2xl font-bold leading-tight">{{ project.title }}</h1>
+                        <p class="text-[#8c7e5a] text-base">{{ project.description }}</p>
+                    </div>
+                    <button class="modify-button" onclick="alert('Modification à implémenter !')">Modifier</button>
+                </div>
+
+                <div class="tabs-container">
+                    <button class="tab-button active" id="tab-info" onclick="showTab('info')">Informations générales</button>
+                    <button class="tab-button" id="tab-membres" onclick="showTab('membres')">Membres d'équipe</button>
+                    <button class="tab-button" id="tab-tickets" onclick="showTab('tickets')">Tickets</button>
+                </div>
+
+                <!-- Section Informations générales -->
+<div id="section-info" style="display:block;">
+  <div class="flex flex-col">
+    <h2 class="text-[#191610] text-lg font-bold leading-tight mb-2">Informations générales</h2>
+    <div class="bg-white border border-[#EBE5E0] rounded-xl shadow-sm mt-4 p-4">
+      <div class="grid grid-cols-4 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          🏷️ <span>Type</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.type }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          ⏳ <span>Statut</span>
+        </div>
+        <div class="text-[#A08D80] text-base font-semibold bg-[#eae6df] px-2 py-1 rounded-full">{{ project.status }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          ⭐ <span>Priorité</span>
+        </div>
+        <div class="text-[#A08D80] text-base font-semibold">{{ project.priority }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          👤 <span>Chef de projet</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.project_manager }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          📅 <span>Date de début prévue</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.expected_start_date }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          📅 <span>Date de fin prévue</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.expected_end_date }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          📅 <span>Date de début réelle</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.start_date }}</div>
+      </div>
+      <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+        <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+          📅 <span>Date de fin réelle</span>
+        </div>
+        <div class="text-[#191610] text-base">{{ project.end_date }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-col">
+    <h2 class="text-[#191610] text-lg font-bold leading-tight mb-2">Charge estimée</h2>
+    <p class="text-[#191610] text-sm mb-4"><span class="font-bold">{{ project.estimated_charges }}</span> heures</p>
+  </div>
+  <div class="flex flex-col">
+    <h2 class="text-[#191610] text-lg font-bold leading-tight mb-2">Avancement</h2>
+    <div class="bg-white border border-[#EBE5E0] rounded-lg shadow-sm p-6 flex items-center justify-center" style="height:260px;">
+      <canvas id="progressChart" height="180" style="max-width:700px; width:100%;"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const nudeColors = [
+        '#A08D80', '#6E6864', '#D4CCC1', '#9C9591', '#3F3C3A', '#C5B4A8', '#8C7E72', '#EDE8E2'
+      ];
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+          datasets: [
+            {
+              label: "Taux d'avancement",
+              data: {{ project.progress }},
+              borderColor: nudeColors[0],
+              backgroundColor: 'rgba(160, 141, 128, 0.2)',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: nudeColors[0],
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#3F3C3A',
+                font: { size: 12, weight: '500' },
+                boxWidth: 20,
+                padding: 15
+              }
+            },
+            tooltip: { mode: 'index', intersect: false }
+          },
+          layout: { padding: 0 },
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              ticks: { stepSize: 10, font: { size: 13, family: 'Inter, Noto Sans, sans-serif' }, color: '#BFB9B2' },
+              grid: { color: '#F3F1ED' }
+            },
+            x: {
+              ticks: { font: { size: 13, family: 'Inter, Noto Sans, sans-serif' }, color: '#BFB9B2' },
+              grid: { color: '#F3F1ED' }
+            }
+          }
+        }
+      });
+    </script>
+  </div>
+  <div class="tags-container">
+    <h2 class="text-[#191610] text-lg font-bold leading-tight mb-2">Tags/Catégories</h2>
+    <div class="flex gap-2 flex-wrap">
+      {% for tag in project.tags %}
+      <span class="px-3 py-1 rounded-full text-sm font-medium bg-[#f1efe9] text-[#191610] shadow-sm transition hover:bg-[#eae6df] cursor-pointer">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Section Membres d'équipe -->
+<div id="section-membres" style="display:none;">
+  <h2 class="text-[#191610] text-2xl font-bold leading-tight mb-6">Membres d'équipe</h2>
+  <div class="members-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
+      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
+        <img class="member-photo" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Ethan Carter" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+        <div class="member-info" style="flex: 1;">
+          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Ethan Carter</div>
+          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Ingénieur Principal</div>
+          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+            12 tickets
+          </div>
+        </div>
+      </div>
+      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Supervise les aspects techniques du projet, y compris l’architecture, le développement et le déploiement. Garantit la qualité du code et le respect des bonnes pratiques.</div>
+      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">React</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Node.js</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Architecture</span>
+      </div>
+    </div>
+    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
+      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
+        <img class="member-photo" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sophia Clark" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+        <div class="member-info" style="flex: 1;">
+          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Sophia Clark</div>
+          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Cheffe de Produit</div>
+          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+            8 tickets
+          </div>
+        </div>
+      </div>
+      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Définit la stratégie produit et collabore avec les équipes pour garantir que le produit répond aux besoins des utilisateurs et aux objectifs de l’entreprise.</div>
+      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Stratégie</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Vision Produit</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Feuille de Route</span>
+      </div>
+    </div>
+    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
+      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
+        <img class="member-photo" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Ava Foster" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+        <div class="member-info" style="flex: 1;">
+          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Ava Foster</div>
+          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Spécialiste Marketing</div>
+          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+            4 tickets
+          </div>
+        </div>
+      </div>
+      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Élabore et met en œuvre des stratégies marketing pour promouvoir l’application et attirer des utilisateurs.</div>
+      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Analyse</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Réseau Sociaux</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Création de Contenu</span>
+      </div>
+    </div>
+    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
+      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
+        <img class="member-photo" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Olivia Bennett" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+        <div class="member-info" style="flex: 1;">
+          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Olivia Bennett</div>
+          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Designer UX</div>
+          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+            6 tickets
+          </div>
+        </div>
+      </div>
+      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Se concentre sur l’expérience utilisateur, la création de wireframes, prototypes et interfaces qui soient à la fois fonctionnels et esthétiques.</div>
+      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Prototypage</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Wireframing</span>
+        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Recherche Utilisateur</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-tickets" style="display:none;">
+  <h2 class="text-[#191610] text-2xl font-bold leading-tight mb-6">Tickets du projet</h2>
+  <div class="tickets-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+    <div class="ticket-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 0.75rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start;">
+      <div class="ticket-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 0.75rem;">
+        <div class="ticket-status" style="background: #eae6df; color: #6e6864; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px;">En attente</div>
+        <div class="ticket-priority" style="background: #f1efe9; color: #191610; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px; margin-left: 0.5rem;">Haute</div>
+      </div>
+      <div class="ticket-title" style="font-size: 1.05rem; font-weight: 600; color: #191610; margin-bottom: 0.3rem;">Bug de connexion</div>
+      <div class="ticket-description" style="font-size: 0.85rem; color: #3f3c3a; margin-bottom: 0.5rem;">Le système de connexion n'est pas fonctionnel depuis quelques jours. Les utilisateurs ne peuvent pas se connecter.</div>
+      <div class="ticket-meta" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #6e6864;">
+        <span>Assigné à: Ethan Carter</span>
+        <span>Créé le: 2025-06-20</span>
+      </div>
+    </div>
+    <div class="ticket-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 0.75rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start;">
+      <div class="ticket-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 0.75rem;">
+        <div class="ticket-status" style="background: #eae6df; color: #6e6864; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px;">En cours</div>
+        <div class="ticket-priority" style="background: #f1efe9; color: #191610; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px; margin-left: 0.5rem;">Moyenne</div>
+      </div>
+      <div class="ticket-title" style="font-size: 1.05rem; font-weight: 600; color: #191610; margin-bottom: 0.3rem;">Nouvelle fonctionnalité demandée</div>
+      <div class="ticket-description" style="font-size: 0.85rem; color: #3f3c3a; margin-bottom: 0.5rem;">Les utilisateurs souhaitent une option pour personnaliser leur profil.</div>
+      <div class="ticket-meta" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #6e6864;">
+        <span>Assigné à: Sophia Clark</span>
+        <span>Créé le: 2025-06-25</span>
+      </div>
+    </div>
+    <div class="ticket-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 0.75rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start;">
+      <div class="ticket-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 0.75rem;">
+        <div class="ticket-status" style="background: #eae6df; color: #6e6864; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px;">Terminé</div>
+        <div class="ticket-priority" style="background: #f1efe9; color: #191610; font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 9999px; margin-left: 0.5rem;">Faible</div>
+      </div>
+      <div class="ticket-title" style="font-size: 1.05rem; font-weight: 600; color: #191610; margin-bottom: 0.3rem;">Amélioration de la performance</div>
+      <div class="ticket-description" style="font-size: 0.85rem; color: #3f3c3a; margin-bottom: 0.5rem;">L'application a une latence élevée lors de la navigation.</div>
+      <div class="ticket-meta" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #6e6864;">
+        <span>Assigné à: Ava Foster</span>
+        <span>Créé le: 2025-06-28</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-card" style="margin-top:2rem;">
+  <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Activités du projet</h2>
+  <div class="flex justify-between items-center mb-4">
+    <button id="prevMonthProject" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200">◀</button>
+    <h3 id="currentMonthYearProject" class="text-xl font-semibold text-[var(--dark-text)]">Mois Année</h3>
+    <button id="nextMonthProject" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200">▶</button>
+  </div>
+  <div class="calendar-grid" id="calendarGridProject">
+    <div class="calendar-day-header">Lun</div>
+    <div class="calendar-day-header">Mar</div>
+    <div class="calendar-day-header">Mer</div>
+    <div class="calendar-day-header">Jeu</div>
+    <div class="calendar-day-header">Ven</div>
+    <div class="calendar-day-header">Sam</div>
+    <div class="calendar-day-header">Dim</div>
+    <!-- Calendar cells will be generated by JS -->
+  </div>
+</div>
+
+<script>
+function showTab(tab) {
+  document.getElementById('tab-info').classList.remove('active');
+  document.getElementById('tab-membres').classList.remove('active');
+  document.getElementById('tab-tickets').classList.remove('active');
+  document.getElementById('section-info').style.display = 'none';
+  document.getElementById('section-membres').style.display = 'none';
+  document.getElementById('section-tickets').style.display = 'none';
+  if(tab === 'info') {
+    document.getElementById('tab-info').classList.add('active');
+    document.getElementById('section-info').style.display = 'block';
+  } else if(tab === 'membres') {
+    document.getElementById('tab-membres').classList.add('active');
+    document.getElementById('section-membres').style.display = 'block';
+  } else if(tab === 'tickets') {
+    document.getElementById('tab-tickets').classList.add('active');
+    document.getElementById('section-tickets').style.display = 'block';
+  }
+}
+</script>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const calendarGrid = document.getElementById('calendarGridProject');
+  const currentMonthYear = document.getElementById('currentMonthYearProject');
+  const prevMonthBtn = document.getElementById('prevMonthProject');
+  const nextMonthBtn = document.getElementById('nextMonthProject');
+  let currentDate = new Date();
+
+  // Example: Replace with your real project activities
+  const projectEvents = [
+    { date: new Date(2025, 6, 1).toDateString(), name: 'Kickoff Meeting', status: 'planned' },
+    { date: new Date(2025, 6, 3).toDateString(), name: 'Sprint 1 Start', status: 'inprogress' },
+    { date: new Date(2025, 6, 7).toDateString(), name: 'Revue de code', status: 'completed' },
+    { date: new Date(2025, 6, 10).toDateString(), name: 'Livraison V1', status: 'completed' },
+    { date: new Date(2025, 6, 12).toDateString(), name: 'Démo Client', status: 'planned' },
+    { date: new Date(2025, 6, 15).toDateString(), name: 'Correction Bug', status: 'inprogress' },
+    { date: new Date(2025, 6, 18).toDateString(), name: 'Sprint 2 Start', status: 'planned' },
+    { date: new Date(2025, 6, 22).toDateString(), name: 'Revue de code', status: 'planned' },
+    { date: new Date(2025, 6, 25).toDateString(), name: 'Livraison V2', status: 'planned' },
+    { date: new Date(2025, 6, 28).toDateString(), name: 'Rétrospective', status: 'planned' }
+  ];
+
+  const renderCalendar = () => {
+    calendarGrid.innerHTML = `
+      <div class="calendar-day-header">Lun</div>
+      <div class="calendar-day-header">Mar</div>
+      <div class="calendar-day-header">Mer</div>
+      <div class="calendar-day-header">Jeu</div>
+      <div class="calendar-day-header">Ven</div>
+      <div class="calendar-day-header">Sam</div>
+      <div class="calendar-day-header">Dim</div>
+    `;
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    currentMonthYear.textContent = new Date(year, month).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    // Previous month padding
+    for (let i = 0; i < startDayIndex; i++) {
+      const day = daysInPrevMonth - startDayIndex + i + 1;
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-cell', 'inactive');
+      cell.innerHTML = `<span class="calendar-date">${day}</span>`;
+      calendarGrid.appendChild(cell);
+    }
+
+    // Current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-cell');
+      const currentDay = new Date(year, month, day);
+      if (currentDay.toDateString() === new Date().toDateString()) {
+        cell.classList.add('today');
+      }
+      cell.innerHTML = `<span class="calendar-date">${day}</span>`;
+      const eventsForDay = projectEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
+      eventsForDay.forEach(event => {
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('event-badge', event.status);
+        eventDiv.textContent = event.name;
+        cell.appendChild(eventDiv);
+      });
+      calendarGrid.appendChild(cell);
+    }
+
+    // Next month padding
+    const totalCells = startDayIndex + daysInMonth;
+    const remainingCells = 42 - totalCells;
+    for (let i = 1; i <= remainingCells; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('calendar-cell', 'inactive');
+      cell.innerHTML = `<span class="calendar-date">${i}</span>`;
+      calendarGrid.appendChild(cell);
+    }
+  };
+
+  prevMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+  });
+  nextMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  renderCalendar();
+});
+</script>
+
+
