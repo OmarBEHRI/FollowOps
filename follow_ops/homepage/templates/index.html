@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* Importation de la police */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -185,6 +186,63 @@
         footer a:hover {
             color: var(--primary-color);
         }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            background-color: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color-light);
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-color-dark);
+        }
     </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
@@ -198,14 +256,14 @@
                         </div>
                         <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">FlowOps</h2>
                     </div>
-                    <button class="header-button">Se connecter</button>
+                    <button class="header-button" id="loginBtn">Se connecter</button>
                 </header>
 
                 <div class="hero-section flex flex-col items-center justify-center text-center p-20">
                     <div class="hero-content bg-white rounded-xl shadow-md p-10">
                         <h1 class="text-4xl font-bold leading-tight tracking-[-0.015em] mb-4 text-[#191610]">Bienvenue sur FlowOps</h1>
                         <p class="text-lg font-normal leading-normal text-[#8c7e5a] mb-8">Suivez vos projets, vos ressources et vos tickets en un seul endroit.</p>
-                        <button class="primary-button">Commencer</button>
+                        <button class="primary-button" id="startBtn">Commencer</button>
                     </div>
                 </div>
 
@@ -249,7 +307,7 @@
                 <div class="cta-section flex flex-col items-center justify-center text-center p-10 mt-10">
                     <h2 class="text-3xl font-bold leading-tight tracking-[-0.015em] mb-4 text-[#191610]">Prêt à transformer vos opérations?</h2>
                     <p class="text-lg font-normal leading-normal text-[#8c7e5a] mb-8">Inscrivez-vous pour un essai gratuit et découvrez la puissance de FlowOps.</p>
-                    <button class="primary-button">Commencer</button>
+                    <button class="primary-button" id="startBtn2">Commencer</button>
                 </div>
             </main>
         </div>
@@ -262,5 +320,94 @@
         </div>
         <p>© 2023 FlowOps. Tous droits réservés.</p>
     </footer>
+    <!-- Modal de connexion -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="text-xl font-bold text-[#191610]">Connexion</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="loginForm" method="post" action="/login/">
+                {% csrf_token %}
+                <div class="form-group mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-[#3F3C3A] mb-1">Email</label>
+                    <input type="email" id="login-email" name="email" class="w-full px-3 py-2 border border-[#EBE5E0] rounded-lg bg-[#FBF9F7]" required>
+                </div>
+                <div class="form-group mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-[#3F3C3A] mb-1">Mot de passe</label>
+                    <input type="password" id="login-password" name="password" class="w-full px-3 py-2 border border-[#EBE5E0] rounded-lg bg-[#FBF9F7]" required>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" name="remember" class="mr-2">
+                        <label for="remember" class="text-sm text-[#6E6864]">Se souvenir de moi</label>
+                    </div>
+                    <a href="#" class="text-sm text-[#A08D80] hover:underline">Mot de passe oublié?</a>
+                </div>
+                <button type="submit" class="w-full bg-[#A08D80] text-white py-2 rounded-lg font-medium hover:bg-[#8C7B71] transition-colors">Se connecter</button>
+                <!-- Removed the signup text as users should already be registered -->
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour ouvrir la modal
+        function openModal() {
+            document.getElementById('loginModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; // Empêcher le défilement
+        }
+
+        // Fonction pour fermer la modal
+        function closeModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.body.style.overflow = ''; // Réactiver le défilement
+        }
+
+        // Attacher les événements aux boutons
+        document.getElementById('loginBtn').addEventListener('click', openModal);
+        document.getElementById('startBtn').addEventListener('click', openModal);
+        document.getElementById('startBtn2').addEventListener('click', openModal);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+
+        // Fermer la modal si on clique en dehors
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Gérer la soumission du formulaire
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Envoyer les données via AJAX
+            fetch('/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/dashboard/';
+                } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data && data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        });
+    </script>
 </body>
 </html>

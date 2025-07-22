@@ -21,21 +21,29 @@ def add_resource(request):
         location = request.POST.get('location')
         availability_rate = request.POST.get('availability')
         skills = request.POST.get('skills')
-        password = 'defaultpassword'  # À sécuriser dans un vrai projet
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Vérifier que les mots de passe correspondent
+        if password != confirm_password:
+            return render(request, 'add_resource.html', {'error': 'Les mots de passe ne correspondent pas'})
+            
         username = email
-        Ressource.objects.create(
+        
+        # Créer l'utilisateur avec le mot de passe hashé
+        user = Ressource.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
             first_name=first_name,
             last_name=last_name,
-            email=email,
             role=role,
             status=status,
             phone_number=phone_number,
             entry_date=entry_date,
             location=location,
             availability_rate=availability_rate,
-            skills=skills,
-            password=password,
-            username=username
+            skills=skills
         )
         return redirect('/ressources/')
     return render(request, 'add_resource.html')

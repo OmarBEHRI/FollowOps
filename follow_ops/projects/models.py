@@ -1,4 +1,5 @@
 from django.db import models
+from ressources.models import Ressource
 
 class Project(models.Model):
     title = models.CharField(max_length=200, verbose_name="Intitulé")
@@ -29,6 +30,7 @@ class Project(models.Model):
     estimated_charges = models.IntegerField(verbose_name="Charges estimées (en jours ou heures)")
     progress = models.IntegerField(verbose_name="Avancement (%)")
     tags = models.ManyToManyField('Tag', related_name='projects', verbose_name="Tags ou categories")
+    comments = models.ManyToManyField('CommentProject', related_name="project_comments", verbose_name="Commentaires", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,6 +39,17 @@ class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Tag")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CommentProject(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="comment_project")
+    content = models.TextField(verbose_name="Contenu")
+    author = models.ForeignKey('ressources.Ressource', on_delete=models.SET_NULL, null=True, related_name='project_comments_authored')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.content}"
 
 
 

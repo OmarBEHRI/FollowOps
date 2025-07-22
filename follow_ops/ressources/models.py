@@ -16,6 +16,11 @@ class Ressource(AbstractUser):
         ('CDD', 'CDD'),
         ('Autre', 'Autre')
     ])
+    appRole = models.CharField(max_length=200, choices=[
+        ('ADMIN', 'ADMIN'),
+        ('MANAGER', 'MANAGER'),
+        ('USER', 'USER')
+    ])
     phone_number = models.CharField(max_length=20)
     entry_date = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=200, null=True, blank=True)
@@ -25,7 +30,7 @@ class Ressource(AbstractUser):
     password = models.CharField(max_length=200)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'role', 'manager', 'status']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'role', 'status']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
