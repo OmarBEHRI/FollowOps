@@ -1,0 +1,141 @@
+{% extends 'projectDetailsBase.html' %}
+
+{% block content %}
+    <!-- Tabs navigation (assumed to be in base template) -->
+    {{ block.super }}
+    <div class="flex flex-col space-y-8">
+        <div>
+            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Informations générales</h2>
+            <div class="bg-white border border-[#EBE5E0] rounded-xl shadow-sm p-6">
+              <div class="grid grid-cols-4 sm:grid-cols-2 gap-6">
+                <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  🏷️ <span>Type</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.type }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  ⏳ <span>Statut</span>
+                </div>
+                <div class="text-[#A08D80] text-base font-semibold bg-[#eae6df] px-2 py-1 rounded-full">{{ project.status }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  ⭐ <span>Priorité</span>
+                </div>
+                <div class="text-[#A08D80] text-base font-semibold">{{ project.priority }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  👤 <span>Chef de projet</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.project_manager }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  📅 <span>Date de début prévue</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.expected_start_date }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  📅 <span>Date de fin prévue</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.expected_end_date }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  📅 <span>Date de début réelle</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.start_date }}</div>
+              </div>
+              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
+                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
+                  📅 <span>Date de fin réelle</span>
+                </div>
+                <div class="text-[#191610] text-base">{{ project.end_date }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col">
+            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Charge estimée</h2>
+            <p class="text-[#191610] text-sm mb-6"><span class="font-bold">{{ project.estimated_charges }}</span> heures</p>
+        </div>
+
+        <div class="flex flex-col">
+            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Avancement</h2>
+            <div class="bg-white border border-[#EBE5E0] rounded-lg shadow-sm p-8 flex items-center justify-center mb-6" style="height:260px;">
+              <canvas id="progressChart" height="180" style="max-width:700px; width:100%;"></canvas>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+              const nudeColors = [
+                '#A08D80', '#6E6864', '#D4CCC1', '#9C9591', '#3F3C3A', '#C5B4A8', '#8C7E72', '#EDE8E2'
+              ];
+              const ctx = document.getElementById('progressChart').getContext('2d');
+              new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                  datasets: [
+                    {
+                      label: "Taux d'avancement",
+                      data: {{ project.progress }},
+                      borderColor: nudeColors[0],
+                      backgroundColor: 'rgba(160, 141, 128, 0.2)',
+                      fill: true,
+                      tension: 0.4,
+                      pointBackgroundColor: nudeColors[0],
+                      pointBorderColor: '#fff',
+                      pointBorderWidth: 2,
+                      pointRadius: 5,
+                      pointHoverRadius: 7
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        color: '#3F3C3A',
+                        font: { size: 12, weight: '500' },
+                        boxWidth: 20,
+                        padding: 15
+                      }
+                    },
+                    tooltip: { mode: 'index', intersect: false }
+                  },
+                  layout: { padding: 0 },
+                  scales: {
+                    y: {
+                      min: 0,
+                      max: 100,
+                      ticks: { stepSize: 10, font: { size: 13, family: 'Inter, Noto Sans, sans-serif' }, color: '#BFB9B2' },
+                      grid: { color: '#F3F1ED' }
+                    },
+                    x: {
+                      ticks: { font: { size: 13, family: 'Inter, Noto Sans, sans-serif' }, color: '#BFB9B2' },
+                      grid: { color: '#F3F1ED' }
+                    }
+                  }
+                }
+              });
+            </script>
+        </div>
+
+        <div class="tags-container mb-8">
+            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Tags/Catégories</h2>
+            <div class="flex gap-3 flex-wrap">
+              {% for tag in project.tags %}
+              <span class="px-3 py-1 rounded-full text-sm font-medium bg-[#f1efe9] text-[#191610] shadow-sm transition hover:bg-[#eae6df] cursor-pointer">{{ tag }}</span>
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

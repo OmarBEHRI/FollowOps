@@ -23,5 +23,21 @@ def projectDetails(request, pk):
         'progress': [20, 35, 50, 65, 70, 80, 90],
         'tags': ["Mobile", "Gestion de projet", "Productivité"]
     }
-    return render(request, 'projectsDetails.html', {'project': project, 'pk': pk})
+    return render(request, 'projectInfo.html', {'project': project, 'pk': pk, 'active_tab': 'info'})
 
+
+def projectMembers(request, pk):
+    # Données statiques pour l'affichage
+    project = {
+        'title': "Projet de développement d'application mobile",
+        'description': "Création d'une application mobile pour la gestion de tickets et de projets."
+    }
+    return render(request, 'projectMembers.html', {'project': project, 'pk': pk, 'active_tab': 'membres'})
+
+def projectCalendar(request, pk):
+    # Static data for display
+    project = {
+        'title': "Projet de développement d'application mobile",
+        'description': "Création d'une application mobile pour la gestion de tickets et de projets."
+    }
+    return render(request, 'projectCalendar.html', {'project': project, 'pk': pk, 'active_tab': 'calendrier'})

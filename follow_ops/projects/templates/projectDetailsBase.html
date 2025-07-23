@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowOps - Détails du Projet</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        :root {
+            --primary-color: #A08D80;
+            --secondary-color: #D4CCC1;
+            --text-color-dark: #3F3C3A;
+            --text-color-medium: #6E6864;
+            --text-color-light: #9C9591;
+            --bg-light: #FBF9F7;
+            --bg-white: #FFFFFF;
+            --border-color: #EBE5E0;
+            --status-active-bg: #EAE6DF;
+            --status-active-text: #6E6864;
+            --status-inactive-bg: #F7EAE3;
+            --status-inactive-text: #A08D80;
+            --nav-link-color: #191610;
+            --nav-link-hover-bg: #f1efe9;
+            --nav-link-active-bg: #f1efe9;
+            --nav-link-active-color: #191610;
+            --button-bg-light: #F0EDE9;
+            --shadow-light: rgba(0, 0, 0, 0.03);
+            --card-bg: #FBF9F7;
+            --card-border: #EBE5E0;
+            --light-text: #9C9591;
+            --dark-text: #191610;
+            --tab-inactive-bg: transparent;
+            --tab-inactive-text: #6E6864;
+            --tab-active-bg: #FBF9F7; /* Matches card background */
+            --tab-active-text: #191610;
+            --tag-bg: #EAE6DF;
+            --tag-text: #6E6864;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans', sans-serif;
+            background-color: #f7f5f3;
+            color: var(--dark-text);
+        }
+        .layout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        header {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2.5rem;
+            box-shadow: 0 1px 3px var(--shadow-light);
+        }
+        header .flex-1 {
+            flex-grow: 1;
+        }
+        header .size-4 {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        header h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-right: 2rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: #191610;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-link:hover {
+            background-color: #f1efe9;
+        }
+        .nav-link-active {
+            background-color: #f1efe9;
+            color: #191610;
+        }
+        .nav-link-active:hover {
+            background-color: #f1efe9;
+            color: #191610;
+        }
+        .search-input-container {
+            border-radius: 9999px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            height: 2.5rem;
+        }
+        .search-input-container svg {
+            color: var(--text-color-light);
+        }
+        .search-input {
+            background-color: transparent;
+            border: none;
+            padding-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--dark-text);
+            height: 100%;
+        }
+        .search-input::placeholder {
+            color: var(--text-color-light);
+        }
+        .profile-icon-header {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            padding: 1rem 2.5rem;
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-color-medium);
+        }
+        .breadcrumbs a {
+            color: var(--text-color-medium);
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main content area */
+        .content-area {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            background-color: #f7f5f3;
+        }
+
+        /* Project Header */
+        .project-header-section {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .project-title-group h1 {
+            font-size: 1.6rem; /* text-2xl */
+            font-weight: 700;
+            color: var(--dark-text);
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+        .project-title-group p {
+            font-size: 0.9375rem; /* text-base */
+            color: var(--text-color-medium);
+            line-height: 1.4;
+        }
+        .modify-button {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 9999px;
+            background-color: transparent;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modify-button:hover {
+            background-color: var(--status-inactive-bg);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--tab-inactive-text);
+            background-color: var(--tab-inactive-bg);
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .tab-button:hover {
+            color: var(--dark-text);
+        }
+        .tab-button.active {
+            color: var(--tab-active-text);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
+    <div class="w-full px-6 py-2">
+        <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+            <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
+                <div class="flex items-center justify-between whitespace-nowrap pb-3">
+                    <div class="flex items-center gap-4 text-[#191610] flex-1">
+                        <div class="size-4">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
+                        <nav class="flex items-center gap-4">
+                            <a href="/dashboard/" class="nav-link">Tableau de bord</a>
+                            <a href="/ressources/" class="nav-link">Ressources</a>
+                            <a href="/projects/" class="nav-link nav-link-active">Projets</a>
+                            <a href="/tickets/" class="nav-link">Tickets</a>
+                        </nav>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <label class="flex flex-col min-w-40 !h-10 max-w-64">
+                            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                                <div class="text-[#8c7e5a] flex border-none bg-[#f1efe9] items-center justify-center pl-4 rounded-l-xl border-r-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+                                </div>
+                                <input type="search" placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#191610] focus:outline-0 focus:ring-0 border-none bg-[#f1efe9] focus:border-none h-full placeholder:text-[#8c7e5a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal">
+                            </div>
+                        </label>
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 text-[#8c7e5a] text-sm font-medium mt-2">
+                    <a href="/projects/" class="hover:underline">Projets</a>
+                    <span>/</span>
+                    <span>{% block breadcrumb_title %}Détails du projet{% endblock %}</span>
+                </div>
+            </header>
+            <div class="px-10 py-6 flex flex-col gap-8">
+                <!-- Project Header Section -->
+                <div class="project-header-section">
+                    <div class="project-title-group">
+                        <h1 class="text-[#191610] text-2xl font-bold leading-tight">{{ project.title }}</h1>
+                        <p class="text-[#8c7e5a] text-base">{{ project.description }}</p>
+                    </div>
+                    <button class="modify-button" onclick="alert('Modification à implémenter !')">Modifier</button>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="tabs-container">
+                    <a href="{% url 'projectDetails' pk=pk %}" class="tab-button{% if active_tab == 'info' %} active{% endif %}" id="tab-info">Informations générales</a>
+                    <a href="{% url 'projectMembers' pk=pk %}" class="tab-button{% if active_tab == 'membres' %} active{% endif %}" id="tab-membres">Membres d'équipe</a>
+                    <a href="{% url 'projectCalendar' pk=pk %}" class="tab-button{% if active_tab == 'calendrier' %} active{% endif %}" id="tab-calendrier">Calendrier</a>
+                </div>
+
+                <!-- Content Sections -->
+                {% block content %}{% endblock %}
+
+                <!-- Tab Functionality Script -->
+                <script>
+                    // Tab functionality
+                    function showTab(tabName) {
+                        // Hide all sections
+                        document.getElementById('section-info').style.display = 'none';
+                        document.getElementById('section-membres').style.display = 'none';
+                        document.getElementById('section-calendrier').style.display = 'none';
+                        
+                        // Remove active class from all tabs
+                        document.querySelectorAll('.tab-button').forEach(tab => {
+                            tab.classList.remove('active');
+                        });
+                        
+                        // Show selected section and activate tab
+                        document.getElementById('section-' + tabName).style.display = 'block';
+                        document.getElementById('tab-' + tabName).classList.add('active');
+                    }
+
+                    // Initialize with the active tab from the server
+                    document.addEventListener('DOMContentLoaded', function() {
+                        {% block active_tab %}showTab('info');{% endblock %}
+                    });
+                </script>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
