@@ -30,6 +30,9 @@ def add_resource(request):
             
         username = email
         
+        # Récupérer le rôle dans l'application
+        app_role = request.POST.get('appRole')
+        
         # Créer l'utilisateur avec le mot de passe hashé
         user = Ressource.objects.create_user(
             username=username,
@@ -43,7 +46,8 @@ def add_resource(request):
             entry_date=entry_date,
             location=location,
             availability_rate=availability_rate,
-            skills=skills
+            skills=skills,
+            appRole=app_role
         )
         return redirect('/ressources/')
     return render(request, 'add_resource.html')
