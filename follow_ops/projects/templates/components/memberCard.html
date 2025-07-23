@@ -1,0 +1,20 @@
+<!-- Member Card Component -->
+<div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
+  <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
+    <img class="member-photo" src="{{ member.photo }}" alt="{{ member.name }}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+    <div class="member-info" style="flex: 1;">
+      <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">{{ member.name }}</div>
+      <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">{{ member.role }}</div>
+      <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+        {{ member.tickets }} tickets
+      </div>
+    </div>
+  </div>
+  <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">{{ member.description }}</div>
+  <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+    {% for tag in member.tags %}
+    <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">{{ tag }}</span>
+    {% endfor %}
+  </div>
+</div>
