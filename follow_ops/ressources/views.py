@@ -67,7 +67,10 @@ def ressources(request):
     })
 
 
-def ressourcesDetails(request):
+def ressourcesDetails(request, resource_id=None):
+    if resource_id:
+        resource = Ressource.objects.get(id=resource_id)
+        return render(request, 'ressourcesDetails.html', {'resource': resource})
     return render(request, 'ressourcesDetails.html')
 
 
@@ -89,23 +92,90 @@ def add_resource(request):
             return render(request, 'add_resource.html', {'error': 'Les mots de passe ne correspondent pas'})
         username = email
         app_role = request.POST.get('appRole')
-        user = Ressource.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role=role,
-            status=status,
-            phone_number=phone_number,
-            entry_date=entry_date,
-            location=location,
-            availability_rate=availability_rate,
-            skills=skills,
-            appRole=app_role
-        )
-        return redirect('/ressources/')
+        
+        # Traitement de la date d'entrée
+        parsed_entry_date = None
+        if entry_date:
+            try:
+                parsed_entry_date = datetime.strptime(entry_date, '%Y-%m-%d').date()
+            except ValueError:
+                return render(request, 'add_resource.html', {'error': 'Format de date invalide. Utilisez le format YYYY-MM-DD.'})
+        
+        try:
+            user = Ressource.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role=role,
+                status=status,
+                phone_number=phone_number,
+                entry_date=parsed_entry_date,
+                location=location,
+                availability_rate=availability_rate,
+                skills=skills,
+                appRole=app_role
+            )
+            return redirect('/ressources/')
+        except Exception as e:
+            return render(request, 'add_resource.html', {'error': f'Erreur lors de la création: {str(e)}'})
     return render(request, 'add_resource.html')
+
+
+def edit_resource(request, resource_id):
+    resource = Ressource.objects.get(id=resource_id)
+    if request.method == 'POST':
+        first_name = request.POST.get('name')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email')
+        role = request.POST.get('role')
+        status = request.POST.get('status')
+        phone_number = request.POST.get('phone')
+        entry_date = request.POST.get('entry_date')
+        location = request.POST.get('location')
+        availability_rate = request.POST.get('availability')
+        skills = request.POST.get('skills')
+        app_role = request.POST.get('appRole')
+        
+        # Mise à jour des champs
+        resource.first_name = first_name
+        resource.last_name = last_name
+        resource.email = email
+        resource.role = role
+        resource.status = status
+        resource.phone_number = phone_number
+        # Vérifier si entry_date est vide et le gérer correctement
+        if entry_date:
+            try:
+                resource.entry_date = datetime.strptime(entry_date, '%Y-%m-%d').date()
+            except ValueError:
+                return render(request, 'edit_resource.html', {'resource': resource, 'error': 'Format de date invalide. Utilisez le format YYYY-MM-DD.'})
+        resource.location = location
+        resource.availability_rate = availability_rate
+        resource.skills = skills
+        resource.appRole = app_role
+        
+        # Vérifier si un nouveau mot de passe est fourni
+        password = request.POST.get('password')
+        if password:
+            confirm_password = request.POST.get('confirm_password')
+            if password != confirm_password:
+                return render(request, 'edit_resource.html', {'resource': resource, 'error': 'Les mots de passe ne correspondent pas'})
+            resource.set_password(password)
+        
+        resource.save()
+        return redirect('/ressources/')
+    
+    return render(request, 'edit_resource.html', {'resource': resource})
+
+
+def delete_resource(request, resource_id):
+    if request.method == 'POST':
+        resource = Ressource.objects.get(id=resource_id)
+        resource.delete()
+        return redirect('/ressources/')
+    return redirect('/ressources/')
 
 
 def export_ressources_excel(request):

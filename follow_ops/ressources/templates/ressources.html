@@ -249,13 +249,13 @@
                 </div>
                 <div class="flex gap-3 p-3 flex-wrap pr-4">
                     <form id="ressource-filter-form" method="get" action="" class="flex flex-wrap gap-3 items-center">
-                        <select name="role" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem;">
+                        <select name="role" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem; appearance: auto;">
                             <option value="">Role</option>
                             {% for role in roles %}
                                 <option value="{{ role }}" {% if current_role == role %}selected{% endif %}>{{ role }}</option>
                             {% endfor %}
                         </select>
-                        <select name="status" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem;">
+                        <select name="status" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem; appearance: auto;">
                             <option value="">Status</option>
                             {% for status in statuses %}
                                 <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>{{ status }}</option>
@@ -284,7 +284,7 @@
                             </thead>
                             <tbody>
                                 {% for ressource in ressources %}
-                                <tr class="border-t border-t-[#e3dfd3]">
+                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='/ressources/details/{{ ressource.id }}/'">
                                     <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ ressource.first_name }} {{ ressource.last_name }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.role }}</td>
                                     <td class="status-cell px-4 py-5 text-center">
@@ -298,9 +298,9 @@
                                     </td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.skills }}</td>
                                     {% if user_role == 'ADMIN' %}
-                                    <td class="px-4 py-5 text-center">
-                                        <a href="#" class="text-[#A08D80] hover:underline text-sm font-medium">Edit</a> |
-                                        <a href="#" class="text-[#A08D80] hover:underline text-sm font-medium">Delete</a>
+                                    <td class="px-4 py-5 text-center" onclick="event.stopPropagation();">
+                                        <a href="/ressources/edit/{{ ressource.id }}/" class="text-[#A08D80] hover:underline text-sm font-medium">Edit</a> |
+                                        <a href="#" onclick="confirmDelete({{ ressource.id }})" class="text-[#A08D80] hover:underline text-sm font-medium">Delete</a>
                                     </td>
                                     {% endif %}
                                 </tr>
@@ -311,6 +311,11 @@
                         </table>
                     </div>
                 </div>
+                <!-- Formulaire caché pour la suppression -->
+                <form id="delete-form" method="post" style="display: none;">
+                    {% csrf_token %}
+                </form>
+
                 <script>
                 function exportRessourcesExcel() {
                     const form = document.getElementById('ressource-filter-form');
@@ -323,6 +328,15 @@
                     if(params.get('search')) filename += `_search-${params.get('search')}`;
                     window.location.href = `/ressources/export/?${params.toString()}&filename=${filename}`;
                 }
+
+                function confirmDelete(resourceId) {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')) {
+                        const form = document.getElementById('delete-form');
+                        form.action = `/ressources/delete/${resourceId}/`;
+                        form.submit();
+                    }
+                }
+                
                 // Optional: submit form on search input
                 const searchInput = document.getElementById('search-input');
                 if(searchInput){

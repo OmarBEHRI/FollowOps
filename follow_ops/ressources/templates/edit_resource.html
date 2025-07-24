@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowOps - Ajouter une Ressource</title>
+    <title>FlowOps - Modifier une Ressource</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
@@ -190,95 +190,107 @@
                     </div>
                     <div class="px-10 py-4">
                         <div class="flex items-center gap-2 text-[#8c7e5a] text-sm font-medium">
-                            <a href="ressources.html" class="hover:underline">Ressources</a>
+                            <a href="/ressources/" class="hover:underline">Ressources</a>
                             <span>/</span>
-                            <span>Ajouter une Ressource</span>
+                            <span>Modifier une Ressource</span>
                         </div>
                     </div>
                 </header>
 
                 <div class="px-10 py-6 flex flex-col gap-6">
                     <div class="flex items-center justify-between">
-                        <h1 class="text-[#191610] text-xl font-bold leading-tight">Ajouter une Nouvelle Ressource</h1>
+                        <h1 class="text-[#191610] text-xl font-bold leading-tight">Modifier la Ressource</h1>
                     </div>
+
+                    {% if error %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">{{ error }}</span>
+                    </div>
+                    {% endif %}
 
                     <form class="form-section" method="post">
                         {% csrf_token %}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <div class="form-group">
                                 <label for="name" class="form-label">Nom Complet</label>
-                                <input type="text" id="name" name="name" class="form-input" placeholder="Ex: Jean Dupont" required>
+                                <input type="text" id="name" name="name" class="form-input" placeholder="Ex: Jean Dupont" value="{{ resource.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">Nom de famille</label>
+                                <input type="text" id="last_name" name="last_name" class="form-input" placeholder="Ex: Dupont" value="{{ resource.last_name }}">
                             </div>
                             <div class="form-group">
                                 <label for="email" class="form-label">Email Professionnel</label>
-                                <input type="email" id="email" name="email" class="form-input" placeholder="Ex: jean.dupont@example.com" required>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="Ex: jean.dupont@example.com" value="{{ resource.email }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="role" class="form-label">Rôle</label>
                                 <select id="role" name="role" class="form-select" required>
                                     <option value="">Sélectionner un rôle</option>
-                                    <option value="software_engineer">Software Engineer</option>
-                                    <option value="product_manager">Product Manager</option>
-                                    <option value="ux_designer">UX Designer</option>
-                                    <option value="qa_engineer">QA Engineer</option>
-                                    <option value="devops_engineer">DevOps Engineer</option>
-                                    <option value="project_manager">Chef de Projet</option>
-                                    <option value="data_analyst">Data Analyst</option>
-                                    <option value="other">Autre</option>
+                                    <option value="software_engineer" {% if resource.role == 'software_engineer' %}selected{% endif %}>Software Engineer</option>
+                                    <option value="product_manager" {% if resource.role == 'product_manager' %}selected{% endif %}>Product Manager</option>
+                                    <option value="ux_designer" {% if resource.role == 'ux_designer' %}selected{% endif %}>UX Designer</option>
+                                    <option value="qa_engineer" {% if resource.role == 'qa_engineer' %}selected{% endif %}>QA Engineer</option>
+                                    <option value="devops_engineer" {% if resource.role == 'devops_engineer' %}selected{% endif %}>DevOps Engineer</option>
+                                    <option value="project_manager" {% if resource.role == 'project_manager' %}selected{% endif %}>Chef de Projet</option>
+                                    <option value="data_analyst" {% if resource.role == 'data_analyst' %}selected{% endif %}>Data Analyst</option>
+                                    <option value="other" {% if resource.role == 'other' %}selected{% endif %}>Autre</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="status" class="form-label">Statut (Contrat)</label>
                                 <select id="status" name="status" class="form-select" required>
                                     <option value="">Sélectionner un statut</option>
-                                    <option value="active">Actif (CDI)</option>
-                                    <option value="contractor">Contractuel</option>
-                                    <option value="intern">Stagiaire</option>
-                                    <option value="inactive">Inactif</option>
+                                    <option value="Stagiaire" {% if resource.status == 'Stagiaire' %}selected{% endif %}>Stagiaire</option>
+                                    <option value="CDI" {% if resource.status == 'CDI' %}selected{% endif %}>CDI</option>
+                                    <option value="Prestataire" {% if resource.status == 'Prestataire' %}selected{% endif %}>Prestataire</option>
+                                    <option value="Alternant" {% if resource.status == 'Alternant' %}selected{% endif %}>Alternant</option>
+                                    <option value="CDD" {% if resource.status == 'CDD' %}selected{% endif %}>CDD</option>
+                                    <option value="Autre" {% if resource.status == 'Autre' %}selected{% endif %}>Autre</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="appRole" class="form-label">Rôle dans l'application</label>
                                 <select id="appRole" name="appRole" class="form-select" required>
                                     <option value="">Sélectionner un rôle</option>
-                                    <option value="ADMIN">Administrateur</option>
-                                    <option value="MANAGER">Manager</option>
-                                    <option value="USER">Utilisateur</option>
+                                    <option value="ADMIN" {% if resource.appRole == 'ADMIN' %}selected{% endif %}>Administrateur</option>
+                                    <option value="MANAGER" {% if resource.appRole == 'MANAGER' %}selected{% endif %}>Manager</option>
+                                    <option value="USER" {% if resource.appRole == 'USER' %}selected{% endif %}>Utilisateur</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="phone" class="form-label">Téléphone Professionnel (optionnel)</label>
-                                <input type="tel" id="phone" name="phone" class="form-input" placeholder="Ex: 0123456789">
+                                <input type="tel" id="phone" name="phone" class="form-input" placeholder="Ex: 0123456789" value="{{ resource.phone_number }}">
                             </div>
                             <div class="form-group">
                                 <label for="entry_date" class="form-label">Date d'entrée</label>
-                                <input type="text" id="entry_date" name="entry_date" class="form-input" required placeholder="YYYY-MM-DD">
+                                <input type="text" id="entry_date" name="entry_date" class="form-input" required placeholder="YYYY-MM-DD" value="{{ resource.entry_date|date:'Y-m-d' }}">
                             </div>
                             <div class="form-group">
                                 <label for="location" class="form-label">Localisation</label>
-                                <input type="text" id="location" name="location" class="form-input" placeholder="Ex: Paris, France" required>
+                                <input type="text" id="location" name="location" class="form-input" placeholder="Ex: Paris, France" value="{{ resource.location }}" required>
                             </div>
                              <div class="form-group">
                                 <label for="availability" class="form-label">Disponibilité (%)</label>
-                                <input type="number" id="availability" name="availability" class="form-input" min="0" max="100" placeholder="Ex: 80" required>
+                                <input type="number" id="availability" name="availability" class="form-input" min="0" max="100" placeholder="Ex: 80" value="{{ resource.availability_rate }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="password" class="form-label">Mot de passe</label>
-                                <input type="password" id="password" name="password" class="form-input" required>
+                                <label for="password" class="form-label">Nouveau mot de passe (laisser vide pour conserver l'actuel)</label>
+                                <input type="password" id="password" name="password" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
-                                <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
+                                <label for="confirm_password" class="form-label">Confirmer le nouveau mot de passe</label>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-input">
                             </div>
                             <div class="form-group md:col-span-2">
                                 <label for="skills" class="form-label">Compétences (séparées par des virgules)</label>
-                                <textarea id="skills" name="skills" class="form-input h-24 resize-y" placeholder="Ex: React, Java, SQL, Gestion de projet"></textarea>
+                                <textarea id="skills" name="skills" class="form-input h-24 resize-y" placeholder="Ex: React, Java, SQL, Gestion de projet">{{ resource.skills }}</textarea>
                             </div>
                         </div>
 
                         <div class="button-group">
                             <button type="button" class="button-secondary" onclick="window.history.back()">Annuler</button>
-                            <button type="submit" class="button-primary">Ajouter la Ressource</button>
+                            <button type="submit" class="button-primary">Enregistrer les modifications</button>
                         </div>
                     </form>
                     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -289,7 +301,6 @@
                             locale: "fr",
                             altInput: true,
                             altFormat: "d/m/Y",
-                            defaultDate: new Date(),
                             allowInput: true,
                             onReady: function(selectedDates, dateStr, instance) {
                                 // Ensure the hidden input has the correct format for Django
