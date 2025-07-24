@@ -250,6 +250,58 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Performance et KPI</h2>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                                <p class="text-[#8c7e5a] text-sm font-medium">Tickets réalisés</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">25</p>
+                            </div>
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                                <p class="text-[#8c7e5a] text-sm font-medium">Projets terminés</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">5</p>
+                            </div>
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité moyen</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">50%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Projets et Tickets Associés</h2>
+                        <div class="overflow-hidden rounded-xl border border-[#e3dfd3]">
+                            <table class="min-w-full border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-[#fbfaf9] text-left text-[#191610]">
+                                        <th class="px-4 py-3 font-medium text-left">Projet</th>
+                                        <th class="px-4 py-3 font-medium text-left">Ticket</th>
+                                        <th class="px-4 py-3 font-medium text-left">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-t border-t-[#e3dfd3]">
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Alpha</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #123</td>
+                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">En cours</span></td>
+                                    </tr>
+                                    <tr class="border-t border-t-[#e3dfd3]">
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Beta</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #456</td>
+                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">Terminé</span></td>
+                                    </tr>
+                                    <tr class="border-t border-t-[#e3dfd3]">
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Gamma</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #789</td>
+                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f7eae3] px-3 py-1 text-sm font-medium text-[#A08D80]">En attente</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="alert('Changement de rôle/statut à implémenter');">Changer rôle/statut</button>
+                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="if(confirm('Confirmer la suppression ?')){ alert('Suppression à implémenter !'); }">Supprimer ressource</button>
+                        </div>
+                    </div>
                     <div class="flex flex-col gap-4 mt-4">
                         <h2 class="text-[#191610] text-lg font-bold leading-tight">Calendrier RH</h2>
                         <div class="section-card">
@@ -384,58 +436,6 @@
                             renderCalendar();
                         });
                     </script>
-                    <div class="flex flex-col gap-4">
-                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Performance et KPI</h2>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm font-medium">Tickets réalisés</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">25</p>
-                            </div>
-                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm font-medium">Projets terminés</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">5</p>
-                            </div>
-                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité moyen</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">50%</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-4">
-                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Projets et Tickets Associés</h2>
-                        <div class="overflow-hidden rounded-xl border border-[#e3dfd3]">
-                            <table class="min-w-full border-collapse text-sm">
-                                <thead>
-                                    <tr class="bg-[#fbfaf9] text-left text-[#191610]">
-                                        <th class="px-4 py-3 font-medium text-left">Projet</th>
-                                        <th class="px-4 py-3 font-medium text-left">Ticket</th>
-                                        <th class="px-4 py-3 font-medium text-left">Statut</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Alpha</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #123</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">En cours</span></td>
-                                    </tr>
-                                    <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Beta</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #456</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">Terminé</span></td>
-                                    </tr>
-                                    <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Gamma</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #789</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f7eae3] px-3 py-1 text-sm font-medium text-[#A08D80]">En attente</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="alert('Changement de rôle/statut à implémenter');">Changer rôle/statut</button>
-                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="if(confirm('Confirmer la suppression ?')){ alert('Suppression à implémenter !'); }">Supprimer ressource</button>
-                        </div>
-                    </div>
                 </div>
             </main>
         </div>
