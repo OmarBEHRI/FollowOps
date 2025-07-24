@@ -105,6 +105,14 @@
             <p class="text-[#191610] tracking-light text-[32px] font-bold leading-tight">Projets</p>
             <p class="text-[#8c7e5a] text-sm font-normal leading-normal">Gérez et suivez vos projets</p>
           </div>
+          {% if can_create_project %}
+          <div class="flex items-center">
+            <a href="{% url 'create_project' %}" class="flex items-center justify-center gap-2 rounded-lg bg-[#A08D80] px-4 py-2 text-white hover:bg-[#8a7a6e] transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+              Créer un projet
+            </a>
+          </div>
+          {% endif %}
         </div>
         <div class="px-4 py-3">
           <label class="flex flex-col min-w-40 h-12 w-full">
@@ -117,18 +125,52 @@
           </label>
         </div>
         <div class="flex gap-3 p-3 flex-wrap pr-4">
-          <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal">
-            Statut
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
-          </button>
-          <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal">
-            Priorité
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
-          </button>
-          <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal">
-            Chef de projet
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
-          </button>
+          <form id="filter-form" method="get" action="{% url 'projects' %}" class="flex gap-3 flex-wrap">
+            <div class="relative inline-block">
+              <button type="button" id="status-dropdown-btn" class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal {% if current_status %}bg-[#e3dfd3]{% endif %}">
+                Statut {% if current_status %}({{ current_status }}){% endif %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+              </button>
+              <div id="status-dropdown" class="absolute z-10 mt-1 hidden w-48 rounded-lg bg-white shadow-lg">
+                <div class="p-2">
+                  <a href="{% url 'projects' %}{% if current_priority %}?priority={{ current_priority }}{% endif %}{% if current_project_manager %}{% if current_priority %}&{% else %}?{% endif %}project_manager={{ current_project_manager }}{% endif %}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9]">Tous</a>
+                  {% for status_value, status_label in status_choices %}
+                  <a href="{% url 'projects' %}?status={{ status_value }}{% if current_priority %}&priority={{ current_priority }}{% endif %}{% if current_project_manager %}&project_manager={{ current_project_manager }}{% endif %}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9] {% if current_status == status_value %}bg-[#f1efe9]{% endif %}">{{ status_value }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="relative inline-block">
+              <button type="button" id="priority-dropdown-btn" class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal {% if current_priority %}bg-[#e3dfd3]{% endif %}">
+                Priorité {% if current_priority %}({{ current_priority }}){% endif %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+              </button>
+              <div id="priority-dropdown" class="absolute z-10 mt-1 hidden w-48 rounded-lg bg-white shadow-lg">
+                <div class="p-2">
+                  <a href="{% url 'projects' %}{% if current_status %}?status={{ current_status }}{% endif %}{% if current_project_manager %}{% if current_status %}&{% else %}?{% endif %}project_manager={{ current_project_manager }}{% endif %}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9]">Tous</a>
+                  {% for priority_value, priority_label in priority_choices %}
+                  <a href="{% url 'projects' %}{% if current_status %}?status={{ current_status }}&{% else %}?{% endif %}priority={{ priority_value }}{% if current_project_manager %}&project_manager={{ current_project_manager }}{% endif %}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9] {% if current_priority == priority_value %}bg-[#f1efe9]{% endif %}">{{ priority_value }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="relative inline-block">
+              <button type="button" id="project-manager-dropdown-btn" class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1efe9] pl-4 pr-2 text-[#191610] text-sm font-medium leading-normal {% if current_project_manager %}bg-[#e3dfd3]{% endif %}">
+                Chef de projet {% if current_project_manager %}({{ current_project_manager }}){% endif %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+              </button>
+              <div id="project-manager-dropdown" class="absolute z-10 mt-1 hidden w-48 rounded-lg bg-white shadow-lg">
+                <div class="p-2">
+                  <a href="{% url 'projects' %}{% if current_status %}?status={{ current_status }}{% endif %}{% if current_priority %}{% if current_status %}&{% else %}?{% endif %}priority={{ current_priority }}{% endif %}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9]">Tous</a>
+                  {% for manager in project_managers %}
+                  <a href="{% url 'projects' %}{% if current_status %}?status={{ current_status }}&{% else %}?{% endif %}{% if current_priority %}priority={{ current_priority }}&{% endif %}project_manager={{ manager.id }}" class="block rounded px-4 py-2 text-sm text-[#191610] hover:bg-[#f1efe9] {% if current_project_manager == manager.id|stringformat:'i' %}bg-[#f1efe9]{% endif %}">{{ manager.first_name }} {{ manager.last_name }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
         
       <div class="mt-4 w-full overflow-x-auto">
@@ -147,56 +189,27 @@
               </tr>
             </thead>
             <tbody id="projects-table-body">
+              {% for project in projects %}
               <tr class="border-t border-t-[#e3dfd3]">
-                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">Projet Alpha</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Développement d'une nouvelle application mobile</td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">BUILD</span></td>
-                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">À initier</span></td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Haute</span></td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Sophie Martin</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">15-07-2024</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">15-08-2024</td>
+                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">
+                  <a href="{% url 'projectDetails' project.id %}" class="text-[#191610] hover:underline">{{ project.title }}</a>
+                </td>
+                <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.description|truncatechars:50 }}</td>
+                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">{{ project.type }}</span></td>
+                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">{{ project.status }}</span></td>
+                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">{{ project.priority }}</span></td>
+                <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.project_manager }}</td>
+                <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.expected_start_date|date:"d-m-Y" }} - {{ project.expected_end_date|date:"d-m-Y" }}</td>
+                <td class="px-4 py-5 text-[#8c7e5a] text-center">
+                  {% if project.start_date %}{{ project.start_date|date:"d-m-Y" }}{% else %}-{% endif %} - 
+                  {% if project.end_date %}{{ project.end_date|date:"d-m-Y" }}{% else %}-{% endif %}
+                </td>
               </tr>
+              {% empty %}
               <tr class="border-t border-t-[#e3dfd3]">
-                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">Projet Beta</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Migration de l'infrastructure vers le cloud</td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">RUN</span></td>
-                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Terminé</span></td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Moyenne</span></td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Thomas Dubois</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">06-01-2024</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">06-02-2024</td>
+                <td colspan="8" class="px-4 py-5 text-center text-[#8c7e5a]">Aucun projet trouvé</td>
               </tr>
-              <tr class="border-t border-t-[#e3dfd3]">
-                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">Projet Gamma</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Amélioration de la sécurité du réseau</td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">RUN</span></td>
-                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">En cours</span></td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Critique</span></td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Marie Dupont</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">30-08-2024</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">30-09-2024</td>
-              </tr>
-              <tr class="border-t border-t-[#e3dfd3]">
-                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">Projet Delta</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Mise en place d'un nouveau système de surveillance</td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">BUILD</span></td>
-                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Suspendu</span></td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Basse</span></td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Jean Lemoine</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">10-09-2024</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">10-10-2024</td>
-              </tr>
-              <tr class="border-t border-t-[#e3dfd3]">
-                <td class="whitespace-nowrap px-4 py-5 font-medium text-center">Projet Epsilon</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Optimisation des performances de l'application web</td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">RUN</span></td>
-                <td class="status-cell px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Annulé</span></td>
-                <td class="px-4 py-5 text-center"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium">Moyenne</span></td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">Camille Girard</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">20-05-2024</td>
-                <td class="px-4 py-5 text-[#8c7e5a] text-center">20-06-2024</td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -206,5 +219,6 @@
     </div>
   </div>
   
+  <script src="/static/projects/projects_filter.js"></script>
 </body>
 </html>
