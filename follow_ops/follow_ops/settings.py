@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'tickets',
     'dashboard',
     'homepage',
-    'activities'
+    'activities',
+    'seeder.apps.SeederConfig'
 ]
 
 MIDDLEWARE = [
