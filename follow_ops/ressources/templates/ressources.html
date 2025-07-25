@@ -12,7 +12,7 @@
         /* Importation de la police */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        /* Définition des couleurs de la palette "nude" via variables CSS */
+        /* Définition des couleurs de la palette "nude" via variables CSS - STANDARDISÉES */
         :root {
             --primary-color: #A08D80; /* Muted brown/taupe */
             --secondary-color: #D4CCC1; /* Lighter, subtle shade for accents */
@@ -112,30 +112,68 @@
             background-color: #8C7B71; /* Une teinte légèrement plus foncée */
         }
 
-        /* Styles pour les boutons de filtre (Role, Status, etc.) */
+        /* Styles pour les boutons de filtre - SUPPRIMÉ car remplacé par les classes Tailwind */
+        /* .filter-btn { ... } */
         .filter-btn {
             display: flex;
-            height: 2.5rem;
+            height: 2rem; /* Changé de 2.5rem à 2rem pour correspondre aux autres pages */
             flex-shrink: 0;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
             border-radius: 9999px;
-            background-color: var(--button-bg-light);
-            padding: 0 1rem;
+            background-color: #f1efe9; /* Harmonisé avec les autres pages */
+            padding-left: 1rem;
+            padding-right: 0.5rem; /* Ajusté pour l'icône */
             color: var(--text-color-dark);
             font-size: 0.875rem;
             font-weight: 500;
             line-height: normal;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px var(--shadow-light);
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            border: none; /* Supprimé la bordure pour correspondre aux autres pages */
+            transition: background-color 0.2s ease;
             text-align: center;
+            cursor: pointer;
         }
 
         .filter-btn:hover {
-            background-color: var(--bg-white);
-            border-color: var(--text-color-light);
+            background-color: #e3dfd3; /* Harmonisé avec les autres pages */
+        }
+
+        .filter-btn.active {
+            background-color: #e3dfd3;
+        }
+
+        /* Styles pour les dropdowns */
+        .dropdown-menu {
+            position: absolute;
+            z-index: 10;
+            margin-top: 0.25rem;
+            width: 12rem;
+            border-radius: 0.5rem;
+            background-color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .dropdown-menu.hidden {
+            display: none;
+        }
+
+        .dropdown-item {
+            display: block;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: #191610;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1efe9;
+        }
+
+        .dropdown-item.active {
+            background-color: #f1efe9;
         }
 
         /* Styles pour les badges de statut dans les tableaux */
@@ -249,21 +287,41 @@
                 </div>
                 <div class="flex gap-3 p-3 flex-wrap pr-4">
                     <form id="ressource-filter-form" method="get" action="" class="flex flex-wrap gap-3 items-center">
-                        <select name="role" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem; appearance: auto;">
-                            <option value="">Role</option>
-                            {% for role in roles %}
-                                <option value="{{ role }}" {% if current_role == role %}selected{% endif %}>{{ role }}</option>
-                            {% endfor %}
-                        </select>
-                        <select name="status" class="filter-btn text-center" onchange="this.form.submit()" style="min-width: fit-content; padding: 0 0.75rem; appearance: auto;">
-                            <option value="">Status</option>
-                            {% for status in statuses %}
-                                <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>{{ status }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="button" class="filter-btn" onclick="exportRessourcesExcel()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+                        <!-- Dropdown Role - HARMONISÉ avec les autres pages -->
+                        <div class="relative inline-block">
+                            <button type="button" id="role-dropdown-btn" class="filter-btn {% if current_role %}active{% endif %}">
+                                Role {% if current_role %}({{ current_role }}){% endif %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                            </button>
+                            <div id="role-dropdown" class="dropdown-menu hidden">
+                                <div class="p-2">
+                                    <a href="?{% if current_status %}status={{ current_status }}{% endif %}" class="dropdown-item">Tous</a>
+                                    {% for role in roles %}
+                                    <a href="?role={{ role }}{% if current_status %}&status={{ current_status }}{% endif %}" class="dropdown-item {% if current_role == role %}active{% endif %}">{{ role }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Status - HARMONISÉ avec les autres pages -->
+                        <div class="relative inline-block">
+                            <button type="button" id="status-dropdown-btn" class="filter-btn {% if current_status %}active{% endif %}">
+                                Status {% if current_status %}({{ current_status }}){% endif %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                            </button>
+                            <div id="status-dropdown" class="dropdown-menu hidden">
+                                <div class="p-2">
+                                    <a href="?{% if current_role %}role={{ current_role }}{% endif %}" class="dropdown-item">Tous</a>
+                                    {% for status in statuses %}
+                                    <a href="?{% if current_role %}role={{ current_role }}&{% endif %}status={{ status }}" class="dropdown-item {% if current_status == status %}active{% endif %}">{{ status }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                                                <button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1efe9] text-[#191610]" onclick="exportRessourcesExcel()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
                         </button>
+                        
                     </form>
                 </div>
 
@@ -317,6 +375,38 @@
                 </form>
 
                 <script>
+                // Gestion des dropdowns - HARMONISÉE avec les autres pages
+                document.addEventListener('DOMContentLoaded', function() {
+                    const roleBtn = document.getElementById('role-dropdown-btn');
+                    const roleDropdown = document.getElementById('role-dropdown');
+                    const statusBtn = document.getElementById('status-dropdown-btn');
+                    const statusDropdown = document.getElementById('status-dropdown');
+                    
+                    if (roleBtn && roleDropdown) {
+                        roleBtn.addEventListener('click', function() {
+                            roleDropdown.classList.toggle('hidden');
+                            if (statusDropdown) statusDropdown.classList.add('hidden');
+                        });
+                    }
+                    
+                    if (statusBtn && statusDropdown) {
+                        statusBtn.addEventListener('click', function() {
+                            statusDropdown.classList.toggle('hidden');
+                            if (roleDropdown) roleDropdown.classList.add('hidden');
+                        });
+                    }
+                    
+                    // Fermer les dropdowns en cliquant ailleurs
+                    document.addEventListener('click', function(event) {
+                        if (roleBtn && roleDropdown && !roleBtn.contains(event.target) && !roleDropdown.contains(event.target)) {
+                            roleDropdown.classList.add('hidden');
+                        }
+                        if (statusBtn && statusDropdown && !statusBtn.contains(event.target) && !statusDropdown.contains(event.target)) {
+                            statusDropdown.classList.add('hidden');
+                        }
+                    });
+                });
+                
                 function exportRessourcesExcel() {
                     const form = document.getElementById('ressource-filter-form');
                     const params = new URLSearchParams(new FormData(form));
