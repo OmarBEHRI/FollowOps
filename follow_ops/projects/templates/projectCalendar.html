@@ -97,92 +97,136 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentMonthYearCalendrier = document.getElementById('currentMonthYearCalendrier');
   const prevMonthBtnCalendrier = document.getElementById('prevMonthCalendrier');
   const nextMonthBtnCalendrier = document.getElementById('nextMonthCalendrier');
-  let currentDateCalendrier = new Date();
-
-  // Example: Replace with your real project activities
-  const projectEvents = [
-    { date: new Date(2025, 6, 1).toDateString(), name: 'Kickoff Meeting', status: 'planned' },
-    { date: new Date(2025, 6, 3).toDateString(), name: 'Sprint 1 Start', status: 'inprogress' },
-    { date: new Date(2025, 6, 7).toDateString(), name: 'Revue de code', status: 'completed' },
-    { date: new Date(2025, 6, 10).toDateString(), name: 'Livraison V1', status: 'completed' },
-    { date: new Date(2025, 6, 12).toDateString(), name: 'Démo Client', status: 'planned' },
-    { date: new Date(2025, 6, 15).toDateString(), name: 'Correction Bug', status: 'inprogress' },
-    { date: new Date(2025, 6, 18).toDateString(), name: 'Sprint 2 Start', status: 'planned' },
-    { date: new Date(2025, 6, 22).toDateString(), name: 'Revue de code', status: 'planned' },
-    { date: new Date(2025, 6, 25).toDateString(), name: 'Livraison V2', status: 'planned' },
-    { date: new Date(2025, 6, 28).toDateString(), name: 'Rétrospective', status: 'planned' }
+  
+  // Initialize with server-provided data
+  let currentMonth = {{ current_month }};
+  let currentYear = {{ current_year }};
+  let currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
+  
+  // Store activities from the server
+  const projectActivities = [
+    {% for activity in calendar_activities %}
+      {
+        id: {{ activity.id }},
+        title: "{{ activity.title|escapejs }}",
+        description: "{{ activity.description|escapejs }}",
+        startDate: new Date("{{ activity.start_date|date:'Y-m-d' }}"),
+        endDate: new Date("{{ activity.end_date|date:'Y-m-d' }}"),
+        employee: "{{ activity.employee|escapejs }}",
+        charge: {{ activity.charge }}
+      },
+    {% endfor %}
   ];
-
-  // Function to render calendar - reusable for both calendars
-  const renderCalendar = (calendarGrid, currentDate, currentMonthYear) => {
-    calendarGrid.innerHTML = `
-      <div class="calendar-day-header">Lun</div>
-      <div class="calendar-day-header">Mar</div>
-      <div class="calendar-day-header">Mer</div>
-      <div class="calendar-day-header">Jeu</div>
-      <div class="calendar-day-header">Ven</div>
-      <div class="calendar-day-header">Sam</div>
-      <div class="calendar-day-header">Dim</div>
-    `;
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    currentMonthYear.textContent = new Date(year, month).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-    const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-    // Previous month padding
-    for (let i = 0; i < startDayIndex; i++) {
-      const day = daysInPrevMonth - startDayIndex + i + 1;
-      const cell = document.createElement('div');
-      cell.classList.add('calendar-cell', 'inactive');
-      cell.innerHTML = `<span class="calendar-date">${day}</span>`;
-      calendarGrid.appendChild(cell);
+  
+  // Update the calendar title
+  currentMonthYearCalendrier.textContent = `{{ month_name }} ${currentYear}`;
+  
+  // Function to render the calendar
+  function renderCalendar() {
+    // Clear previous calendar cells
+    const dayHeaders = calendarGridCalendrier.querySelectorAll('.calendar-day-header');
+    const cells = calendarGridCalendrier.querySelectorAll('.calendar-cell');
+    cells.forEach(cell => cell.remove());
+    
+    // Get first day of month and total days
+    const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+    // Convert Sunday (0) to 7 to match Monday (1) start
+    const firstDayAdjusted = firstDay === 0 ? 7 : firstDay;
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    
+    // Add empty cells for days before the first day of month
+    for (let i = 1; i < firstDayAdjusted; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'calendar-cell inactive';
+      calendarGridCalendrier.appendChild(emptyCell);
     }
-
-    // Current month days
+    
+    // Add cells for each day of the month
+    const today = new Date();
     for (let day = 1; day <= daysInMonth; day++) {
       const cell = document.createElement('div');
-      cell.classList.add('calendar-cell');
-      const currentDay = new Date(year, month, day);
-      if (currentDay.toDateString() === new Date().toDateString()) {
+      cell.className = 'calendar-cell';
+      
+      // Check if this is today
+      if (day === today.getDate() && currentMonth === today.getMonth() + 1 && currentYear === today.getFullYear()) {
         cell.classList.add('today');
       }
-      cell.innerHTML = `<span class="calendar-date">${day}</span>`;
-      const eventsForDay = projectEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
-      eventsForDay.forEach(event => {
-        const eventDiv = document.createElement('div');
-        eventDiv.classList.add('event-badge', event.status);
-        eventDiv.textContent = event.name;
-        cell.appendChild(eventDiv);
+      
+      // Add date to cell
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'calendar-date';
+      dateSpan.textContent = day;
+      cell.appendChild(dateSpan);
+      
+      // Check for activities on this day
+      const cellDate = new Date(currentYear, currentMonth - 1, day);
+      const activitiesOnDay = projectActivities.filter(activity => {
+        const activityDate = new Date(activity.startDate);
+        return activityDate.getDate() === day && 
+               activityDate.getMonth() === currentMonth - 1 && 
+               activityDate.getFullYear() === currentYear;
       });
-      calendarGrid.appendChild(cell);
+      
+      // Add activity badges if there are activities
+      if (activitiesOnDay.length > 0) {
+        const badge = document.createElement('div');
+        badge.className = 'event-badge inprogress';
+        badge.textContent = activitiesOnDay.length > 1 ? `${activitiesOnDay.length} activités` : '1 activité';
+        cell.appendChild(badge);
+        
+        // Add tooltip with activity details
+        cell.title = activitiesOnDay.map(act => `${act.title} (${act.employee})`).join('\n');
+        
+        // Make cell clickable to show details
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', () => {
+          alert(`Activités du ${day}/${currentMonth}/${currentYear}:\n\n` + 
+                activitiesOnDay.map(act => `- ${act.title}\n  Par: ${act.employee}\n  Charge: ${act.charge} heures`).join('\n\n'));
+        });
+      }
+      
+      calendarGridCalendrier.appendChild(cell);
     }
-
-    // Next month padding
-    const totalCells = startDayIndex + daysInMonth;
-    const remainingCells = 42 - totalCells;
-    for (let i = 1; i <= remainingCells; i++) {
-      const cell = document.createElement('div');
-      cell.classList.add('calendar-cell', 'inactive');
-      cell.innerHTML = `<span class="calendar-date">${i}</span>`;
-      calendarGrid.appendChild(cell);
-    }
-  };
-
-  // Initialize Calendrier Tab Calendar
+  }
+  
+  // Initial render
+  renderCalendar();
+  
+  // Handle month navigation
   prevMonthBtnCalendrier.addEventListener('click', () => {
-    currentDateCalendrier.setMonth(currentDateCalendrier.getMonth() - 1);
-    renderCalendar(calendarGridCalendrier, currentDateCalendrier, currentMonthYearCalendrier);
+    currentMonth--;
+    if (currentMonth < 1) {
+      currentMonth = 12;
+      currentYear--;
+    }
+    currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
+    currentMonthYearCalendrier.textContent = `${currentDateCalendrier.toLocaleString('fr-FR', { month: 'long' })} ${currentYear}`;
+    renderCalendar();
   });
+  
   nextMonthBtnCalendrier.addEventListener('click', () => {
-    currentDateCalendrier.setMonth(currentDateCalendrier.getMonth() + 1);
-    renderCalendar(calendarGridCalendrier, currentDateCalendrier, currentMonthYearCalendrier);
+    currentMonth++;
+    if (currentMonth > 12) {
+      currentMonth = 1;
+      currentYear++;
+    }
+    currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
+    currentMonthYearCalendrier.textContent = `${currentDateCalendrier.toLocaleString('fr-FR', { month: 'long' })} ${currentYear}`;
+    renderCalendar();
   });
-  renderCalendar(calendarGridCalendrier, currentDateCalendrier, currentMonthYearCalendrier);
+  // End of calendar initialization
 });
 </script>
+
 {% endblock %}
 
 {% block active_tab %}showTab('calendrier');{% endblock %}
+
+{% block extra_scripts %}
+<style>
+  /* Add more space at the bottom of the calendar */
+  #calendarGridCalendrier {
+    margin-bottom: 60px;
+  }
+</style>
+{% endblock %}

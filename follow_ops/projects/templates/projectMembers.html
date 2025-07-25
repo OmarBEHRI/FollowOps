@@ -7,8 +7,12 @@
   /* Member Card Styles */
   .members-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
+  }
+  .member-card {
+    height: 320px;
+    width: 100%;
   }
 </style>
 {% endblock %}
@@ -24,130 +28,45 @@
 <div id="section-membres" style="display:block;">
   <h2 class="text-[#191610] text-2xl font-bold leading-tight mb-6">Membres d'équipe</h2>
   <div class="members-grid">
-    <!-- Hardcoded Member 1 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Ethan Carter" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Ethan Carter</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Ingénieur Principal</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            12 tickets
+    {% if members %}
+      {% for member in members %}
+        <a href="/ressources/details/{{ member.id }}/" class="member-card" style="background: #fff; border-bottom: 2px solid #eae6df; padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(160,141,128,0.1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 16px rgba(160,141,128,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(160,141,128,0.1)';">
+          <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1.5rem;">
+              <img class="member-photo" src="https://randomuser.me/api/portraits/{% if forloop.counter|divisibleby:2 %}men{% else %}women{% endif %}/{{ forloop.counter|add:30 }}.jpg" alt="{{ member.name }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+              <div class="member-info" style="flex: 1;">
+                <div class="member-name" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; color: #191610;">{{ member.name }}</div>
+                <div class="member-role" style="font-size: 1rem; color: #6E6864; margin-bottom: 0.3rem;">{{ member.role }}</div>
+                <div class="member-hours" style="font-size: 0.95rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
+                  {{ forloop.counter|add:15 }} heures
+                </div>
+              </div>
+            </div>
+          <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">
+            {{ member.role }} - {{ member.status }} - {% if member.location %}{{ member.location }}{% else %}Non spécifié{% endif %}
           </div>
-        </div>
-      </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Supervise les aspects techniques du projet, y compris l'architecture, le développement et le déploiement. Garantit la qualité du code et le respect des bonnes pratiques.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">React</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Node.js</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Architecture</span>
-      </div>
-    </div>
-    
-    <!-- Hardcoded Member 2 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sophia Clark" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Sophia Clark</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Cheffe de Produit</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            8 tickets
+          <div class="member-contact" style="font-size: 0.9rem; color: #6E6864; margin-bottom: 1rem;">
+            <div>📧 {{ member.email }}</div>
+            {% if member.phone %}<div>📱 {{ member.phone }}</div>{% endif %}
           </div>
-        </div>
-      </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Définit la stratégie produit et collabore avec les équipes pour garantir que le produit répond aux besoins des utilisateurs et aux objectifs de l'entreprise.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Stratégie</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Vision Produit</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Feuille de Route</span>
-      </div>
-    </div>
-    
-    <!-- Hardcoded Member 3 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Ava Foster" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Ava Foster</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Spécialiste Marketing</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            4 tickets
+          <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+            {% for skill in member.skills|slice:":4" %}
+              {% if skill %}
+                <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">{{ skill }}</span>
+              {% endif %}
+            {% endfor %}
+            {% if member.skills|length > 4 %}
+              <span class="tag" style="background: #eae6df; color: #A08D80; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">+{{ member.skills|length|add:"-4" }}</span>
+            {% endif %}
           </div>
-        </div>
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="col-span-full text-center py-8">
+        <p class="text-[#6E6864] text-lg">Aucun membre n'a été ajouté à ce projet.</p>
       </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Élabore et met en œuvre des stratégies marketing pour promouvoir l'application et attirer des utilisateurs.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Analyse</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Réseau Sociaux</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Création de Contenu</span>
-      </div>
-    </div>
-    
-    <!-- Hardcoded Member 4 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Olivia Bennett" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Olivia Bennett</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Designer UX</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            6 tickets
-          </div>
-        </div>
-      </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Se concentre sur l'expérience utilisateur, la création de wireframes, prototypes et interfaces qui soient à la fois fonctionnels et esthétiques.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Prototypage</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Wireframing</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Recherche Utilisateur</span>
-      </div>
-    </div>
-    
-    <!-- Hardcoded Member 5 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/men/45.jpg" alt="Lucas Martin" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Lucas Martin</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Développeur Backend</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            10 tickets
-          </div>
-        </div>
-      </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Responsable du développement des API et de l'infrastructure backend. Expert en bases de données et en optimisation des performances.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Python</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Django</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">API REST</span>
-      </div>
-    </div>
-    
-    <!-- Hardcoded Member 6 -->
-    <div class="member-card" style="background: #fbf9f7; border: 1px solid #eae6df; border-radius: 1rem; box-shadow: 0 2px 8px 0 rgba(160,141,128,0.07); padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; min-height: 320px;">
-      <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1rem;">
-        <img class="member-photo" src="https://randomuser.me/api/portraits/women/22.jpg" alt="Emma Wilson" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
-        <div class="member-info" style="flex: 1;">
-          <div class="member-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; color: #191610;">Emma Wilson</div>
-          <div class="member-role" style="font-size: 0.95rem; color: #6E6864; margin-bottom: 0.1rem;">Développeuse Frontend</div>
-          <div class="member-tickets" style="font-size: 0.9rem; color: #A08D80; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A08D80" viewBox="0 0 24 24" style="margin-right:2px;vertical-align:middle;"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 17.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM20 13h-1.93A8.006 8.006 0 0 1 13 19.93V20a1 1 0 0 1-2 0v-.07A8.006 8.006 0 0 1 4.07 13H6a1 1 0 0 1 0 2H4.07A8.006 8.006 0 0 1 11 19.93ZM12 4a8 8 0 1 1-8 8 8.009 8.009 0 0 1 8-8Z"/></svg>
-            9 tickets
-          </div>
-        </div>
-      </div>
-      <div class="member-desc" style="font-size: 0.97rem; color: #3F3C3A; margin-bottom: 1rem; margin-top: 0.2rem;">Spécialiste des interfaces utilisateur modernes et réactives. Maîtrise les frameworks JavaScript et les techniques d'optimisation web.</div>
-      <div class="member-tags" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">JavaScript</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">Vue.js</span>
-        <span class="tag" style="background: #f1efe9; color: #191610; font-size: 0.85rem; font-weight: 500; padding: 0.25rem 0.9rem; border-radius: 9999px;">CSS</span>
-      </div>
+     {% endif %}
+   </div>
     </div>
   </div>
 </div>
