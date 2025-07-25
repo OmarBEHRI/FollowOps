@@ -5,69 +5,71 @@
     {{ block.super }}
     <div class="flex flex-col space-y-8">
         <div>
-            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Informations générales</h2>
-            <div class="bg-white border border-[#EBE5E0] rounded-xl shadow-sm p-6">
-              <div class="grid grid-cols-4 sm:grid-cols-2 gap-6">
-                <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  🏷️ <span>Type</span>
+            <h2 class="text-[#191610] text-xl font-bold leading-tight mb-4">Informations générales</h2>
+            <div class="p-6">
+              <div class="grid grid-cols-2 gap-y-6 gap-x-12">
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    🏷️ <span>Type</span>
+                  </div>
+                  <div class="text-[#191610] text-base font-medium">{{ project.type }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.type }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  ⏳ <span>Statut</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    ⏳ <span>Statut</span>
+                  </div>
+                  <div class="text-[#A08D80] text-base font-semibold">{{ project.status }}</div>
                 </div>
-                <div class="text-[#A08D80] text-base font-semibold bg-[#eae6df] px-2 py-1 rounded-full">{{ project.status }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  ⭐ <span>Priorité</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    ⭐ <span>Priorité</span>
+                  </div>
+                  <div class="text-[#A08D80] text-base font-medium">{{ project.priority }}</div>
                 </div>
-                <div class="text-[#A08D80] text-base font-semibold">{{ project.priority }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  👤 <span>Chef de projet</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    👤 <span>Chef de projet</span>
+                  </div>
+                  <div class="text-[#191610] text-base font-medium">{{ project.project_manager }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.project_manager }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  📅 <span>Date de début prévue</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    📅 <span>Date de début prévue</span>
+                  </div>
+                  <div class="text-[#191610] text-base">{{ project.expected_start_date }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.expected_start_date }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  📅 <span>Date de fin prévue</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    📅 <span>Date de fin prévue</span>
+                  </div>
+                  <div class="text-[#191610] text-base">{{ project.expected_end_date }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.expected_end_date }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  📅 <span>Date de début réelle</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    📅 <span>Date de début réelle</span>
+                  </div>
+                  <div class="text-[#191610] text-base">{{ project.start_date }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.start_date }}</div>
-              </div>
-              <div class="flex flex-col items-start bg-[#fbf9f7] rounded-lg p-4 shadow transition hover:shadow-md border border-[#f1efe9]">
-                <div class="flex items-center gap-2 mb-2 text-[#6E6864] text-sm font-medium">
-                  📅 <span>Date de fin réelle</span>
+                <div class="flex flex-col border-b border-[#f1efe9] pb-3">
+                  <div class="flex items-center gap-2 mb-1 text-[#6E6864] text-sm font-medium">
+                    📅 <span>Date de fin réelle</span>
+                  </div>
+                  <div class="text-[#191610] text-base">{{ project.end_date }}</div>
                 </div>
-                <div class="text-[#191610] text-base">{{ project.end_date }}</div>
               </div>
             </div>
-          </div>
         </div>
 
         <div class="flex flex-col">
-            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Charge estimée</h2>
-            <p class="text-[#191610] text-sm mb-6"><span class="font-bold">{{ project.estimated_charges }}</span> heures</p>
+            <h2 class="text-[#191610] text-xl font-bold leading-tight mb-4">Charge estimée</h2>
+            <div class="border-b border-[#f1efe9] pb-3 mb-6 inline-block">
+                <p class="text-[#191610] text-base"><span class="text-2xl font-bold text-[#A08D80]">{{ project.estimated_charges }}</span> <span class="font-medium ml-1">heures</span></p>
+            </div>
         </div>
 
         <div class="flex flex-col">
-            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Avancement</h2>
-            <div class="bg-white border border-[#EBE5E0] rounded-lg shadow-sm p-8 flex items-center justify-center mb-6" style="height:260px;">
+            <h2 class="text-[#191610] text-xl font-bold leading-tight mb-4">Avancement</h2>
+            <div class="p-6 mb-6 flex items-center justify-center" style="height:260px;">
               <canvas id="progressChart" height="180" style="max-width:700px; width:100%;"></canvas>
             </div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -130,10 +132,10 @@
         </div>
 
         <div class="tags-container mb-8">
-            <h2 class="text-[#191610] text-lg font-bold leading-tight mb-4">Tags/Catégories</h2>
+            <h2 class="text-[#191610] text-xl font-bold leading-tight mb-4">Tags/Catégories</h2>
             <div class="flex gap-3 flex-wrap">
-              {% for tag in project.tags %}
-              <span class="px-3 py-1 rounded-full text-sm font-medium bg-[#f1efe9] text-[#191610] shadow-sm transition hover:bg-[#eae6df] cursor-pointer">{{ tag }}</span>
+              {% for tag in project.tags.all %}
+              <span class="px-3 py-1 text-sm font-medium text-[#191610] border-b border-[#A08D80] transition hover:border-[#191610] cursor-pointer">{{ tag.name }}</span>
               {% endfor %}
             </div>
         </div>

@@ -245,10 +245,15 @@
                 <!-- Project Header Section -->
                 <div class="project-header-section">
                     <div class="project-title-group">
-                        <h1 class="text-[#191610] text-2xl font-bold leading-tight">{{ project.title }}</h1>
-                        <p class="text-[#8c7e5a] text-base">{{ project.description }}</p>
+                        <h1 class="text-[#191610] text-3xl font-bold leading-tight mb-8">{{ project.title }}</h1>
+                        <div class="flex items-start gap-4">
+                            <div class="w-1 h-full bg-[#EBE5E0] rounded-full"></div>
+                            <p class="text-[#8c7e5a] text-base max-w-5xl mt-4">{{ project.description }}</p>
+                        </div>
                     </div>
-                    <button class="modify-button" onclick="alert('Modification à implémenter !')">Modifier</button>
+                    {% if can_edit %}
+                    <button class="modify-button" onclick="window.location.href='{% url 'edit_project' pk=pk %}'">Modifier</button>
+                    {% endif %}
                 </div>
 
                 <!-- Tabs Navigation -->
@@ -256,6 +261,7 @@
                     <a href="{% url 'projectDetails' pk=pk %}" class="tab-button{% if active_tab == 'info' %} active{% endif %}" id="tab-info">Informations générales</a>
                     <a href="{% url 'projectMembers' pk=pk %}" class="tab-button{% if active_tab == 'membres' %} active{% endif %}" id="tab-membres">Membres d'équipe</a>
                     <a href="{% url 'projectCalendar' pk=pk %}" class="tab-button{% if active_tab == 'calendrier' %} active{% endif %}" id="tab-calendrier">Calendrier</a>
+                    <a href="{% url 'projectComments' pk=pk %}" class="tab-button{% if active_tab == 'commentaires' %} active{% endif %}" id="tab-commentaires">Commentaires</a>
                 </div>
 
                 <!-- Content Sections -->

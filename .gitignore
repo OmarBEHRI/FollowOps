@@ -1,1 +1,3 @@
 __pycache__/
+follow_ops/db.sqlite3
+*.sqlite3
