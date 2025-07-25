@@ -208,7 +208,7 @@
                     </div>
                     {% endif %}
 
-                    <form class="form-section" method="post">
+                    <form class="form-section" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <div class="form-group">
@@ -285,6 +285,17 @@
                             <div class="form-group md:col-span-2">
                                 <label for="skills" class="form-label">Compétences (séparées par des virgules)</label>
                                 <textarea id="skills" name="skills" class="form-input h-24 resize-y" placeholder="Ex: React, Java, SQL, Gestion de projet">{{ resource.skills }}</textarea>
+                            </div>
+                            <div class="form-group md:col-span-2">
+                                <label for="profile_picture" class="form-label">Photo de profil</label>
+                                {% if resource.profile_picture %}
+                                    <div class="mb-3">
+                                        <img src="{{ resource.profile_picture.url }}" alt="Photo actuelle" class="w-20 h-20 rounded-full object-cover border-2 border-gray-300">
+                                        <p class="text-sm text-gray-600 mt-1">Photo actuelle</p>
+                                    </div>
+                                {% endif %}
+                                <input type="file" id="profile_picture" name="profile_picture" class="form-input" accept="image/*">
+                                <small class="text-gray-600 text-sm mt-1">Formats acceptés: JPG, PNG, GIF. Taille maximale: 5MB. Laissez vide pour conserver la photo actuelle.</small>
                             </div>
                         </div>
 

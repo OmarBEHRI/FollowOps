@@ -136,6 +136,60 @@
             font-weight: 500;
             letter-spacing: 0.01em;
             box-shadow: 0 1px 2px 0 rgba(160,141,128,0.07);
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        /* Couleurs pour les types d'activités */
+        .event-badge.project {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            border-left-color: #2196F3;
+        }
+        .event-badge.ticket {
+            background-color: #FFF3E0;
+            color: #E65100;
+            border-left-color: #FF9800;
+        }
+        
+        /* Couleurs pour les statuts (optionnel) */
+        .event-badge.planned {
+            background-color: #F3E5F5;
+            color: #7B1FA2;
+            border-left-color: #9C27B0;
+        }
+        .event-badge.inprogress {
+            background-color: #E8F5E8;
+            color: #2E7D32;
+            border-left-color: #4CAF50;
+        }
+        .event-badge.completed {
+            background-color: #ECEFF1;
+            color: #455A64;
+            border-left-color: #607D8B;
+        }
+        
+        /* Effet de survol */
+        .event-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px 0 rgba(160,141,128,0.15);
+        }
+        
+        /* Couleurs alternatives pour plus de variété */
+        .event-badge.priority-high {
+            background-color: #FFEBEE;
+            color: #C62828;
+            border-left-color: #F44336;
+        }
+        .event-badge.priority-medium {
+            background-color: #FFF8E1;
+            color: #F57F17;
+            border-left-color: #FFEB3B;
+        }
+        .event-badge.priority-low {
+            background-color: #E0F2F1;
+            color: #00695C;
+            border-left-color: #009688;
         }
         .event-badge.planned {
             background-color: #D1E7DD;
@@ -169,6 +223,7 @@
     <div class="layout-container flex h-full grow flex-col">
         <div class="w-full px-6 py-2">
             <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+                <!-- BARRE DE NAVIGATION PRINCIPALE RESTAURÉE -->
                 <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
                     <div class="flex items-center justify-between whitespace-nowrap pb-3">
                         <div class="flex items-center gap-4 text-[#191610] flex-1">
@@ -195,75 +250,94 @@
                             <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
                         </div>
                     </div>
-                    <div class="px-10 py-4">
-                        <div class="flex items-center gap-2 text-[#8c7e5a] text-sm font-medium">
-                            <a href="#" class="hover:underline">Ressources</a>
-                            <span>/</span>
-                            <span>Détails de la ressource</span>
-                        </div>
+                    <!-- BREADCRUMB AMÉLIORÉ -->
+                    <div class="flex items-center gap-4 text-[#8c7e5a] text-sm font-medium">
+                        <a href="/ressources/" class="hover:underline">Ressources</a>
+                        <span>/</span>
+                        <span>Détails de la ressource</span>
                     </div>
                 </header>
                 <div class="px-10 py-6 flex flex-col gap-8">
-                    <div class="flex items-center gap-6">
-                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4')"></div>
-                        <div class="flex flex-col">
-                            <h1 class="text-[#191610] text-xl font-bold leading-tight">Sophie Dubois</h1>
-                            <p class="text-[#8c7e5a] text-sm font-medium">Chef de projet</p>
-                            <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité: <span class="font-bold text-[#191610]">90%</span></p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16" 
+                                 style="background-image: url('{% if resource.profile_picture %}{{ resource.profile_picture.url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4{% endif %}')">
+                            </div>
+                            <div class="flex flex-col">
+                                <h1 class="text-[#191610] text-2xl font-bold leading-tight">{{ resource.first_name }} {{ resource.last_name }}</h1>
+                                <p class="text-[#8c7e5a] text-base font-medium">{{ resource.role }}</p>
+                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité: <span class="font-bold text-[#191610]">{{ resource.availability_rate|default:"0" }}%</span></p>
+                            </div>
                         </div>
-                        <button class="ml-auto rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="alert('Modification à implémenter !')">Modifier</button>
+                        <!-- BOUTONS D'ACTION -->
+                        {% if user_role == 'ADMIN' %}
+                        <div class="flex items-center gap-3">
+                            <button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#f1efe9] px-4 text-[#191610] text-sm font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='/ressources/edit/{{ resource.id }}/'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.31,64l24-24L216,84.69Z"></path></svg>
+                                Modifier
+                            </button>
+                        </div>
+                        {% endif %}
                     </div>
+                    <!-- Section Informations détaillées -->
                     <div class="flex flex-col gap-4">
                         <h2 class="text-[#191610] text-lg font-bold leading-tight">Informations</h2>
-                        <div class="grid grid-cols-2 gap-x-6 gap-y-3">
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Rôle</p>
-                                <p class="text-[#191610] text-sm font-medium">Chef de projet</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Compétences</p>
-                                <p class="text-[#191610] text-sm font-medium">Gestion de projet, Communication, Leadership</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Manager</p>
-                                <p class="text-[#191610] text-sm font-medium">Jean Martin</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Statut</p>
-                                <p class="text-[#191610] text-sm font-medium">CDI</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Téléphone professionnel</p>
-                                <p class="text-[#191610] text-sm font-medium">01 23 45 67 89</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Email professionnel</p>
-                                <p class="text-[#191610] text-sm font-medium">sophie.dubois@example.com</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Date d'entrée</p>
-                                <p class="text-[#191610] text-sm font-medium">01/01/2022</p>
-                            </div>
-                            <div>
-                                <p class="text-[#8c7e5a] text-sm font-medium">Localisation</p>
-                                <p class="text-[#191610] text-sm font-medium">Paris</p>
+                        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="flex flex-col gap-4">
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Rôle</p>
+                                        <p class="text-[#191610] text-base">{{ resource.role|default:"Non spécifié" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Compétences</p>
+                                        <p class="text-[#191610] text-base">{{ resource.skills|default:"Non spécifiées" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Manager</p>
+                                        <p class="text-[#191610] text-base">{{ resource.manager|default:"Non assigné" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Statut</p>
+                                        <p class="text-[#191610] text-base">{{ resource.status|default:"Non spécifié" }}</p>  <!-- ✅ Correct -->
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Téléphone</p>
+                                        <p class="text-[#191610] text-base">{{ resource.phone_number|default:"Non renseigné" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Email</p>
+                                        <p class="text-[#191610] text-base">{{ resource.email|default:"Non renseigné" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date d'entrée</p>
+                                        <p class="text-[#191610] text-base">{{ resource.entry_date|date:"d/m/Y"|default:"Non renseignée" }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[#8c7e5a] text-sm font-medium mb-1">Localisation</p>
+                                        <p class="text-[#191610] text-base">{{ resource.location|default:"Non spécifiée" }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="flex flex-col gap-4">
                         <h2 class="text-[#191610] text-lg font-bold leading-tight">Performance et KPI</h2>
                         <div class="grid grid-cols-3 gap-4">
                             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
                                 <p class="text-[#8c7e5a] text-sm font-medium">Tickets réalisés</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">25</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ completed_tickets|default:"0" }}</p>
                             </div>
                             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
                                 <p class="text-[#8c7e5a] text-sm font-medium">Projets terminés</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">5</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ completed_projects|default:"0" }}</p>
                             </div>
                             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité moyen</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">50%</p>
+                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ resource.availability_rate|default:"0" }}%</p>
                             </div>
                         </div>
                     </div>
@@ -273,37 +347,48 @@
                             <table class="min-w-full border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-[#fbfaf9] text-left text-[#191610]">
-                                        <th class="px-4 py-3 font-medium text-left">Projet</th>
-                                        <th class="px-4 py-3 font-medium text-left">Ticket</th>
+                                        <th class="px-4 py-3 font-medium text-left">Type</th>
+                                        <th class="px-4 py-3 font-medium text-left">Nom</th>
                                         <th class="px-4 py-3 font-medium text-left">Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for project in assigned_projects %}
                                     <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Alpha</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #123</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">En cours</span></td>
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">{{ project.title }}</td>
+                                        <td class="px-4 py-5 text-left">
+                                            <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.status }}</span>
+                                        </td>
                                     </tr>
+                                    {% endfor %}
+                                    
+                                    {% for ticket in assigned_tickets %}
                                     <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Beta</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #456</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">Terminé</span></td>
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Ticket</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">{{ ticket.title }}</td>
+                                        <td class="px-4 py-5 text-left">
+                                            <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ ticket.status }}</span>
+                                        </td>
                                     </tr>
+                                    {% endfor %}
+                                    
+                                    {% if not assigned_projects and not assigned_tickets %}
                                     <tr class="border-t border-t-[#e3dfd3]">
-                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-left">Projet Gamma</td>
-                                        <td class="px-4 py-5 text-[#8c7e5a] text-left">Ticket #789</td>
-                                        <td class="px-4 py-5 text-left"><span class="rounded-full bg-[#f7eae3] px-3 py-1 text-sm font-medium text-[#A08D80]">En attente</span></td>
+                                        <td colspan="3" class="px-4 py-5 text-center text-[#8c7e5a]">Aucun projet ou ticket assigné</td>
                                     </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
-                        <div class="flex gap-2">
-                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="alert('Changement de rôle/statut à implémenter');">Changer rôle/statut</button>
-                            <button class="rounded-full px-4 py-2 text-[#A08D80] text-sm font-medium border border-[#A08D80] hover:bg-[#F7EAE3]" onclick="if(confirm('Confirmer la suppression ?')){ alert('Suppression à implémenter !'); }">Supprimer ressource</button>
-                        </div>
                     </div>
+                    
+                    <!-- Boutons supprimés : Changer rôle/statut et Supprimer ressource -->
                     <div class="flex flex-col gap-4 mt-4">
-                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Calendrier RH</h2>
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-[#191610] text-lg font-bold leading-tight">Calendrier RH</h2>
+                            <!-- Bouton supprimé -->
+                        </div>
                         <div class="section-card">
                             <div class="flex justify-between items-center mb-4">
                                 <button id="prevMonth" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200 transition duration-150 ease-in-out">
@@ -315,127 +400,10 @@
                                 </button>
                             </div>
                             <div class="calendar-grid" id="calendarGrid">
-                                <div class="calendar-day-header">Lun</div>
-                                <div class="calendar-day-header">Mar</div>
-                                <div class="calendar-day-header">Mer</div>
-                                <div class="calendar-day-header">Jeu</div>
-                                <div class="calendar-day-header">Ven</div>
-                                <div class="calendar-day-header">Sam</div>
-                                <div class="calendar-day-header">Dim</div>
-                                <!-- Calendar Cells will be generated here by JavaScript -->
+                                <!-- Les cellules du calendrier seront générées par JavaScript -->
                             </div>
                         </div>
                     </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const calendarGrid = document.getElementById('calendarGrid');
-                            const currentMonthYear = document.getElementById('currentMonthYear');
-                            const prevMonthBtn = document.getElementById('prevMonth');
-                            const nextMonthBtn = document.getElementById('nextMonth');
-
-                            let currentDate = new Date(); // Start with current date
-
-                            const renderCalendar = () => {
-                                calendarGrid.innerHTML = `
-                                    <div class="calendar-day-header">Lun</div>
-                                    <div class="calendar-day-header">Mar</div>
-                                    <div class="calendar-day-header">Mer</div>
-                                    <div class="calendar-day-header">Jeu</div>
-                                    <div class="calendar-day-header">Ven</div>
-                                    <div class="calendar-day-header">Sam</div>
-                                    <div class="calendar-day-header">Dim</div>
-                                `; // Clear existing cells and re-add headers
-
-                                const year = currentDate.getFullYear();
-                                const month = currentDate.getMonth(); // 0-indexed
-
-                                // Set current month and year display
-                                currentMonthYear.textContent = new Date(year, month).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-
-                                // Get first day of the month (0 = Sunday, 1 = Monday, etc.)
-                                const firstDayOfMonth = new Date(year, month, 1).getDay();
-                                // Adjust for Monday start (0 for Monday, 6 for Sunday)
-                                const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-
-                                // Get number of days in current month
-                                const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-                                // Get number of days in previous month for padding
-                                const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-                                // Hardcoded HR events for demonstration (adjust dates as needed)
-                                const hrEvents = [
-                                    { date: new Date(year, month, 3).toDateString(), name: 'Entretien Recrutement', status: 'inprogress' },
-                                    { date: new Date(year, month, 8).toDateString(), name: 'Onboarding Nouveau Salarié', status: 'planned' },
-                                    { date: new Date(year, month, 10).toDateString(), name: 'Réunion Stratégie RH', status: 'completed' },
-                                    { date: new Date(year, month, 15).toDateString(), name: 'Formation Leadership', status: 'inprogress' },
-                                    { date: new Date(year, month, 16).toDateString(), name: 'Évaluation Annuelle', status: 'planned' },
-                                    { date: new Date(year, month, 20).toDateString(), name: 'Atelier Bien-être', status: 'completed' },
-                                    { date: new Date(year, month, 25).toDateString(), name: 'Préparation Salaires', status: 'inprogress' },
-                                    { date: new Date(year, month, 28).toDateString(), name: 'Bilan Q3', status: 'planned' },
-                                ];
-
-                                // Add empty cells for previous month's days
-                                for (let i = 0; i < startDayIndex; i++) {
-                                    const day = daysInPrevMonth - startDayIndex + i + 1;
-                                    const cell = document.createElement('div');
-                                    cell.classList.add('calendar-cell', 'inactive');
-                                    cell.innerHTML = `<span class="calendar-date">${day}</span>`;
-                                    calendarGrid.appendChild(cell);
-                                }
-
-                                // Add cells for current month's days
-                                for (let day = 1; day <= daysInMonth; day++) {
-                                    const cell = document.createElement('div');
-                                    cell.classList.add('calendar-cell');
-                                    const currentDay = new Date(year, month, day);
-
-                                    // Check if it's today
-                                    if (currentDay.toDateString() === new Date().toDateString()) {
-                                        cell.classList.add('today');
-                                    }
-
-                                    cell.innerHTML = `<span class="calendar-date">${day}</span>`;
-
-                                    // Add events for this day
-                                    const eventsForDay = hrEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
-                                    eventsForDay.forEach(event => {
-                                        const eventDiv = document.createElement('div');
-                                        eventDiv.classList.add('event-badge', event.status);
-                                        eventDiv.textContent = event.name;
-                                        cell.appendChild(eventDiv);
-                                    });
-
-                                    calendarGrid.appendChild(cell);
-                                }
-
-                                // Add empty cells for next month's days (to fill the last row)
-                                const totalCells = startDayIndex + daysInMonth;
-                                const remainingCells = 42 - totalCells; // Max 6 rows * 7 days = 42 cells
-
-                                for (let i = 1; i <= remainingCells; i++) {
-                                    const cell = document.createElement('div');
-                                    cell.classList.add('calendar-cell', 'inactive');
-                                    cell.innerHTML = `<span class="calendar-date">${i}</span>`;
-                                    calendarGrid.appendChild(cell);
-                                }
-                            };
-
-                            // Event Listeners for month navigation
-                            prevMonthBtn.addEventListener('click', () => {
-                                currentDate.setMonth(currentDate.getMonth() - 1);
-                                renderCalendar();
-                            });
-
-                            nextMonthBtn.addEventListener('click', () => {
-                                currentDate.setMonth(currentDate.getMonth() + 1);
-                                renderCalendar();
-                            });
-
-                            // Initial render
-                            renderCalendar();
-                        });
-                    </script>
                 </div>
             </main>
         </div>
@@ -443,5 +411,354 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/cal-heatmap@4.4.0/dist/cal-heatmap.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Variables du calendrier
+        const calendarGrid = document.getElementById('calendarGrid');
+        const currentMonthYear = document.getElementById('currentMonthYear');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        // Suppression de la référence au bouton addEventBtn
+        let currentDate = new Date();
+        
+        // Événements du calendrier (récupérés depuis Django)
+        let calendarEvents = {{ calendar_events|safe }};
+        
+        // Fonction pour rendre le calendrier
+        function renderCalendar() {
+            // Vider la grille
+            calendarGrid.innerHTML = '';
+            
+            // Ajouter les en-têtes des jours
+            const dayHeaders = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            dayHeaders.forEach(day => {
+                const headerDiv = document.createElement('div');
+                headerDiv.classList.add('calendar-day-header');
+                headerDiv.textContent = day;
+                calendarGrid.appendChild(headerDiv);
+            });
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Mettre à jour le titre du mois
+            currentMonthYear.textContent = new Date(year, month).toLocaleString('fr-FR', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            
+            // Calculer le premier jour du mois et le nombre de jours
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Jours du mois précédent (padding)
+            for (let i = 0; i < startDayIndex; i++) {
+                const day = daysInPrevMonth - startDayIndex + i + 1;
+                const cell = document.createElement('div');
+                cell.classList.add('calendar-cell', 'inactive');
+                cell.innerHTML = `<span class="calendar-date">${day}</span>`;
+                calendarGrid.appendChild(cell);
+            }
+            
+            // Jours du mois actuel
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.classList.add('calendar-cell');
+                const currentDay = new Date(year, month, day);
+                
+                // Marquer le jour actuel
+                if (currentDay.toDateString() === new Date().toDateString()) {
+                    cell.classList.add('today');
+                }
+                
+                // Ajouter le numéro du jour
+                cell.innerHTML = `<span class="calendar-date">${day}</span>`;
+                
+                // Ajouter les événements pour ce jour
+                const eventsForDay = calendarEvents.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate.getDate() === day && 
+                           eventDate.getMonth() === month && 
+                           eventDate.getFullYear() === year;
+                });
+                
+                eventsForDay.forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    // Utiliser le type d'activité pour la couleur principale
+                    eventDiv.classList.add('event-badge', event.type || event.status);
+                    eventDiv.textContent = event.name;
+                    eventDiv.title = `${event.name} (${event.type ? event.type.toUpperCase() : event.status})`; // Tooltip amélioré
+                    cell.appendChild(eventDiv);
+                });
+                
+                // Ajouter l'événement de clic pour créer une activité
+                cell.addEventListener('click', function() {
+                    const selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    openActivityModal(selectedDate);
+                });
+                
+                // Ajouter un style de survol
+                cell.style.cursor = 'pointer';
+                
+                calendarGrid.appendChild(cell);
+            }
+            
+            // Jours du mois suivant (padding)
+            const totalCells = startDayIndex + daysInMonth;
+            const remainingCells = 42 - totalCells; // 6 semaines * 7 jours
+            for (let i = 1; i <= remainingCells && totalCells + i <= 42; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('calendar-cell', 'inactive');
+                cell.innerHTML = `<span class="calendar-date">${i}</span>`;
+                calendarGrid.appendChild(cell);
+            }
+        }
+        
+        // Événements de navigation
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+        
+        // Fonction pour ajouter une nouvelle activité au calendrier
+        function addEventToCalendar(newActivity) {
+            const eventDate = new Date(newActivity.start_datetime);
+            const eventData = {
+                date: eventDate.toISOString().split('T')[0],
+                name: newActivity.title,
+                status: newActivity.activity_type.toLowerCase(), // 'project' ou 'ticket'
+                type: newActivity.activity_type.toLowerCase() // Ajout du type pour les couleurs
+            };
+            
+            // Ajouter l'événement à la liste
+            calendarEvents.push(eventData);
+            
+            // Re-rendre le calendrier pour afficher le nouvel événement
+            renderCalendar();
+        }
+        
+        // Fonction pour ouvrir le modal avec une date pré-sélectionnée
+        window.openActivityModal = function(selectedDate) {
+            const modal = document.getElementById('activityModal');
+            const dateInput = document.getElementById('activityDate');
+            
+            // Pré-remplir la date
+            dateInput.value = selectedDate;
+            
+            // Afficher le modal
+            modal.classList.remove('hidden');
+            
+            // Charger les projets et tickets
+            loadProjectsAndTickets();
+        };
+        
+        // Gestion du modal
+        const modal = document.getElementById('activityModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const activityForm = document.getElementById('activityForm');
+        const activityType = document.getElementById('activityType');
+        const projectSelect = document.getElementById('projectSelect');
+        const ticketSelect = document.getElementById('ticketSelect');
+        
+        // Fermer le modal
+        [closeModal, cancelBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                activityForm.reset();
+            });
+        });
+        
+        // Fermer le modal en cliquant à l'extérieur
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                activityForm.reset();
+            }
+        });
+        
+        // Gérer le changement de type d'activité
+        activityType.addEventListener('change', () => {
+            const type = activityType.value;
+            if (type === 'PROJECT') {
+                projectSelect.classList.remove('hidden');
+                ticketSelect.classList.add('hidden');
+            } else if (type === 'TICKET') {
+                ticketSelect.classList.remove('hidden');
+                projectSelect.classList.add('hidden');
+            } else {
+                projectSelect.classList.add('hidden');
+                ticketSelect.classList.add('hidden');
+            }
+        });
+        
+        // Charger les projets et tickets
+        async function loadProjectsAndTickets() {
+            try {
+                const response = await fetch(`/activities/get-options/{{ resource.id }}/`);
+                const data = await response.json();
+                
+                // Remplir les options de projets
+                const projectSelectEl = document.getElementById('projectId');
+                projectSelectEl.innerHTML = '<option value="">Sélectionner un projet</option>';
+                data.projects.forEach(project => {
+                    projectSelectEl.innerHTML += `<option value="${project.id}">${project.title}</option>`;
+                });
+                
+                // Remplir les options de tickets
+                const ticketSelectEl = document.getElementById('ticketId');
+                ticketSelectEl.innerHTML = '<option value="">Sélectionner un ticket</option>';
+                data.tickets.forEach(ticket => {
+                    ticketSelectEl.innerHTML += `<option value="${ticket.id}">${ticket.title}</option>`;
+                });
+            } catch (error) {
+                console.error('Erreur lors du chargement des options:', error);
+            }
+        }
+        
+        // Soumettre le formulaire
+        activityForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                resource_id: {{ resource.id }},
+                title: document.getElementById('activityTitle').value,
+                description: document.getElementById('activityDescription').value,
+                activity_type: document.getElementById('activityType').value || 'GENERAL',
+                start_datetime: document.getElementById('activityDate').value + 'T' + document.getElementById('startTime').value,
+                end_datetime: document.getElementById('activityDate').value + 'T' + document.getElementById('endTime').value
+            };
+            
+            if (formData.activity_type === 'PROJECT') {
+                const projectId = document.getElementById('projectId').value;
+                if (projectId) {
+                    formData.project_id = projectId;
+                }
+            } else if (formData.activity_type === 'TICKET') {
+                const ticketId = document.getElementById('ticketId').value;
+                if (ticketId) {
+                    formData.ticket_id = ticketId;
+                }
+            }
+            
+            try {
+                const response = await fetch('/activities/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Activité créée avec succès!');
+                    modal.classList.add('hidden');
+                    activityForm.reset();
+                    
+                    // Ajouter immédiatement l'activité au calendrier
+                    addEventToCalendar({
+                        title: formData.title,
+                        start_datetime: formData.start_datetime,
+                        activity_type: formData.activity_type
+                    });
+                } else {
+                    alert('Erreur: ' + result.message);
+                }
+            } catch (error) {
+                alert('Erreur lors de la création de l\'activité');
+                console.error('Erreur:', error);
+            }
+        });
+        
+        // Rendu initial du calendrier
+        renderCalendar();
+    });
+    </script>
+    <!-- Modal pour créer une activité -->
+    <div id="activityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-[#191610]">Nouvelle Activité</h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="activityForm">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="activityTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                        <select id="activityType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" required>
+                            <option value="">Activité générale</option>
+                            <option value="PROJECT">Lié à un projet</option>
+                            <option value="TICKET">Lié à un ticket</option>
+                        </select>
+                    </div>
+                    
+                    <div id="projectSelect" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Projet</label>
+                        <select id="projectId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]">
+                            <option value="">Sélectionner un projet</option>
+                        </select>
+                    </div>
+                    
+                    <div id="ticketSelect" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ticket</label>
+                        <select id="ticketId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]">
+                            <option value="">Sélectionner un ticket</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                            <input type="date" id="activityDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Heure début</label>
+                            <input type="time" id="startTime" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" min="09:00" max="17:00" value="09:00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Heure fin</label>
+                        <input type="time" id="endTime" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" min="09:00" max="17:00" value="10:00" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description (optionnel)</label>
+                        <textarea id="activityDescription" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#a08d80]" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 sticky bottom-0 bg-white pt-4 border-t border-gray-200">
+                        <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-[#a08d80] text-white rounded-md hover:bg-[#8c7b71]">
+                            Créer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

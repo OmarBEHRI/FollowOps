@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Ressource
+from activities.models import Activity  # Ajouter cet import
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse
 import pandas as pd
 from urllib.parse import quote
 from datetime import datetime
+import json  # Ajouter cet import
 
 @login_required
 def ressources(request):
@@ -69,9 +71,62 @@ def ressources(request):
 
 def ressourcesDetails(request, resource_id=None):
     if resource_id:
-        resource = Ressource.objects.get(id=resource_id)
-        return render(request, 'ressourcesDetails.html', {'resource': resource})
-    return render(request, 'ressourcesDetails.html')
+        try:
+            resource = get_object_or_404(Ressource, id=resource_id)
+            
+            # Récupérer les tickets assignés à cette ressource
+            assigned_tickets = resource.assignedTickets.all()
+            
+            # Récupérer les projets où cette ressource est membre
+            assigned_projects = resource.members.all()
+            
+            # Récupérer les activités de cette ressource pour le calendrier
+            activities = Activity.objects.filter(employee=resource)
+            
+            # Préparer les événements du calendrier
+            calendar_events = []
+            for activity in activities:
+                event_name = activity.title
+                if activity.project:
+                    event_name = activity.project.title
+                elif activity.ticket:
+                    event_name = activity.ticket.title
+                
+                # Déterminer le statut
+                now = datetime.now().date()
+                activity_date = activity.start_datetime.date()
+                
+                if activity_date < now:
+                    status = 'completed'
+                elif activity_date == now:
+                    status = 'inprogress'
+                else:
+                    status = 'planned'
+                
+                calendar_events.append({
+                    'date': activity.start_datetime.strftime('%Y-%m-%d'),
+                    'name': event_name,
+                    'status': status
+                })
+            
+            # Calculer les KPI
+            completed_tickets = assigned_tickets.filter(status='Fermé').count()
+            total_tickets = assigned_tickets.count()
+            completed_projects = assigned_projects.filter(status='Terminé').count()
+            
+            return render(request, 'ressourcesDetails.html', {
+                'resource': resource,
+                'ressource': resource,
+                'assigned_tickets': assigned_tickets,
+                'assigned_projects': assigned_projects,
+                'completed_tickets': completed_tickets,
+                'total_tickets': total_tickets,
+                'completed_projects': completed_projects,
+                'calendar_events': json.dumps(calendar_events),
+            })
+        except Ressource.DoesNotExist:
+            return redirect('/ressources/')
+    return redirect('/ressources/')  # Rediriger si pas d'ID
 
 
 def add_resource(request):

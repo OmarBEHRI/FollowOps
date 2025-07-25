@@ -5,18 +5,20 @@ from ressources.models import Ressource
 from projects.models import Project
 from tickets.models import Ticket
 
+# Supprimer ou assouplir les validations restrictives
 def validate_working_hours(value):
-    """Validate that the time is within working hours (9:00 - 17:00)"""
-    working_start = time(9, 0)
-    working_end = time(17, 0)
+    """Validate that the time is within working hours (8:00 - 18:00) - assoupli"""
+    working_start = time(8, 0)
+    working_end = time(18, 0)
     
     if value.time() < working_start or value.time() > working_end:
-        raise ValidationError('Time must be within working hours (9:00 - 17:00)')
+        raise ValidationError('Time must be within working hours (8:00 - 18:00)')
 
-def validate_working_day(value):
-    """Validate that the date is a working day (Monday to Friday)"""
-    if value.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
-        raise ValidationError('Date must be a working day (Monday to Friday)')
+# Supprimer complètement la validation des jours ouvrables
+# def validate_working_day(value):
+#     """Validate that the date is a working day (Monday to Friday)"""
+#     if value.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
+#         raise ValidationError('Date must be a working day (Monday to Friday)')
 
 class Activity(models.Model):
     ACTIVITY_TYPES = [
@@ -33,8 +35,9 @@ class Activity(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True, related_name='activities')
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True, blank=True, related_name='activities')
     
-    start_datetime = models.DateTimeField(validators=[validate_working_hours, validate_working_day])
-    end_datetime = models.DateTimeField(validators=[validate_working_hours, validate_working_day])
+    # Assouplir les validations - supprimer validate_working_day
+    start_datetime = models.DateTimeField(validators=[validate_working_hours])
+    end_datetime = models.DateTimeField(validators=[validate_working_hours])
     
     # Calculated field for working hours
     charge = models.DecimalField(max_digits=5, decimal_places=2, editable=False)
@@ -43,11 +46,11 @@ class Activity(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def clean(self):
-        # Ensure only one of project or ticket is set based on activity_type
-        if self.activity_type == 'PROJECT' and not self.project:
-            raise ValidationError({'project': 'Project must be set for PROJECT activity type'})
-        elif self.activity_type == 'TICKET' and not self.ticket:
-            raise ValidationError({'ticket': 'Ticket must be set for TICKET activity type'})
+        # Assouplir les validations - rendre projet/ticket optionnels
+        # if self.activity_type == 'PROJECT' and not self.project:
+        #     raise ValidationError({'project': 'Project must be set for PROJECT activity type'})
+        # elif self.activity_type == 'TICKET' and not self.ticket:
+        #     raise ValidationError({'ticket': 'Ticket must be set for TICKET activity type'})
             
         # Ensure start_datetime is before end_datetime
         if self.start_datetime and self.end_datetime and self.start_datetime >= self.end_datetime:
