@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowOps - Créer un Ticket</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+        :root {
+            --primary-color: #A08D80;
+            --secondary-color: #D4CCC1;
+            --text-color-dark: #3F3C3A;
+            --text-color-medium: #6E6864;
+            --text-color-light: #9C9591;
+            --bg-light: #FBF9F7;
+            --bg-white: #FFFFFF;
+            --border-color: #EBE5E0;
+            --status-active-bg: #EAE6DF;
+            --status-active-text: #6E6864;
+            --status-inactive-bg: #F7EAE3;
+            --status-inactive-text: #A08D80;
+            --nav-link-color: #191610;
+            --nav-link-hover-bg: #f1efe9;
+            --nav-link-active-bg: #f1efe9;
+            --nav-link-active-color: #191610;
+            --button-bg-light: #F0EDE9;
+            --shadow-light: rgba(0, 0, 0, 0.03);
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--nav-link-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-link:hover {
+            background-color: var(--nav-link-hover-bg);
+        }
+        .nav-link-active {
+            background-color: var(--nav-link-active-bg);
+            color: var(--nav-link-active-color);
+        }
+        .nav-link-active:hover {
+            background-color: var(--nav-link-active-bg);
+            color: var(--nav-link-active-color);
+        }
+    </style>
+</head>
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
+  <div class="layout-container flex h-full grow flex-col">
+    <div class="w-full px-6 py-2">
+      <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+        <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
+          <div class="flex items-center justify-between whitespace-nowrap pb-3">
+          <div class="flex items-center gap-4 text-[#191610] flex-1">
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.2561..." /></svg>
+            </div>
+            <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
+            <nav class="flex items-center gap-4">
+              <a href="/dashboard/" class="nav-link">Tableau de bord</a>
+              <a href="/ressources/" class="nav-link">Ressources</a>
+              <a href="/projects/" class="nav-link">Projets</a>
+              <a href="/tickets/" class="nav-link nav-link-active">Tickets</a>
+            </nav>
+          </div>
+          <div class="flex items-center gap-8">
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTeg...");'></div>
+          </div>
+        </div>
+        
+        <div class="px-10 py-6">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-[#191610]">Créer un nouveau ticket</h1>
+            <a href="/tickets/" class="px-4 py-2 bg-[#f1efe9] text-[#191610] rounded-xl hover:bg-[#e3dfd3] transition-colors">
+              Retour aux tickets
+            </a>
+          </div>
+          
+          <div class="bg-white rounded-xl border border-[#e3dfd3] p-6 max-w-3xl">
+            <form method="POST" action="{% url 'create_ticket' %}">
+              {% csrf_token %}
+              
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="mb-4 p-4 {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %} rounded-lg">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+              
+              <div class="mb-4">
+                <label for="title" class="block text-sm font-medium text-[#191610] mb-1">Titre</label>
+                <input type="text" id="title" name="title" required class="w-full px-4 py-2 border border-[#e3dfd3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80]">
+              </div>
+              
+              <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-[#191610] mb-1">Description</label>
+                <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-[#e3dfd3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80]"></textarea>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label for="status" class="block text-sm font-medium text-[#191610] mb-1">Statut</label>
+                  <select id="status" name="status" class="w-full px-4 py-2 border border-[#e3dfd3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80]">
+                    {% for status_value, status_label in status_choices %}
+                      <option value="{{ status_value }}">{{ status_label }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="priority" class="block text-sm font-medium text-[#191610] mb-1">Priorité</label>
+                  <select id="priority" name="priority" class="w-full px-4 py-2 border border-[#e3dfd3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80]">
+                    {% for priority_value, priority_label in priority_choices %}
+                      <option value="{{ priority_value }}">{{ priority_label }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              
+              <div class="mb-6">
+                <label for="resource-search" class="block text-sm font-medium text-[#191610] mb-1">Assigné à</label>
+                <div class="relative">
+                  <input type="text" id="resource-search" placeholder="Rechercher des ressources..." class="w-full px-4 py-2 border border-[#e3dfd3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80]">
+                  <div id="search-results" class="absolute z-10 w-full mt-1 bg-white border border-[#e3dfd3] rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                </div>
+                
+                <div id="selected-resources" class="flex flex-wrap gap-2 mt-3">
+                  <!-- Selected resources will appear here as tags -->
+                </div>
+                
+                <!-- Hidden input to store selected resource IDs -->
+                <div id="resource-ids-container">
+                  <!-- Hidden inputs will be dynamically added here -->
+                </div>
+              </div>
+              
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const searchInput = document.getElementById('resource-search');
+                  const searchResults = document.getElementById('search-results');
+                  const selectedResources = document.getElementById('selected-resources');
+                  const resourceIdsContainer = document.getElementById('resource-ids-container');
+                  const resources = [
+                    {% for resource in resources %}
+                      {
+                        id: {{ resource.id }},
+                        name: "{{ resource.first_name }} {{ resource.last_name }}",
+                        role: "{{ resource.role }}"
+                      },
+                    {% endfor %}
+                  ];
+                  
+                  let selectedResourceIds = new Set();
+                  
+                  // Function to show search results
+                  function showSearchResults(query) {
+                    searchResults.innerHTML = '';
+                    searchResults.classList.remove('hidden');
+                    
+                    if (!query) {
+                      // Show all resources if query is empty
+                      resources.forEach(resource => {
+                        if (!selectedResourceIds.has(resource.id)) {
+                          addResourceToResults(resource);
+                        }
+                      });
+                      return;
+                    }
+                    
+                    // Filter resources based on query
+                    const filteredResources = resources.filter(resource => {
+                      return resource.name.toLowerCase().includes(query.toLowerCase()) && 
+                             !selectedResourceIds.has(resource.id);
+                    });
+                    
+                    if (filteredResources.length === 0) {
+                      searchResults.innerHTML = '<div class="p-3 text-sm text-[#8c7e5a]">Aucune ressource trouvée</div>';
+                      return;
+                    }
+                    
+                    filteredResources.forEach(resource => {
+                      addResourceToResults(resource);
+                    });
+                  }
+                  
+                  // Function to add a resource to search results
+                  function addResourceToResults(resource) {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'p-3 hover:bg-[#f9f8f7] cursor-pointer flex justify-between items-center';
+                    resultItem.innerHTML = `
+                      <div>
+                        <div class="text-sm font-medium">${resource.name}</div>
+                        <div class="text-xs text-[#8c7e5a]">${resource.role}</div>
+                      </div>
+                    `;
+                    
+                    resultItem.addEventListener('click', () => {
+                      addResourceTag(resource);
+                      searchResults.classList.add('hidden');
+                      searchInput.value = '';
+                    });
+                    
+                    searchResults.appendChild(resultItem);
+                  }
+                  
+                  // Function to add a resource tag
+                  function addResourceTag(resource) {
+                    if (selectedResourceIds.has(resource.id)) return;
+                    
+                    selectedResourceIds.add(resource.id);
+                    
+                    const tag = document.createElement('div');
+                    tag.className = 'flex items-center bg-[#f1efe9] text-[#191610] px-3 py-1 rounded-full text-sm group';
+                    tag.dataset.resourceId = resource.id;
+                    tag.innerHTML = `
+                      <span>${resource.name}</span>
+                      <button type="button" class="ml-2 text-[#8c7e5a] hover:text-[#191610] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    `;
+                    
+                    // Add remove button functionality
+                    const removeButton = tag.querySelector('button');
+                    removeButton.addEventListener('click', () => {
+                      selectedResourceIds.delete(resource.id);
+                      tag.remove();
+                      updateHiddenInputs();
+                    });
+                    
+                    selectedResources.appendChild(tag);
+                    updateHiddenInputs();
+                  }
+                  
+                  // Function to update hidden inputs for form submission
+                  function updateHiddenInputs() {
+                    resourceIdsContainer.innerHTML = '';
+                    
+                    selectedResourceIds.forEach(id => {
+                      const hiddenInput = document.createElement('input');
+                      hiddenInput.type = 'hidden';
+                      hiddenInput.name = 'assigned_to';
+                      hiddenInput.value = id;
+                      resourceIdsContainer.appendChild(hiddenInput);
+                    });
+                  }
+                  
+                  // Event listeners
+                  searchInput.addEventListener('focus', () => {
+                    showSearchResults(searchInput.value);
+                  });
+                  
+                  searchInput.addEventListener('input', () => {
+                    showSearchResults(searchInput.value);
+                  });
+                  
+                  // Close search results when clicking outside
+                  document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                      searchResults.classList.add('hidden');
+                    }
+                  });
+                });
+              </script>
+              
+              <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2 bg-[#A08D80] text-white rounded-xl hover:bg-[#8a7a6e] transition-colors">
+                  Créer le ticket
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

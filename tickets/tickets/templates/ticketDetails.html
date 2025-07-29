@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowOps - Ticket #{{ ticket.id }}: {{ ticket.title }}</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Définition des couleurs de la palette "nude" via variables CSS */
+        :root {
+            --primary-color: #A08D80; /* Muted brown/taupe */
+            --secondary-color: #D4CCC1; /* Lighter, subtle shade for accents */
+            --text-color-dark: #3F3C3A; /* Darker brown/grey for main text */
+            --text-color-medium: #6E6864; /* Medium brown/grey */
+            --text-color-light: #9C9591; /* Lighter grey/brown for subtle text */
+            --bg-light: #FBF9F7; /* Very light, warm off-white */
+            --bg-white: #FFFFFF;
+            --border-color: #EBE5E0; /* Soft, warm border */
+
+            /* Couleurs pour les statuts */
+            --status-active-bg: #EAE6DF; /* Beige clair pour "Active", "En cours", "Terminé" */
+            --status-active-text: #6E6864; /* Texte moyen pour ces statuts */
+            --status-inactive-bg: #F7EAE3; /* Pêche clair pour "Inactive", "À initier", "Suspendu", "Annulé" */
+            --status-inactive-text: #A08D80; /* Texte primaire pour ces statuts */
+
+            /* Couleurs de navigation et boutons */
+            --nav-link-color: #191610; /* Couleur du texte par défaut pour les liens de navigation */
+            --nav-link-hover-bg: #f1efe9; /* Couleur de fond au survol pour les liens de navigation */
+            --nav-link-active-bg: #f1efe9; /* Couleur de fond pour le lien actif */
+            --nav-link-active-color: #191610; /* Couleur du texte pour le lien actif */
+
+            --button-bg-light: #F0EDE9; /* Fond pour les boutons secondaires/filtres */
+
+            /* Couleurs des barres d'availability */
+            --availability-bar-color: #D4A88D; /* Muted terracotta/orange */
+            --availability-bar-bg: #EBE5E0;
+            --availability-dot-color: #D4A88D; /* Couleur pour le point de disponibilité */
+
+            /* Couleurs pour les boutons d'action */
+            --action-button-primary-bg: var(--primary-color);
+            --action-button-primary-text: var(--bg-white);
+            --action-button-delete-bg: #F7EAE3;
+            --action-button-delete-text: #A08D80;
+
+            --shadow-light: rgba(0, 0, 0, 0.03); /* Ombre très légère */
+        }
+
+        /* Styles généraux */
+        body {
+            font-family: 'Inter', 'Noto Sans', sans-serif;
+            color: var(--text-color-dark);
+        }
+
+        /* Styles de la barre de navigation principale (header) */
+        header {
+            background-color: var(--bg-white);
+            box-shadow: 0 2px 5px var(--shadow-light);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Styles pour les liens de navigation */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--nav-link-color); /* Couleur par défaut */
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background-color: var(--nav-link-hover-bg);
+        }
+
+        .nav-link-active {
+            background-color: var(--nav-link-active-bg); /* Fond pour le lien actif */
+            color: var(--nav-link-active-color); /* Texte pour le lien actif */
+        }
+
+        .nav-link-active:hover {
+            background-color: var(--nav-link-active-bg); /* Maintenir le fond actif au survol */
+            color: var(--nav-link-active-color); /* Maintenir le texte actif au survol */
+        }
+
+        /* Styles pour les statuts */
+        .status-en-cours {
+            color: var(--status-active-text);
+            font-weight: normal;
+        }
+
+        .status-haute {
+            color: var(--status-inactive-text); /* Couleur de texte pour "Haute" priorité */
+            font-weight: normal;
+        }
+
+        /* Styles pour les commentaires */
+        .comment-bubble {
+            background-color: var(--bg-white);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px var(--shadow-light);
+            border: 1px solid var(--border-color);
+        }
+
+        .comment-avatar {
+            min-width: 40px;
+            min-height: 40px;
+            max-width: 40px;
+            max-height: 40px;
+            border-radius: 9999px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .comment-input-container {
+            background-color: var(--bg-white);
+            border-radius: 12px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px var(--shadow-light);
+        }
+
+        .comment-input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color-dark);
+            background-color: transparent;
+        }
+
+        .send-button {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .send-button:hover {
+            background-color: #8C7B71; /* Une teinte légèrement plus foncée */
+        }
+
+        .edit-button {
+            background-color: transparent;
+            color: #A08D80;
+            border: 1px solid #A08D80;
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        .edit-button:hover {
+            background-color: #F7EAE3;
+        }
+    </style>
+</head>
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
+    <div class="layout-container flex h-full grow flex-col">
+        <div class="w-full px-6 py-2">
+            <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
+                <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
+                    <div class="flex items-center justify-between whitespace-nowrap pb-3">
+                        <div class="flex items-center gap-4 text-[#191610] flex-1">
+                            <div class="size-4">
+                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
+                            </div>
+                            <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
+                            <nav class="flex items-center gap-4">
+  <a href="/dashboard/" class="nav-link">Tableau de bord</a>
+  <a href="/ressources/" class="nav-link">Ressources</a>
+  <a href="/projects/" class="nav-link">Projets</a>
+  <a href="/tickets/" class="nav-link nav-link-active">Tickets</a>
+</nav>
+                        </div>
+                        <div class="flex items-center gap-8">
+                            <label class="flex flex-col min-w-40 !h-10 max-w-64">
+                                <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                                    <div class="text-[#8c7e5a] flex border-none bg-[#f1efe9] items-center justify-center pl-4 rounded-l-xl border-r-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+                                    </div>
+                                    <input type="search" placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#191610] focus:outline-0 focus:ring-0 border-none bg-[#f1efe9] focus:border-none h-full placeholder:text-[#8c7e5a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal">
+                                </div>
+                            </label>
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                        </div>
+                    </div>
+                    <div class="px-10 py-4">
+                        <div class="flex items-center gap-2 text-[#8c7e5a] text-sm font-medium">
+                            <a href="{% url 'tickets' %}" class="hover:underline">Tickets</a>
+                            <span>/</span>
+                            <span>Ticket #{{ ticket.id }}</span>
+                        </div>
+                    </div>
+                </header>
+                <div class="px-10 py-6 flex flex-col gap-8">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <h1 class="text-[#191610] text-xl font-bold leading-tight">Ticket #{{ ticket.id }}: {{ ticket.title }}</h1>
+                            <p class="text-[#8c7e5a] text-sm font-medium">Créé le {{ ticket.created_at|date:"d F Y" }} à {{ ticket.created_at|time:"H:i" }}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            {% if can_edit %}
+                            <a href="{% url 'edit_ticket' ticket.id %}" class="edit-button">Modifier</a>
+                            {% endif %}
+                            {% if can_delete %}
+                            <a href="{% url 'delete_ticket' ticket.id %}" class="edit-button" style="background-color: var(--action-button-delete-bg); color: var(--action-button-delete-text);">Supprimer</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Détails du ticket</h2>
+                        <div class="py-4">
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-5">
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Statut</p>
+                                    <p>
+                                        <span class="text-lg {% if ticket.status == 'En cours' %}status-en-cours{% else %}status-{{ ticket.status|lower }}{% endif %}">{{ ticket.status }}</span>
+                                    </p>
+                                </div>
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Priorité</p>
+                                    <p>
+                                        <span class="text-lg {% if ticket.priority == 'Haute' %}status-haute{% else %}status-{{ ticket.priority|lower }}{% endif %}">{{ ticket.priority }}</span>
+                                    </p>
+                                </div>
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Assigné à</p>
+                                    <p class="text-[#191610] text-base">
+                                        {% if ticket.assigned_to.all %}
+                                            {% for resource in ticket.assigned_to.all %}
+                                                {{ resource.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            Non assigné
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Créé par</p>
+                                    <p class="text-[#191610] text-base">{{ ticket.created_by.get_full_name }}</p>
+                                </div>
+                                {% if ticket.project %}
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Projet</p>
+                                    <p class="text-[#191610] text-base">{{ ticket.project.name }}</p>
+                                </div>
+                                {% endif %}
+                                {% if ticket.due_date %}
+                                <div class="border-b border-[var(--border-color)] pb-3">
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Date d'échéance</p>
+                                    <p class="text-[#191610] text-base">{{ ticket.due_date|date:"d/m/Y" }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Description du ticket -->
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Description</h2>
+                        <p class="text-[#191610] text-sm font-normal leading-normal">{{ ticket.description }}</p>
+                    </div>
+
+                    <!-- Calendrier des activités du ticket -->
+                    <div class="flex flex-col gap-4 mt-6">
+                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Activités du ticket</h2>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
+                            <div class="calendar-header">
+                                <button id="prevMonthTicket" class="calendar-nav-button">◀</button>
+                                <h3 id="month-year-display" class="text-xl font-semibold text-[var(--text-color-dark)]">Mois Année</h3>
+                                <div class="flex items-center gap-2">
+                                    <button id="back-to-month" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200 transition-colors duration-200 hidden">Retour au mois</button>
+                                    <button id="nextMonthTicket" class="calendar-nav-button">▶</button>
+                                </div>
+                            </div>
+                            <div id="calendar-container" class="calendar-container">
+                                <div id="calendar-grid" class="calendar-grid">
+                                    <!-- Les en-têtes des jours seront générés par JavaScript -->
+                                </div>
+                                <div id="day-view" class="day-view hidden">
+                                    <div id="day-view-header" class="day-view-header">Jour</div>
+                                    <div id="day-view-content" class="day-view-content">
+                                        <!-- Le contenu de la vue journalière sera généré par JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Commentaires du ticket</h2>
+                        
+                        <!-- Comments Section with Project-style UI -->
+                        <div class="comments-section flex flex-col h-[calc(100vh-400px)] overflow-hidden border border-[#f1efe9] rounded-lg bg-white shadow-sm">
+                            <!-- Comments List -->
+                            <div id="comments-container" class="comments-list flex-grow overflow-y-auto px-6 py-4">
+                                {% if comments %}
+                                    {% for comment in comments %}
+                                        <div class="comment-item mb-5 group hover:bg-[#f9f8f7] p-4 rounded-lg transition-all duration-200 border-b border-[#f1efe9]">
+                                            <div class="comment-header flex justify-between items-center mb-2">
+                                                <div class="comment-author flex items-center">
+                                                    <div class="author-avatar bg-[#A08D80] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 shadow-sm">
+                                                        {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
+                                                    </div>
+                                                    <div class="author-info">
+                                                        <div class="author-name font-medium text-[#191610]">
+                                                            {{ comment.author.get_full_name }}
+                                                        </div>
+                                                        <div class="author-role text-xs text-[#8c7e5a]">
+                                                            {{ comment.author.role }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="comment-date text-xs text-[#8c7e5a] opacity-70 group-hover:opacity-100 transition-opacity">
+                                                    {{ comment.created_at|date:"d/m/Y H:i" }}
+                                                </div>
+                                            </div>
+                                            <div class="comment-content text-[#191610] mt-2 pl-11">
+                                                {{ comment.content|linebreaks }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div id="no-comments-message" class="no-comments flex items-center justify-center h-full text-[#8c7e5a] text-sm">
+                                        <p>Aucun commentaire pour ce ticket. Soyez le premier à commenter !</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Comment Form -->
+                            {% if can_comment %}
+                            <div class="comment-form-container px-6 py-4 border-t border-[#f1efe9] bg-transparent">
+                                <form id="comment-form" class="comment-form flex items-center" onsubmit="return false;">
+                                    {% csrf_token %}
+                                    <div class="form-group flex-grow mr-3">
+                                        <textarea id="comment-input" name="comment" class="w-full p-3 border border-[#eae6df] bg-white/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80] focus:border-transparent resize-none" rows="1" placeholder="Écrivez votre commentaire ici..."></textarea>
+                                    </div>
+                                    <div class="form-actions flex-shrink-0">
+                                        <button type="submit" class="bg-[#A08D80] text-white p-3 rounded-full hover:bg-[#8a7a6e] transition-colors flex items-center justify-center w-10 h-10">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <style>
+                        .comments-list::-webkit-scrollbar {
+                            width: 4px;
+                        }
+                        .comments-list::-webkit-scrollbar-track {
+                            background: transparent;
+                        }
+                        .comments-list::-webkit-scrollbar-thumb {
+                            background-color: #eae6df;
+                            border-radius: 20px;
+                        }
+                        .comments-list::-webkit-scrollbar-thumb:hover {
+                            background-color: #d6d0c7;
+                        }
+                        textarea {
+                            transition: all 0.2s ease;
+                            background-color: #f9f8f7;
+                        }
+                        textarea:focus {
+                            height: 80px;
+                            background-color: white;
+                        }
+                    </style>
+
+                </div>
+            </main>
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const commentForm = document.getElementById('comment-form');
+        const commentInput = document.getElementById('comment-input');
+        const commentsContainer = document.getElementById('comments-container');
+        const noCommentsMessage = document.getElementById('no-comments-message');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Function to scroll to the bottom of the comments container
+        function scrollToBottom() {
+            if (commentsContainer) {
+                commentsContainer.scrollTop = commentsContainer.scrollHeight;
+            }
+        }
+        
+        // Scroll to bottom on page load if there are comments
+        if (commentsContainer && commentsContainer.children.length > 0) {
+            scrollToBottom();
+        }
+        
+        if (commentForm) {
+            // Auto-resize textarea as user types
+            const textarea = document.getElementById('comment-input');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+            
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const comment = textarea.value.trim();
+                if (!comment) return;
+                
+                // Préparer les données pour l'envoi
+                const data = JSON.stringify({
+                    comment: comment
+                });
+                
+                // Envoyer la requête AJAX
+                fetch('{% url "add_comment_ajax" ticket.id %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: data
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove no comments message if it exists
+                        if (noCommentsMessage) {
+                            noCommentsMessage.remove();
+                        }
+                        
+                        // Create the new comment element with project-style UI
+                        const newComment = document.createElement('div');
+                        newComment.className = 'comment-item mb-5 group hover:bg-[#f9f8f7] p-4 rounded-lg transition-all duration-200 border-b border-[#f1efe9]';
+                        
+                        // Get initials from author name
+                        const nameParts = data.comment.author_name.split(' ');
+                        const firstInitial = nameParts[0] ? nameParts[0].charAt(0) : '';
+                        const lastInitial = nameParts[1] ? nameParts[1].charAt(0) : '';
+                        const initials = firstInitial + lastInitial;
+                        
+                        // Format content with line breaks
+                        const formattedContent = data.comment.content.replace(/\n/g, '<br>');
+                        
+                        // Build the comment HTML structure
+                        newComment.innerHTML = `
+                            <div class="comment-header flex justify-between items-center mb-2">
+                                <div class="comment-author flex items-center">
+                                    <div class="author-avatar bg-[#A08D80] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 shadow-sm">
+                                        ${initials}
+                                    </div>
+                                    <div class="author-info">
+                                        <div class="author-name font-medium text-[#191610]">
+                                            ${data.comment.author_name}
+                                        </div>
+                                        <div class="author-role text-xs text-[#8c7e5a]">
+                                            ${data.comment.author_role || 'Membre'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="comment-date text-xs text-[#8c7e5a] opacity-70 group-hover:opacity-100 transition-opacity">
+                                    ${data.comment.created_at}
+                                </div>
+                            </div>
+                            <div class="comment-content text-[#191610] mt-2 pl-11">
+                                ${formattedContent}
+                            </div>
+                        `;
+                        
+                        // Add the comment to the container
+                        commentsContainer.appendChild(newComment);
+                        
+                        // Scroll to the new comment
+                        scrollToBottom();
+                        
+                        // Reset the form
+                        textarea.value = '';
+                        textarea.style.height = 'auto';
+                    } else {
+                        console.error('Erreur lors de l\'ajout du commentaire:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la requête AJAX:', error);
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
+
+<style>
+/* Enhanced Calendar styles */
+.calendar-container {
+    position: relative;
+    width: 100%;
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: var(--border-color);
+}
+
+.calendar-day-header {
+    font-weight: 600;
+    color: var(--text-color-medium);
+    text-align: center;
+    padding: 1rem 0.5rem;
+    background-color: var(--bg-light);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-cell {
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+    background-color: var(--bg-white);
+    padding: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-cell:hover {
+    background-color: var(--bg-light);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.calendar-cell.inactive {
+    background-color: #f8f6f4;
+    color: var(--text-color-light);
+    cursor: default;
+}
+
+.calendar-cell.inactive:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: #f8f6f4;
+}
+
+.calendar-cell.today {
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    color: var(--bg-white);
+}
+
+.calendar-cell.today .calendar-date {
+    color: var(--bg-white);
+    font-weight: 700;
+}
+
+.calendar-date {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
+    margin-bottom: 0.5rem;
+    align-self: flex-start;
+}
+
+.activities-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.activity-item {
+    padding: 0.375rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--bg-white);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.activity-item:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.activity-item.inprogress {
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    border-left-color: #8C7B71;
+}
+
+.activity-item.completed {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-left-color: #45a049;
+}
+
+.activity-item.planned {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-left-color: #1976D2;
+}
+
+/* Enhanced Activity Tooltip */
+.activity-tooltip {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 15px);
+    transform: translateY(-50%);
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    width: 280px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.activity-item:hover .activity-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Arrow for tooltip */
+.activity-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: var(--bg-white);
+}
+
+.activity-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -9px;
+    transform: translateY(-50%);
+    border: 9px solid transparent;
+    border-right-color: var(--border-color);
+    z-index: -1;
+}
+
+.activity-tooltip-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.activity-tooltip-info {
+    font-size: 0.8rem;
+    color: var(--text-color-medium);
+    margin-bottom: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.activity-tooltip-info::before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.activity-tooltip-description {
+    font-size: 0.8rem;
+    color: var(--text-color-dark);
+    line-height: 1.4;
+    background-color: var(--bg-light);
+    padding: 0.5rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.more-activities {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-color-medium);
+    text-align: center;
+    background-color: var(--bg-light);
+    border-radius: 4px;
+    padding: 0.25rem;
+    border: 1px dashed var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.more-activities:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+}
+
+/* Enhanced Day view styles */
+.day-view {
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+}
+
+.day-view-header {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-color-dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.day-view-content {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Custom scrollbar */
+.day-view-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.day-view-content::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 3px;
+}
+
+.day-view-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.hour-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color-medium);
+    text-align: right;
+    padding-right: 1rem;
+    line-height: 3rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-white);
+}
+
+.hour-activities {
+    position: relative;
+    min-height: 3rem;
+    border-left: 2px solid var(--border-color);
+    padding-left: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+.hour-activities::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 1.5rem;
+    width: 6px;
+    height: 6px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+}
+
+.day-activity {
+    position: relative;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--bg-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.day-activity:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.day-activity.inprogress {
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    border-left-color: #8C7B71;
+}
+
+.day-activity.completed {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-left-color: #45a049;
+}
+
+.day-activity.planned {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-left-color: #1976D2;
+}
+
+.day-activity-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.day-activity-time {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.day-activity-description {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Navigation improvements */
+.calendar-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-light);
+    color: var(--text-color-dark);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.calendar-nav-button:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    transform: scale(1.05);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+/* Empty state for days with no activities */
+.empty-day-message {
+    text-align: center;
+    color: var(--text-color-light);
+    font-style: italic;
+    font-size: 0.8rem;
+    padding: 2rem;
+}
+
+/* Tooltip positioning adjustments for edge cases */
+.calendar-cell:nth-child(7n) .activity-tooltip,
+.calendar-cell:nth-child(7n-1) .activity-tooltip {
+    left: auto;
+    right: calc(100% + 15px);
+    transform: translateY(-50%) translateX(10px);
+}
+
+.calendar-cell:nth-child(7n):hover .activity-tooltip,
+.calendar-cell:nth-child(7n-1):hover .activity-tooltip {
+    transform: translateY(-50%) translateX(0);
+}
+
+.calendar-cell:nth-child(7n) .activity-tooltip::before,
+.calendar-cell:nth-child(7n-1) .activity-tooltip::before {
+    left: auto;
+    right: -8px;
+    border-right-color: transparent;
+    border-left-color: var(--bg-white);
+}
+
+.calendar-cell:nth-child(7n) .activity-tooltip::after,
+.calendar-cell:nth-child(7n-1) .activity-tooltip::after {
+    left: auto;
+    right: -9px;
+    border-right-color: transparent;
+    border-left-color: var(--border-color);
+}
+</style>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarContainer = document.getElementById('calendar-container');
+  const calendarGrid = document.getElementById('calendar-grid');
+  const monthYearDisplay = document.getElementById('month-year-display');
+  const prevMonthBtn = document.getElementById('prevMonthTicket');
+  const nextMonthBtn = document.getElementById('nextMonthTicket');
+  const backToMonthBtn = document.getElementById('back-to-month');
+  const dayView = document.getElementById('day-view');
+  const dayViewHeader = document.getElementById('day-view-header');
+  const dayViewContent = document.getElementById('day-view-content');
+  
+  let currentDate = new Date();
+  let selectedDay = null;
+  let isMonthView = true;
+
+  // Activités liées au ticket
+  const today = new Date();
+  
+  // Création d'événements basés sur les données du ticket avec plus de détails
+  let ticketEvents = [
+    { 
+      date: new Date('{{ ticket.created_at|date:"Y-m-d" }}').toDateString(), 
+      name: 'Création du ticket', 
+      status: 'planned',
+      description: 'Le ticket a été créé par {{ ticket.created_by.get_full_name }}',
+      startTime: new Date('{{ ticket.created_at|date:"Y-m-d H:i:s" }}'),
+      endTime: new Date(new Date('{{ ticket.created_at|date:"Y-m-d H:i:s" }}').getTime() + 30 * 60000) // 30 minutes later
+    }
+  ];
+  
+  // Ajout d'un événement pour le statut actuel
+  ticketEvents.push({
+    date: today.toDateString(),
+    name: 'Statut: {{ ticket.status }}',
+    status: '{{ ticket.status|lower }}' === 'en cours' ? 'inprogress' : 
+            ('{{ ticket.status|lower }}' === 'terminé' ? 'completed' : 'planned'),
+    description: 'Le statut actuel du ticket est {{ ticket.status }}',
+    startTime: today,
+    endTime: new Date(today.getTime() + 60 * 60000) // 1 hour later
+  });
+  
+  // Récupérer les activités depuis l'API
+  fetch('/activities/ticket/{{ ticket.id }}/activities/')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Ajouter les activités récupérées à notre liste d'événements
+        data.activities.forEach(activity => {
+          const startTime = new Date(activity.start);
+          const endTime = new Date(activity.end);
+          
+          ticketEvents.push({
+            date: startTime.toDateString(),
+            name: activity.title,
+            status: activity.status === 'completed' ? 'completed' : 'inprogress',
+            description: `${activity.description}\nAssigné à: ${activity.employee || 'Non assigné'}`,
+            startTime: startTime,
+            endTime: endTime
+          });
+        });
+        
+        // Mettre à jour le calendrier avec les nouvelles activités
+        renderCalendar();
+      } else {
+        console.error('Erreur lors de la récupération des activités:', data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des activités:', error);
+      renderCalendar(); // Render calendar even if API fails
+    });
+
+  // Fonction pour générer le calendrier
+  const renderCalendar = () => {
+    calendarGrid.innerHTML = '';
+
+    // Ajout des en-têtes des jours
+    const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    dayNames.forEach(day => {
+      const dayHeader = document.createElement('div');
+      dayHeader.className = 'calendar-day-header';
+      dayHeader.textContent = day;
+      calendarGrid.appendChild(dayHeader);
+    });
+
+    // Déterminer le premier jour du mois
+    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const startingDay = firstDay.getDay() || 7; // Convertir 0 (dimanche) en 7 pour le format européen
+
+    // Déterminer le nombre de jours dans le mois
+    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const totalDays = lastDay.getDate();
+
+    // Mettre à jour l'affichage du mois et de l'année
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    monthYearDisplay.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+    // Ajouter les jours du mois précédent
+    const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+    for (let i = 1; i < startingDay; i++) {
+      const day = prevMonthLastDay - startingDay + i + 1;
+      const prevMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, day);
+      addCalendarDay(day, prevMonthDate, true);
+    }
+
+    // Ajouter les jours du mois actuel
+    for (let i = 1; i <= totalDays; i++) {
+      const currentDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+      const isToday = currentDay.toDateString() === today.toDateString();
+      addCalendarDay(i, currentDay, false, isToday);
+    }
+
+    // Ajouter les jours du mois suivant pour compléter la grille
+    const remainingCells = 42 - (startingDay - 1 + totalDays); // 42 = 6 semaines * 7 jours
+    for (let i = 1; i <= remainingCells; i++) {
+      const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i);
+      addCalendarDay(i, nextMonthDate, true);
+    }
+  };
+
+  // Fonction pour ajouter un jour au calendrier
+  const addCalendarDay = (day, currentDay, isInactive = false, isToday = false) => {
+    const cell = document.createElement('div');
+    cell.className = `calendar-cell ${isInactive ? 'inactive' : ''} ${isToday ? 'today' : ''}`;
+    cell.dataset.date = currentDay.toISOString().split('T')[0]; // Stocker la date comme attribut de données
+    
+    // Ajouter la date et créer un conteneur pour les activités
+    const dateSpan = document.createElement('span');
+    dateSpan.className = 'calendar-date';
+    dateSpan.textContent = day;
+    
+    const activitiesContainer = document.createElement('div');
+    activitiesContainer.className = 'activities-container';
+    
+    cell.appendChild(dateSpan);
+    cell.appendChild(activitiesContainer);
+    
+    // Ajouter un événement de clic pour afficher la vue journalière (seulement pour les jours actifs)
+    if (!isInactive) {
+      cell.addEventListener('click', () => {
+        showDayView(currentDay);
+      });
+      cell.style.cursor = 'pointer';
+    }
+    
+    calendarGrid.appendChild(cell);
+    
+    // Ajouter les événements pour ce jour
+    const eventsForDay = ticketEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
+    
+    // Trier les événements par heure de début
+    eventsForDay.sort((a, b) => a.startTime - b.startTime);
+    
+    // Afficher jusqu'à 3 événements, avec un indicateur +plus s'il y en a plus
+    const maxVisible = 3;
+    const visibleEvents = eventsForDay.slice(0, maxVisible);
+    
+    visibleEvents.forEach(event => {
+      const activityItem = document.createElement('div');
+      activityItem.className = `activity-item ${event.status}`;
+      activityItem.textContent = event.name;
+      
+      // Créer une infobulle pour le survol
+      const tooltip = document.createElement('div');
+      tooltip.className = 'activity-tooltip';
+      
+      const tooltipTitle = document.createElement('div');
+      tooltipTitle.className = 'activity-tooltip-title';
+      tooltipTitle.textContent = event.name;
+      
+      const tooltipTime = document.createElement('div');
+      tooltipTime.className = 'activity-tooltip-info';
+      const startTime = event.startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const endTime = event.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      tooltipTime.textContent = `${startTime} - ${endTime}`;
+      
+      // Calculer la durée en minutes
+      const durationMs = event.endTime - event.startTime;
+      const durationMinutes = Math.round(durationMs / 60000);
+      const tooltipDuration = document.createElement('div');
+      tooltipDuration.className = 'activity-tooltip-info';
+      tooltipDuration.textContent = `Durée: ${durationMinutes} minutes`;
+      
+      const tooltipDescription = document.createElement('div');
+      tooltipDescription.className = 'activity-tooltip-description';
+      tooltipDescription.textContent = event.description;
+      
+      tooltip.appendChild(tooltipTitle);
+      tooltip.appendChild(tooltipTime);
+      tooltip.appendChild(tooltipDuration);
+      tooltip.appendChild(tooltipDescription);
+      
+      activityItem.appendChild(tooltip);
+      activitiesContainer.appendChild(activityItem);
+    });
+    
+    // Ajouter l'indicateur 'plus' si nécessaire
+    if (eventsForDay.length > maxVisible) {
+      const moreIndicator = document.createElement('div');
+      moreIndicator.className = 'more-activities';
+      moreIndicator.textContent = `+${eventsForDay.length - maxVisible} plus`;
+      moreIndicator.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showDayView(currentDay);
+      });
+      activitiesContainer.appendChild(moreIndicator);
+    }
+  };
+  
+  // Fonction pour afficher la vue journalière avec toutes les activités pour un jour spécifique
+  const showDayView = (date) => {
+    selectedDay = date;
+    isMonthView = false;
+    
+    // Mettre à jour l'en-tête de la vue journalière
+    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    dayViewHeader.textContent = date.toLocaleDateString('fr-FR', options);
+    
+    // Effacer le contenu précédent de la vue journalière
+    dayViewContent.innerHTML = '';
+    
+    // Générer des créneaux horaires (8h à 20h)
+    for (let hour = 8; hour <= 20; hour++) {
+      const hourLabel = document.createElement('div');
+      hourLabel.className = 'hour-label';
+      hourLabel.textContent = `${hour}:00`;
+      
+      const hourActivities = document.createElement('div');
+      hourActivities.className = 'hour-activities';
+      hourActivities.dataset.hour = hour;
+      
+      dayViewContent.appendChild(hourLabel);
+      dayViewContent.appendChild(hourActivities);
+    }
+    
+    // Ajouter les activités à la vue journalière
+    const dayActivities = ticketEvents.filter(event => 
+      new Date(event.date).toDateString() === date.toDateString()
+    );
+    
+    // Trier les activités par heure de début
+    dayActivities.sort((a, b) => a.startTime - b.startTime);
+    
+    if (dayActivities.length === 0) {
+      const emptyMessage = document.createElement('div');
+      emptyMessage.className = 'empty-day-message';
+      emptyMessage.textContent = 'Aucune activité prévue pour cette journée';
+      dayViewContent.appendChild(emptyMessage);
+    } else {
+      // Ajouter les activités aux créneaux horaires appropriés
+      dayActivities.forEach(activity => {
+        const startHour = activity.startTime.getHours();
+        const hourSlot = document.querySelector(`.hour-activities[data-hour="${startHour}"]`);
+        
+        if (hourSlot) {
+          const activityEl = document.createElement('div');
+          activityEl.className = `day-activity ${activity.status}`;
+          
+          const startTime = activity.startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+          const endTime = activity.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+          
+          activityEl.innerHTML = `
+            <div class="day-activity-title">${activity.name}</div>
+            <div class="day-activity-time">${startTime} - ${endTime}</div>
+            <div class="day-activity-description">${activity.description}</div>
+          `;
+          
+          hourSlot.appendChild(activityEl);
+        }
+      });
+    }
+    
+    // Afficher la vue journalière, masquer la vue mensuelle
+    calendarGrid.classList.add('hidden');
+    dayView.classList.remove('hidden');
+    backToMonthBtn.classList.remove('hidden');
+  };
+  
+  // Fonction pour revenir à la vue mensuelle
+  const showMonthView = () => {
+    isMonthView = true;
+    calendarGrid.classList.remove('hidden');
+    dayView.classList.add('hidden');
+    backToMonthBtn.classList.add('hidden');
+  };
+
+  // Navigation entre les mois/jours
+  prevMonthBtn.addEventListener('click', () => {
+    if (isMonthView) {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    } else {
+      const prevDay = new Date(selectedDay);
+      prevDay.setDate(prevDay.getDate() - 1);
+      showDayView(prevDay);
+    }
+  });
+  
+  nextMonthBtn.addEventListener('click', () => {
+    if (isMonthView) {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    } else {
+      const nextDay = new Date(selectedDay);
+      nextDay.setDate(nextDay.getDate() + 1);
+      showDayView(nextDay);
+    }
+  });
+  
+  backToMonthBtn.addEventListener('click', () => {
+    showMonthView();
+  });
+
+  // Initialiser le calendrier
+  renderCalendar();
+});
+</script>
