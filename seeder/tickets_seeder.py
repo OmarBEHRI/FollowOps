@@ -75,6 +75,7 @@ def seed_tickets(users, projects):
                 title=template['title'],
                 description=template['description'],
                 status=template['status'],
+                created_by=random.choice(members),  # Ajouter cette ligne
                 created_at=project.start_date + timedelta(days=random.randint(1, max(2, (timezone.now().date() - project.start_date).days)))
             )
             
