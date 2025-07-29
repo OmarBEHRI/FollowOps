@@ -271,8 +271,10 @@
                     <div class="flex min-w-72 flex-col gap-3">
                         <p class="text-[#191610] tracking-light text-[32px] font-bold leading-tight">Ressources</p>
                     </div>
-                    <!-- Bouton d'ajout de ressource -->
+                    <!-- Bouton d'ajout de ressource - seulement pour ADMIN et MANAGER -->
+                    {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
                     <button class="add-resource-btn" onclick="window.location.href='/ressources/add/'">Ajouter une Ressource</button>
+                    {% endif %}
                 </div>
                 <div class="px-4 py-3">
                     <label class="flex flex-col min-w-40 h-12 w-full">

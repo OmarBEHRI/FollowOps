@@ -12,7 +12,26 @@ import json  # Ajouter cet import
 @login_required
 def ressources(request):
     user = request.user
-    ressources = Ressource.objects.all()
+    
+    # Filter resources based on user role
+    if user.appRole == 'ADMIN':
+        # Admin sees all resources
+        ressources = Ressource.objects.all()
+    elif user.appRole == 'MANAGER':
+        # Manager sees resources from their projects + themselves
+        from projects.models import Project
+        managed_projects = Project.objects.filter(project_manager=user)
+        # Use Q objects to combine conditions properly
+        ressources = Ressource.objects.filter(
+            Q(members__in=managed_projects) | Q(id=user.id)
+        ).distinct()
+    else:
+        # Regular user sees only resources from their projects + themselves
+        user_projects = user.members.all()
+        # Use Q objects to combine conditions properly
+        ressources = Ressource.objects.filter(
+            Q(members__in=user_projects) | Q(id=user.id)
+        ).distinct()
 
     # Search functionality
     search_query = request.GET.get('search', '').strip()
@@ -130,6 +149,10 @@ def ressourcesDetails(request, resource_id=None):
 
 
 def add_resource(request):
+    # Vérifier que l'utilisateur a les permissions
+    if request.user.appRole not in ['ADMIN', 'MANAGER']:
+        return redirect('ressources')
+    
     if request.method == 'POST':
         first_name = request.POST.get('name')
         last_name = ''  # À adapter si tu veux le demander
