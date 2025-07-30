@@ -224,6 +224,14 @@ def create_tag(request):
 
 
 @login_required
+def get_all_tags(request):
+    """API endpoint to get all available tags"""
+    tags = Tag.objects.all().order_by('name')
+    tags_data = [{'id': tag.id, 'name': tag.name} for tag in tags]
+    return JsonResponse({'tags': tags_data})
+
+
+@login_required
 def edit_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
     

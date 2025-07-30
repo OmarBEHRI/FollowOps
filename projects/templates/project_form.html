@@ -217,86 +217,7 @@
         transform: translateY(-1px);
     }
 
-    /* Styles pour les tags */
-    .tag-container {
-        background: var(--bg-light);
-        border: 2px solid var(--border-color);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        min-height: 80px;
-        transition: all 0.2s ease;
-    }
 
-    .tag-container:focus-within {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.1);
-    }
-
-    .clean-input {
-        width: 100%;
-        border: none;
-        outline: none;
-        font-size: 14px;
-        color: #2d3748;
-        background: transparent;
-        padding: 8px 0;
-    }
-
-    .clean-input::placeholder {
-        color: #a0aec0;
-    }
-
-    .clean-input:focus {
-        outline: none;
-        box-shadow: none;
-    }
-
-    .tags-display {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 12px;
-        min-height: 20px;
-    }
-
-    .simple-tag {
-        background: #f7fafc;
-        color: #4a5568;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        border: 1px solid #e2e8f0;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.15s ease;
-    }
-
-    .simple-tag:hover {
-        background: #edf2f7;
-        border-color: #cbd5e0;
-    }
-
-    .tag-remove {
-        background: none;
-        border: none;
-        color: #a0aec0;
-        cursor: pointer;
-        font-size: 14px;
-        line-height: 1;
-        padding: 0;
-        width: 14px;
-        height: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 2px;
-    }
-
-    .tag-remove:hover {
-        color: #e53e3e;
-        background: #fed7d7;
-    }
   </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
@@ -630,42 +551,250 @@
               </div>
             </div>
 
-            <!-- Section 3: Tags -->
-            <div class="form-section animate-fade-in-up" style="animation-delay: 0.2s">
-              <div class="section-header">
-                <div class="section-icon">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h2 class="section-title">Tags</h2>
-                  <p class="section-subtitle">Étiquettes du projet</p>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="id_tags" class="form-label">{{ form.tags.label }}</label>
-                <!-- Barre de recherche avec style uniforme comme les membres -->
-                <div class="member-search-container">
-                  <div class="relative">
-                    <input 
-                      type="text" 
-                      id="id_tags" 
-                      name="tags" 
-                      placeholder="Ex: web, mobile, urgent, backend..."
-                      class="member-search-input"
-                    >
-                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <p class="text-sm text-[#6E6864] mt-2">
-                  💡 Séparez les tags par des virgules
-                </p>
-              </div>
-            </div>
+<!-- Section 3: Tags avec liste déroulante harmonisée -->
+<div class="form-section animate-fade-in-up" style="animation-delay: 0.2s">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
+      </svg>
+    </div>
+    <div>
+      <h2 class="section-title">Tags</h2>
+      <p class="section-subtitle">Sélectionnez ou créez des étiquettes pour votre projet</p>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label for="tag-input" class="form-label">{{ form.tags.label }}</label>
+    <div class="tag-input-container">
+      <div class="member-search-container">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="tag-input" 
+            placeholder="Cliquez pour voir les tags disponibles ou tapez pour créer..."
+            class="member-search-input"
+            autocomplete="off"
+          >
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Liste déroulante harmonisée -->
+      <div class="dropdown-menu hidden" id="tag-dropdown">
+        <div class="dropdown-header">Tags disponibles</div>
+        <div class="dropdown-content" id="tag-list">
+          <!-- Les tags seront chargés ici -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Affichage des tags sélectionnés -->
+    <div class="selected-tags-display" id="selected-tags">
+      <!-- Les tags sélectionnés apparaîtront ici -->
+    </div>
+    
+    <!-- Input caché pour le formulaire -->
+    {{ form.tags }}
+  </div>
+</div>
+
+<style>
+.tag-input-container {
+  position: relative;
+}
+
+/* Harmonisation avec les autres dropdowns */
+.dropdown-menu {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.25rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-menu.hidden {
+  display: none;
+}
+
+.dropdown-header {
+  padding: 0.75rem 1rem;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-color-dark);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.dropdown-content {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: block;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #191610;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-item:hover {
+  background-color: #f1efe9;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.selected-tags-display {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.selected-tag {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tag-remove {
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.tag-remove:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tagInput = document.getElementById('tag-input');
+  const tagDropdown = document.getElementById('tag-dropdown');
+  const tagList = document.getElementById('tag-list');
+  const selectedTagsContainer = document.getElementById('selected-tags');
+  const hiddenInput = document.querySelector('input[name="tags"]');
+  
+  let availableTags = [];
+  let selectedTags = [];
+  
+  // Charger les tags disponibles
+  function loadTags() {
+    fetch('/projects/api/tags/all/')
+      .then(response => response.json())
+      .then(data => {
+        availableTags = data.tags;
+        displayTags(availableTags);
+      })
+      .catch(error => console.error('Erreur:', error));
+  }
+  
+  // Afficher les tags dans la liste déroulante (style harmonisé)
+  function displayTags(tags) {
+    tagList.innerHTML = '';
+    tags.forEach(tag => {
+      const tagElement = document.createElement('div');
+      tagElement.className = 'dropdown-item';
+      tagElement.textContent = tag.name;
+      tagElement.onclick = () => selectTag(tag);
+      tagList.appendChild(tagElement);
+    });
+  }
+  
+  // Sélectionner un tag
+  function selectTag(tag) {
+    if (!selectedTags.find(t => t.id === tag.id)) {
+      selectedTags.push(tag);
+      updateSelectedTags();
+      tagDropdown.classList.add('hidden');
+      tagInput.value = '';
+    }
+  }
+  
+  // Supprimer un tag
+  function removeTag(tagId) {
+    selectedTags = selectedTags.filter(tag => tag.id !== tagId);
+    updateSelectedTags();
+  }
+  
+  // Mettre à jour l'affichage des tags sélectionnés
+  function updateSelectedTags() {
+    selectedTagsContainer.innerHTML = '';
+    selectedTags.forEach(tag => {
+      const tagElement = document.createElement('div');
+      tagElement.className = 'selected-tag';
+      tagElement.innerHTML = `
+        <span>${tag.name}</span>
+        <button type="button" class="tag-remove" onclick="removeTag(${tag.id})">
+          ×
+        </button>
+      `;
+      selectedTagsContainer.appendChild(tagElement);
+    });
+    
+    // Mettre à jour l'input caché
+    if (hiddenInput) {
+      hiddenInput.value = selectedTags.map(tag => tag.id).join(',');
+    }
+  }
+  
+  // Événements harmonisés avec les autres dropdowns
+  tagInput.addEventListener('click', function() {
+    loadTags();
+    tagDropdown.classList.remove('hidden');
+  });
+  
+  tagInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const filteredTags = availableTags.filter(tag => 
+      tag.name.toLowerCase().includes(searchTerm)
+    );
+    displayTags(filteredTags);
+    tagDropdown.classList.remove('hidden');
+  });
+  
+  // Fermer la liste au clic extérieur (comme les autres dropdowns)
+  document.addEventListener('click', function(e) {
+    if (!tagInput.contains(e.target) && !tagDropdown.contains(e.target)) {
+      tagDropdown.classList.add('hidden');
+    }
+  });
+  
+  // Fonction globale pour supprimer un tag
+  window.removeTag = removeTag;
+});
+</script>
 
             <style>
             .tags-container-enhanced {
@@ -1493,7 +1622,146 @@
     </div>
   </div>
   <!-- Avant la fermeture du body -->
-  <script src="{% static 'projects/js/simple_tags.js' %}"></script>
+  <script>
+// JavaScript pour la gestion des tags avec liste de sélection
+document.addEventListener('DOMContentLoaded', function() {
+  const tagSelector = document.getElementById('tag-selector');
+  const addSelectedTagBtn = document.getElementById('add-selected-tag');
+  const newTagInput = document.getElementById('new-tag-input');
+  const createNewTagBtn = document.getElementById('create-new-tag');
+  const selectedTagsContainer = document.getElementById('selected-tags-container');
+  const tagsPlaceholder = document.getElementById('tags-placeholder');
+  const tagCount = document.getElementById('tag-count');
+  const hiddenTagsInput = document.getElementById('id_tags');
+  
+  let selectedTags = new Set();
+  
+  // Charger les tags existants
+  function loadExistingTags() {
+    fetch('/projects/api/tags/all/')
+      .then(response => response.json())
+      .then(data => {
+        tagSelector.innerHTML = '<option value="">Choisir un tag existant...</option>';
+        data.tags.forEach(tag => {
+          const option = document.createElement('option');
+          option.value = tag.id;
+          option.textContent = tag.name;
+          option.dataset.name = tag.name;
+          tagSelector.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Erreur lors du chargement des tags:', error));
+  }
+  
+  // Ajouter un tag sélectionné
+  function addTag(id, name) {
+    if (selectedTags.has(id)) return;
+    
+    selectedTags.add(id);
+    updateTagsDisplay();
+    updateHiddenInput();
+  }
+  
+  // Supprimer un tag
+  function removeTag(id) {
+    selectedTags.delete(id);
+    updateTagsDisplay();
+    updateHiddenInput();
+  }
+  
+  // Mettre à jour l'affichage des tags
+  function updateTagsDisplay() {
+    if (selectedTags.size === 0) {
+      selectedTagsContainer.innerHTML = ``;
+      selectedTagsContainer.classList.remove('has-tags');
+    } else {
+      const tagsHTML = Array.from(selectedTags).map(tagId => {
+        const option = tagSelector.querySelector(`option[value="${tagId}"]`);
+        const tagName = option ? option.dataset.name : tagId;
+        return `
+          <div class="selected-tag" data-id="${tagId}">
+            <span>${tagName}</span>
+            <button type="button" class="tag-remove" onclick="removeTagById('${tagId}')">
+              ×
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      selectedTagsContainer.innerHTML = `<div class="tags-grid">${tagsHTML}</div>`;
+      selectedTagsContainer.classList.add('has-tags');
+    }
+    
+    // Mettre à jour le compteur
+    tagCount.textContent = selectedTags.size;
+  }
+  
+  // Mettre à jour l'input caché
+  function updateHiddenInput() {
+    const tagIds = Array.from(selectedTags);
+    // Mettre à jour les options sélectionnées
+    Array.from(hiddenTagsInput.options).forEach(option => {
+      option.selected = tagIds.includes(option.value);
+    });
+  }
+  
+  // Fonction globale pour supprimer un tag
+  window.removeTagById = function(id) {
+    removeTag(id);
+  };
+  
+  // Événements
+  addSelectedTagBtn.addEventListener('click', function() {
+    const selectedOption = tagSelector.options[tagSelector.selectedIndex];
+    if (selectedOption.value) {
+      addTag(selectedOption.value, selectedOption.dataset.name);
+      tagSelector.selectedIndex = 0;
+    }
+  });
+  
+  createNewTagBtn.addEventListener('click', function() {
+    const tagName = newTagInput.value.trim();
+    if (tagName) {
+      // Créer le nouveau tag
+      fetch('/projects/api/tags/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ name: tagName })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Ajouter à la liste déroulante
+          const option = document.createElement('option');
+          option.value = data.tag.id;
+          option.textContent = data.tag.name;
+          option.dataset.name = data.tag.name;
+          tagSelector.appendChild(option);
+          
+          // Ajouter aux tags sélectionnés
+          addTag(data.tag.id, data.tag.name);
+          newTagInput.value = '';
+        }
+      })
+      .catch(error => console.error('Erreur lors de la création du tag:', error));
+    }
+  });
+  
+  // Permettre la création avec Enter
+  newTagInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      createNewTagBtn.click();
+    }
+  });
+  
+  // Initialisation
+  loadExistingTags();
+});
+</script>
   <script src="{% static 'projects/js/planning_calculator.js' %}"></script>
 </body>
 </html>
