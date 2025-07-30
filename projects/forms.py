@@ -5,11 +5,9 @@ from ressources.models import Ressource
 class ProjectForm(forms.ModelForm):
     members = forms.ModelMultipleChoiceField(
         queryset=Ressource.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False,
-        label="Membres du projet"
+        widget=forms.MultipleHiddenInput,  # ← SOLUTION
+        required=False
     )
-    
     project_manager = forms.ModelChoiceField(
         queryset=Ressource.objects.filter(appRole__in=['ADMIN', 'MANAGER']),
         widget=forms.Select(attrs={'class': 'form-control'}),
@@ -38,6 +36,16 @@ class ProjectForm(forms.ModelForm):
             'project_manager': forms.Select(attrs={'class': 'form-control'}),
             'expected_start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'expected_end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'estimated_charges': forms.NumberInput(attrs={'class': 'form-control'}),
-            'progress': forms.NumberInput(attrs={'class': 'form-control'}),
+            'estimated_charges': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '1',
+                'placeholder': 'Ex: 10 jours ou 80 heures'
+            }),
+            'progress': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'max': '100',
+                'step': '1'
+            }),
         }

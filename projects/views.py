@@ -82,7 +82,13 @@ def create_project(request):
     else:
         form = ProjectForm()
     
-    return render(request, 'project_form.html', {'form': form})
+    # Récupérer tous les membres disponibles de la base de données
+    available_members = Ressource.objects.all().order_by('first_name', 'last_name')
+    
+    return render(request, 'project_form.html', {
+        'form': form,
+        'available_members': available_members
+    })
 
 @login_required
 def projectDetails(request, pk):
@@ -220,29 +226,29 @@ def create_tag(request):
 @login_required
 def edit_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
-    user = request.user
     
-    # Check if user has permission to edit the project
-    if not (user.appRole == 'ADMIN' or (user.appRole == 'MANAGER' and project.project_manager == user)):
-        return redirect('projectDetails', pk=pk)
+    # Check permissions
+    user = request.user
+    if user.appRole not in ['ADMIN', 'MANAGER'] or (user.appRole == 'MANAGER' and project.project_manager != user):
+        return redirect('projects')
     
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            project = form.save()
-            
-            # Update members if provided
-            members = form.cleaned_data.get('members')
-            if members:
-                project.members.set(members)
-            
+            form.save()
             return redirect('projectDetails', pk=pk)
     else:
         form = ProjectForm(instance=project)
-        # Preselect current members
-        form.fields['members'].initial = project.members.all()
     
-    return render(request, 'project_form.html', {'form': form, 'edit_mode': True, 'project': project})
+    # Récupérer tous les membres disponibles
+    available_members = Ressource.objects.all().order_by('first_name', 'last_name')
+    
+    return render(request, 'project_form.html', {
+        'form': form, 
+        'project': project, 
+        'edit_mode': True,
+        'available_members': available_members
+    })
 
 
 @login_required
