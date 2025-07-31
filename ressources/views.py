@@ -89,10 +89,28 @@ def ressources(request):
     })
 
 
+@login_required
 def ressourcesDetails(request, resource_id=None):
     if resource_id:
         try:
             resource = get_object_or_404(Ressource, id=resource_id)
+            user = request.user
+            
+            # Vérifier les permissions d'accès selon le rôle
+            if user.appRole == 'ADMIN':
+                # Admin peut voir toutes les ressources
+                pass
+            elif user.appRole == 'MANAGER':
+                # Manager peut voir les ressources de ses projets + lui-même
+                from projects.models import Project
+                managed_projects = Project.objects.filter(project_manager=user)
+                if not (resource.members.filter(id__in=managed_projects).exists() or resource.id == user.id):
+                    return redirect('ressources')
+            else:
+                # Utilisateur normal peut voir seulement les ressources de ses projets + lui-même
+                user_projects = user.members.all()
+                if not (resource.members.filter(id__in=user_projects).exists() or resource.id == user.id):
+                    return redirect('ressources')
             
             # Récupérer les tickets assignés à cette ressource
             assigned_tickets = resource.assignedTickets.all()
@@ -202,8 +220,21 @@ def add_resource(request):
     return render(request, 'add_resource.html')
 
 
+@login_required
 def edit_resource(request, resource_id):
-    resource = Ressource.objects.get(id=resource_id)
+    # Vérifier que l'utilisateur a les permissions
+    if request.user.appRole not in ['ADMIN', 'MANAGER']:
+        return redirect('ressources')
+        
+    resource = get_object_or_404(Ressource, id=resource_id)
+    
+    # Vérifier que le manager peut seulement éditer les ressources de ses projets
+    if request.user.appRole == 'MANAGER':
+        from projects.models import Project
+        managed_projects = Project.objects.filter(project_manager=request.user)
+        if not resource.members.filter(id__in=managed_projects).exists():
+            return redirect('ressources')
+    
     if request.method == 'POST':
         first_name = request.POST.get('name')
         last_name = request.POST.get('last_name', '')
