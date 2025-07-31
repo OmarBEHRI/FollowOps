@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendrier - {{ resource.first_name }} {{ resource.last_name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'js/activity-form.js' %}" defer></script>
     <style>
         :root {
             --primary-color: #A08D80;
@@ -640,7 +641,9 @@
             </button>
         </div>
         
-        <form id="addActivityForm" class="p-6 space-y-4">
+        <form id="addActivityForm" method="post" class="p-6 space-y-4">
+            {% csrf_token %}
+            {% csrf_token %}
             <div>
                 <label for="activityTitle" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Titre</label>
                 <input type="text" id="activityTitle" name="title" required 
@@ -679,12 +682,12 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="activityStartDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de début</label>
-                    <input type="datetime-local" id="activityStartDate" required 
+                    <input type="datetime-local" id="activityStartDate" name="start_datetime" required 
                            class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
                 </div>
                 <div>
                     <label for="activityEndDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de fin</label>
-                    <input type="datetime-local" id="activityEndDate" required 
+                    <input type="datetime-local" id="activityEndDate" name="end_datetime" required 
                            class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
                 </div>
             </div>
@@ -1208,6 +1211,87 @@
           if (event.target === modal) {
               closeActivityModal();
           }
+      }
+      // Gérer la soumission du formulaire d'ajout d'activité
+      if (addActivityForm) {
+          addActivityForm.addEventListener('submit', function(e) {
+              e.preventDefault();
+              
+              const formData = {
+                  title: document.getElementById('activityTitle').value,
+                  description: document.getElementById('activityDescription').value,
+                  type: document.getElementById('activityType').value,
+                  start_date: document.getElementById('activityStartDate').value,
+                  end_date: document.getElementById('activityEndDate').value,
+                  resource_id: '{{ resource.id }}'
+              };
+
+              // Ajouter l'ID du projet ou du ticket selon le type sélectionné
+              if (formData.type === 'PROJECT') {
+                  formData.project_id = document.getElementById('activityProject').value;
+              } else if (formData.type === 'TICKET') {
+                  formData.ticket_id = document.getElementById('activityTicket').value;
+              }
+
+              // Envoyer les données au serveur
+              fetch('/activities/create/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCookie('csrftoken')
+                  },
+                  body: JSON.stringify(formData)
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      // Ajouter la nouvelle activité à la liste des événements
+                      const newActivity = {
+                          date: new Date(formData.start_date).toDateString(),
+                          name: formData.title,
+                          status: 'planned',
+                          description: formData.description,
+                          startTime: new Date(formData.start_date),
+                          endTime: new Date(formData.end_date)
+                      };
+                      
+                      resourceEvents.push(newActivity);
+                      
+                      // Fermer le modal et rafraîchir le calendrier
+                      addActivityModal.classList.add('hidden');
+                      addActivityForm.reset();
+                      renderCalendar();
+                      
+                      // Si on est en vue journalière, rafraîchir la vue
+                      if (!isMonthView && selectedDay) {
+                          showDayView(selectedDay);
+                      }
+                  } else {
+                      console.error('Erreur lors de la création de l\'activité:', data.error);
+                      alert('Une erreur est survenue lors de la création de l\'activité');
+                  }
+              })
+              .catch(error => {
+                  console.error('Erreur lors de la création de l\'activité:', error);
+                  alert('Une erreur est survenue lors de la création de l\'activité');
+              });
+          });
+      }
+
+      // Fonction utilitaire pour récupérer le token CSRF
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
       }
     });
     </script>
