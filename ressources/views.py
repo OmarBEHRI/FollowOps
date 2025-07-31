@@ -8,6 +8,7 @@ import pandas as pd
 from urllib.parse import quote
 from datetime import datetime
 import json  # Ajouter cet import
+from django.http import JsonResponse
 
 @login_required
 def ressources(request):
@@ -307,3 +308,56 @@ def export_ressources_excel(request):
     with pd.ExcelWriter(response, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Ressources')
     return response
+
+
+@login_required
+def get_resource_activities(request, resource_id):
+    """API endpoint to get activities for a specific resource"""
+    try:
+        resource = get_object_or_404(Ressource, id=resource_id)
+        
+        # Get activities for this resource
+        activities = Activity.objects.filter(employee=resource).order_by('start_datetime')
+        
+        activities_data = []
+        for activity in activities:
+            # Determine activity name
+            activity_name = activity.title
+            if activity.project:
+                activity_name = f"{activity.project.title} - {activity.title}"
+            elif activity.ticket:
+                activity_name = f"Ticket #{activity.ticket.id} - {activity.title}"
+            
+            # Determine status based on dates
+            now = datetime.now().date()
+            activity_date = activity.start_datetime.date()
+            
+            if activity_date < now:
+                status = 'completed'
+            elif activity_date == now:
+                status = 'inprogress'
+            else:
+                status = 'planned'
+            
+            activities_data.append({
+                'id': activity.id,
+                'title': activity_name,
+                'description': activity.description,
+                'start': activity.start_datetime.isoformat(),
+                'end': activity.end_datetime.isoformat(),
+                'status': status,
+                'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+                'project': activity.project.title if activity.project else None,
+                'ticket': activity.ticket.id if activity.ticket else None
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'activities': activities_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })

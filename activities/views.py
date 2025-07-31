@@ -50,17 +50,17 @@ def create_activity(request):
         }, status=400)
 
 def get_projects_and_tickets(request, resource_id):
-    """Récupérer les projets et tickets disponibles pour une ressource"""
     try:
         resource = get_object_or_404(Ressource, id=resource_id)
         
-        # Récupérer tous les projets (ou filtrer selon vos besoins)
-        projects = Project.objects.all().values('id', 'title')
-        tickets = Ticket.objects.all().values('id', 'title')
+        # Utiliser 'name' pour correspondre au JavaScript
+        projects = [{'id': p.id, 'name': p.title} for p in Project.objects.all()]
+        tickets = [{'id': t.id, 'title': t.title} for t in Ticket.objects.all()]
         
         return JsonResponse({
-            'projects': list(projects),
-            'tickets': list(tickets)
+            'success': True,  # Ajouté pour correspondre au JavaScript
+            'projects': projects,
+            'tickets': tickets
         })
         
     except Exception as e:

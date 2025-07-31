@@ -9,6 +9,8 @@ urlpatterns = [
     path('edit/<int:resource_id>/', views.edit_resource, name='edit_resource'),
     path('delete/<int:resource_id>/', views.delete_resource, name='delete_resource'),
     path('export/', views.export_ressources_excel, name='export_ressources'),
+    # API endpoint for resource activities
+    path('api/<int:resource_id>/activities/', views.get_resource_activities, name='get_resource_activities'),
 ]
 
 
