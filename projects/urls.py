@@ -9,6 +9,7 @@ urlpatterns = [
     path('calendar/<int:pk>/', views.projectCalendar, name='projectCalendar'),
     path('comments/<int:pk>/', views.projectComments, name='projectComments'),
     path('edit/<int:pk>/', views.edit_project, name='edit_project'),
+    path('delete/<int:pk>/', views.delete_project, name='delete_project'),  # Nouvelle route
     # Tag API endpoints
     path('api/tags/search/', views.search_tags, name='search_tags'),
     path('api/tags/all/', views.get_all_tags, name='get_all_tags'),

@@ -245,7 +245,7 @@
         </header>
         
         <!-- Titre principal -->
-        <div class="container mx-auto px-4 py-8">
+        <div class="w-full px-6 py-8">
           <div class="flex justify-between items-center mb-8">
             <div>
               {% if edit_mode %}
@@ -276,8 +276,27 @@
           </div>
 
           <!-- Formulaire principal -->
-          <form method="post" class="space-y-6">
+          <form method="post" class="space-y-6 w-full">
             {% csrf_token %}
+            
+            <!-- Affichage des erreurs de validation -->
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-red-800 font-medium">Erreurs de validation</h3>
+              </div>
+              <ul class="text-red-700 text-sm space-y-1">
+                {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ field|capfirst }} : {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
             
             <!-- Section 1: Informations générales -->
             <div class="form-section animate-fade-in-up">
@@ -508,7 +527,7 @@
                                     id="id_expected_start_date" 
                                     name="expected_start_date"
                                     class="member-search-input"
-                                    value="{{ form.expected_start_date.value|default:'' }}"
+                                    value="{{ form.expected_start_date.value|date:'Y-m-d'|default:'' }}"
                                 >
                                 <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -527,7 +546,7 @@
                                     id="id_expected_end_date" 
                                     name="expected_end_date"
                                     class="member-search-input"
-                                    value="{{ form.expected_end_date.value|default:'' }}"
+                                    value="{{ form.expected_end_date.value|date:'Y-m-d'|default:'' }}"
                                 >
                                 <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1505,6 +1524,33 @@ document.addEventListener('DOMContentLoaded', function() {
               
               let selectedMembers = [];
 
+              // Initialisation des membres existants en mode édition
+              {% if edit_mode and project.members.all %}
+              const existingMembers = [
+                {% for member in project.members.all %}
+                {
+                  id: '{{ member.id }}',
+                  name: '{{ member.first_name }} {{ member.last_name }}',
+                  role: '{{ member.role|default:"Membre" }}'
+                },
+                {% endfor %}
+              ];
+              
+              // Pré-remplir les membres sélectionnés
+              existingMembers.forEach(member => {
+                selectedMembers.push(member);
+                createMemberBadge(member.id, member.name);
+                
+                // Marquer le tag comme sélectionné
+                const memberTag = document.querySelector(`[data-member="${member.id}"]`);
+                if (memberTag) {
+                  memberTag.classList.add('selected');
+                }
+              });
+              
+              updateSelectedCount();
+              {% endif %}
+
               // Fonction de recherche
               searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
@@ -1758,6 +1804,60 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // Initialisation des tags existants en mode édition
+  {% if edit_mode and project.tags.all %}
+  const existingTags = [
+    {% for tag in project.tags.all %}
+    { id: '{{ tag.id }}', name: '{{ tag.name }}' },
+    {% endfor %}
+  ];
+  
+  // Attendre que les tags soient chargés avant de les pré-sélectionner
+  function initializeExistingTags() {
+    existingTags.forEach(tag => {
+      selectedTags.add(tag.id);
+    });
+    updateTagsDisplay();
+    updateHiddenInput();
+  }
+  
+  // Modifier la fonction loadExistingTags
+  function loadExistingTags() {
+    fetch('/projects/api/tags/all/')
+      .then(response => response.json())
+      .then(data => {
+        tagSelector.innerHTML = '<option value="">Choisir un tag existant...</option>';
+        data.tags.forEach(tag => {
+          const option = document.createElement('option');
+          option.value = tag.id;
+          option.textContent = tag.name;
+          option.dataset.name = tag.name;
+          tagSelector.appendChild(option);
+        });
+        
+        // Initialiser les tags existants après le chargement
+        initializeExistingTags();
+      })
+      .catch(error => console.error('Erreur lors du chargement des tags:', error));
+  }
+  {% else %}
+  function loadExistingTags() {
+    fetch('/projects/api/tags/all/')
+      .then(response => response.json())
+      .then(data => {
+        tagSelector.innerHTML = '<option value="">Choisir un tag existant...</option>';
+        data.tags.forEach(tag => {
+          const option = document.createElement('option');
+          option.value = tag.id;
+          option.textContent = tag.name;
+          option.dataset.name = tag.name;
+          tagSelector.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Erreur lors du chargement des tags:', error));
+  }
+  {% endif %}
+
   // Initialisation
   loadExistingTags();
 });

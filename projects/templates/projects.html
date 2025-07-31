@@ -342,7 +342,8 @@
                             </thead>
                             <tbody id="projects-table-body">
                                 {% for project in projects %}
-                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='{% url 'projectDetails' project.id %}'">
+                                {% if project.id %}
+                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='{% url 'projectDetails' project.id %}'"> 
                                     <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ project.title }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.description|truncatechars:50 }}</td>
                                     <td class="px-4 py-5 text-center"><span class="status-badge type-badge rounded-full px-3 py-1 text-sm font-medium">{{ project.type }}</span></td>
@@ -361,6 +362,7 @@
                                     </td>
                                     {% endif %}
                                 </tr>
+                                {% endif %}
                                 {% empty %}
                                 <tr><td colspan="9" class="text-center py-5">Aucun projet trouvé.</td></tr>
                                 {% endfor %}

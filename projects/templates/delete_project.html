@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowOps - Supprimer un Projet</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    :root {
+        --primary-color: #A08D80;
+        --secondary-color: #D4CCC1;
+        --text-color-dark: #3F3C3A;
+        --text-color-medium: #6E6864;
+        --bg-light: #FBF9F7;
+        --bg-white: #FFFFFF;
+        --border-color: #EBE5E0;
+        --danger-color: #DC2626;
+    }
+  </style>
+</head>
+<body class="bg-[#fbfaf9] font-['Inter','Noto_Sans',sans-serif]">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+      <div class="text-center mb-6">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+          <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Supprimer le projet</h3>
+        <p class="text-sm text-gray-500 mb-4">
+          Êtes-vous sûr de vouloir supprimer le projet <strong>"{{ project.title }}"</strong> ?
+        </p>
+        <p class="text-sm text-red-600">
+          Cette action est irréversible et supprimera définitivement toutes les données associées.
+        </p>
+      </div>
+      
+      <div class="flex gap-3">
+        <a href="{% url 'projects' %}" class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-center hover:bg-gray-200 transition-colors">
+          Annuler
+        </a>
+        <form method="post" class="flex-1">
+          {% csrf_token %}
+          <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+            Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

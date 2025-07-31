@@ -22,6 +22,9 @@ def projects(request):
         # Regular user sees projects where they are a member
         projects = Project.objects.filter(members=user)
     
+    # Filtrer les projets avec des IDs valides
+    projects = projects.exclude(id__isnull=True)
+    
     # Apply additional filters from query parameters
     status_filter = request.GET.get('status')
     priority_filter = request.GET.get('priority')
@@ -47,6 +50,7 @@ def projects(request):
     return render(request, 'projects.html', {
         'projects': projects,
         'can_create_project': can_create_project,
+        'user_role': user.appRole,
         'status_choices': status_choices,
         'priority_choices': priority_choices,
         'project_managers': project_managers,
@@ -65,6 +69,11 @@ def create_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
+            
+            # Assigner automatiquement le créateur comme chef de projet si aucun n'est spécifié
+            if not project.project_manager:
+                project.project_manager = request.user
+            
             # Set start date to None initially
             project.start_date = None
             project.end_date = None
@@ -78,7 +87,16 @@ def create_project(request):
             if members:
                 project.members.set(members)
             
+            # Si aucun membre n'est spécifié, ajouter le créateur comme membre
+            if not members:
+                project.members.add(request.user)
+            
             return redirect('projects')
+        else:
+            # Debug: afficher les erreurs de validation
+            print("Erreurs de validation du formulaire:")
+            for field, errors in form.errors.items():
+                print(f"{field}: {errors}")
     else:
         form = ProjectForm()
     
@@ -243,7 +261,26 @@ def edit_project(request, pk):
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            form.save()
+            project = form.save(commit=False)
+            project.save()
+            
+            # Sauvegarder les relations many-to-many
+            form.save_m2m()
+            
+            # Gérer les membres spécifiquement
+            members = form.cleaned_data.get('members')
+            if members:
+                project.members.set(members)
+            else:
+                project.members.clear()
+                
+            # Gérer les tags spécifiquement
+            tags = form.cleaned_data.get('tags')
+            if tags:
+                project.tags.set(tags)
+            else:
+                project.tags.clear()
+            
             return redirect('projectDetails', pk=pk)
     else:
         form = ProjectForm(instance=project)
@@ -308,3 +345,18 @@ def projectComments(request, pk):
         'active_tab': 'commentaires',
         'pk': pk
     })
+
+
+@login_required
+def delete_project(request, pk):
+    # Vérifier que l'utilisateur est admin
+    if request.user.appRole != 'ADMIN':
+        return redirect('projects')
+    
+    project = get_object_or_404(Project, pk=pk)
+    
+    if request.method == 'POST':
+        project.delete()
+        return redirect('projects')
+    
+    return render(request, 'delete_project.html', {'project': project})

@@ -26,7 +26,7 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['title', 'description', 'type', 'status', 'priority', 
                  'project_manager', 'expected_start_date', 'expected_end_date',
-                 'estimated_charges', 'progress']
+                 'estimated_charges', 'progress', 'members', 'tags']  # Ajout de 'members' et 'tags'
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control h-32'}),
