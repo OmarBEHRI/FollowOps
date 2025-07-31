@@ -158,8 +158,8 @@ def projectCalendar(request, pk):
             'id': activity.id,
             'title': activity.title,
             'description': activity.description,
-            'start_date': activity.start_datetime.date(),
-            'end_date': activity.end_datetime.date(),
+            'start_date': activity.start_datetime,  # Garder l'objet datetime complet
+            'end_date': activity.end_datetime,      # Garder l'objet datetime complet
             'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
             'charge': activity.charge
         })

@@ -2,231 +2,1012 @@
 
 {% block extra_styles %}
 <style>
+:root {
+    --primary-color: #A08D80;
+    --secondary-color: #8C7B71;
+    --accent-color: #D4C4B0;
+    --bg-white: #FFFFFF;
+    --bg-light: #F9F8F7;
+    --text-color-dark: #191610;
+    --text-color-medium: #8C7E5A;
+    --text-color-light: #B8B4A8;
+    --border-color: #E3DFD3;
+    --button-bg-light: #F1EFE9;
+    --nav-link-color:rgb(0, 0, 0);
+}
+
+/* Enhanced Calendar styles */
+main {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.calendar-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bg-white);
+    border-radius: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background-color: var(--bg-white);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px var(--shadow-light);
+    gap: 1px;
+    background-color: var(--border-color);
+    flex: 1;
+    width: 100%;
+    height: 100%;
 }
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.bg-white {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.calendar-section {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-cell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100px;
+    background-color: var(--bg-white);
+    padding: 1rem;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
 .calendar-day-header {
     font-weight: 600;
     color: var(--text-color-medium);
     text-align: center;
-    padding: 0.5rem 0;
-}
-.calendar-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80px;
-    border-radius: 0.375rem;
+    padding: 0.5rem 0.25rem;
     background-color: var(--bg-light);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem;
-    position: relative;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
+
+.calendar-cell:hover {
+    background-color: var(--bg-light);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
 .calendar-cell.inactive {
-    background-color: var(--bg-light);
+    background-color: #f8f6f4;
     color: var(--text-color-light);
-    cursor: not-allowed;
+    cursor: default;
 }
+
+.calendar-cell.inactive:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: #f8f6f4;
+}
+
 .calendar-cell.today {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    color: var(--bg-white);
+}
+
+.calendar-cell.today .calendar-date {
     color: var(--bg-white);
     font-weight: 700;
 }
+
 .calendar-date {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--dark-text);
-}
-.event-badge {
-    position: absolute;
-    bottom: 0.25rem;
-    left: 0.25rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: 600;
+    color: var(--text-color-dark);
+    margin-bottom: 0.5rem;
+    align-self: flex-start;
+}
+
+.activities-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.activity-item {
+    padding: 0.375rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: var(--bg-white);
-    text-align: center;
+    cursor: pointer;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
-.event-badge.inprogress {
+
+.activity-item:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.activity-item.inprogress {
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    border-left-color: #8C7B71;
+}
+
+.activity-item.completed {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-left-color: #45a049;
+}
+
+.activity-item.planned {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-left-color: #1976D2;
+}
+
+/* Enhanced Activity Tooltip */
+.activity-tooltip {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 15px);
+    transform: translateY(-50%);
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    width: 280px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.activity-item:hover .activity-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Arrow for tooltip */
+.activity-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: var(--bg-white);
+}
+
+.activity-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -9px;
+    transform: translateY(-50%);
+    border: 9px solid transparent;
+    border-right-color: var(--border-color);
+    z-index: -1;
+}
+
+.activity-tooltip-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.activity-tooltip-info {
+    font-size: 0.8rem;
+    color: var(--text-color-medium);
+    margin-bottom: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.activity-tooltip-info::before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.activity-tooltip-description {
+    font-size: 0.8rem;
+    color: var(--text-color-dark);
+    line-height: 1.4;
+    background-color: var(--bg-light);
+    padding: 0.5rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.more-activities {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-color-medium);
+    text-align: center;
+    background-color: var(--bg-light);
+    border-radius: 4px;
+    padding: 0.25rem;
+    border: 1px dashed var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.more-activities:hover {
     background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
 }
-.event-badge.completed {
-    background-color: #4CAF50;
+
+/* Enhanced Day view styles */
+.day-view {
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
 }
-.event-badge.planned {
-    background-color: #2196F3;
+
+.day-view-header {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-color-dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.day-view-content {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    max-height: 70vh;
+    min-height: 600px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.day-view-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.day-view-content::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 3px;
+}
+
+.day-view-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.hour-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color-medium);
+    text-align: right;
+    padding-right: 1rem;
+    line-height: 3rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-white);
+}
+
+.hour-activities {
+    position: relative;
+    min-height: 3rem;
+    border-left: 2px solid var(--border-color);
+    padding-left: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+.hour-activities::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 1.5rem;
+    width: 6px;
+    height: 6px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+}
+
+.day-activity {
+    position: relative;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--bg-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.day-activity:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.day-activity.inprogress {
+    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+    border-left-color: #8C7B71;
+}
+
+.day-activity.completed {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-left-color: #45a049;
+}
+
+.day-activity.planned {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-left-color: #1976D2;
+}
+
+.day-activity-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.day-activity-time {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.day-activity-description {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Navigation improvements */
+.calendar-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-light);
+    color: var(--text-color-dark);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.calendar-nav-button:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    transform: scale(1.05);
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+#back-to-month, #add-activity-btn {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(160, 141, 128, 0.3);
+}
+
+#back-to-month:hover, #add-activity-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(160, 141, 128, 0.4);
+}
+
+#back-to-month::before, #add-activity-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+#back-to-month:hover::before, #add-activity-btn:hover::before {
+    left: 100%;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="section-card">
-  <div class="flex justify-between items-center mb-4">
-    <button id="prevMonthCalendrier" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200">◀</button>
-    <h3 id="currentMonthYearCalendrier" class="text-xl font-semibold text-[var(--dark-text)]">Mois Année</h3>
-    <button id="nextMonthCalendrier" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200">▶</button>
-  </div>
-  <div class="calendar-grid" id="calendarGridCalendrier">
-    <div class="calendar-day-header">Lun</div>
-    <div class="calendar-day-header">Mar</div>
-    <div class="calendar-day-header">Mer</div>
-    <div class="calendar-day-header">Jeu</div>
-    <div class="calendar-day-header">Ven</div>
-    <div class="calendar-day-header">Sam</div>
-    <div class="calendar-day-header">Dim</div>
-    <!-- Calendar cells will be generated by JS -->
-  </div>
+<div class="calendar-section">
+    <div class="calendar-header">
+        <button id="prevMonthProject" class="calendar-nav-button">◀</button>
+        <h3 id="month-year-display" class="text-xl font-semibold text-[var(--text-color-dark)]">{{ month_name }} {{ current_year }}</h3>
+        <div class="flex items-center gap-2">
+            <button id="back-to-month" class="hidden">Retour au mois</button>
+            <button id="add-activity-btn">+ Ajouter une activité</button>
+            <button id="nextMonthProject" class="calendar-nav-button">▶</button>
+        </div>
+    </div>
+    </div>
+    <div id="calendar-container" class="calendar-container">
+        <div id="calendar-grid" class="calendar-grid">
+            <!-- Les en-têtes des jours seront générés par JavaScript -->
+        </div>
+        <div id="day-view" class="day-view hidden">
+            <div id="day-view-header" class="day-view-header">Jour</div>
+            <div id="day-view-content" class="day-view-content">
+                <!-- Le contenu de la vue journalière sera généré par JavaScript -->
+            </div>
+        </div>
+    </div>
 </div>
 
-
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Calendrier Tab Calendar
-  const calendarGridCalendrier = document.getElementById('calendarGridCalendrier');
-  const currentMonthYearCalendrier = document.getElementById('currentMonthYearCalendrier');
-  const prevMonthBtnCalendrier = document.getElementById('prevMonthCalendrier');
-  const nextMonthBtnCalendrier = document.getElementById('nextMonthCalendrier');
-  
-  // Initialize with server-provided data
-  let currentMonth = {{ current_month }};
-  let currentYear = {{ current_year }};
-  let currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
-  
-  // Store activities from the server
-  const projectActivities = [
-    {% for activity in calendar_activities %}
-      {
-        id: {{ activity.id }},
-        title: "{{ activity.title|escapejs }}",
-        description: "{{ activity.description|escapejs }}",
-        startDate: new Date("{{ activity.start_date|date:'Y-m-d' }}"),
-        endDate: new Date("{{ activity.end_date|date:'Y-m-d' }}"),
-        employee: "{{ activity.employee|escapejs }}",
-        charge: {{ activity.charge }}
-      },
-    {% endfor %}
-  ];
-  
-  // Update the calendar title
-  currentMonthYearCalendrier.textContent = `{{ month_name }} ${currentYear}`;
-  
-  // Function to render the calendar
-  function renderCalendar() {
-    // Clear previous calendar cells
-    const dayHeaders = calendarGridCalendrier.querySelectorAll('.calendar-day-header');
-    const cells = calendarGridCalendrier.querySelectorAll('.calendar-cell');
-    cells.forEach(cell => cell.remove());
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarContainer = document.getElementById('calendar-container');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthYearDisplay = document.getElementById('month-year-display');
+    const prevMonthBtn = document.getElementById('prevMonthProject');
+    const nextMonthBtn = document.getElementById('nextMonthProject');
+    const backToMonthBtn = document.getElementById('back-to-month');
+    const addActivityBtn = document.getElementById('add-activity-btn');
+    const dayView = document.getElementById('day-view');
+    const dayViewHeader = document.getElementById('day-view-header');
+    const dayViewContent = document.getElementById('day-view-content');
     
-    // Get first day of month and total days
-    const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
-    // Convert Sunday (0) to 7 to match Monday (1) start
-    const firstDayAdjusted = firstDay === 0 ? 7 : firstDay;
-    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    // Variables pour le modal d'ajout d'activité
+    const addActivityModal = document.getElementById('addActivityModal');
+    const closeAddActivityModal = document.getElementById('closeAddActivityModal');
+    const cancelAddActivity = document.getElementById('cancelAddActivity');
+    const addActivityForm = document.getElementById('addActivityForm');
     
-    // Add empty cells for days before the first day of month
-    for (let i = 1; i < firstDayAdjusted; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.className = 'calendar-cell inactive';
-      calendarGridCalendrier.appendChild(emptyCell);
-    }
+    // Initialize with server-provided data
+    let currentMonth = {{ current_month }};
+    let currentYear = {{ current_year }};
+    let currentDate = new Date(currentYear, currentMonth - 1, 1);
+    let selectedDay = null;
+    let isMonthView = true;
     
-    // Add cells for each day of the month
-    const today = new Date();
-    for (let day = 1; day <= daysInMonth; day++) {
-      const cell = document.createElement('div');
-      cell.className = 'calendar-cell';
-      
-      // Check if this is today
-      if (day === today.getDate() && currentMonth === today.getMonth() + 1 && currentYear === today.getFullYear()) {
-        cell.classList.add('today');
-      }
-      
-      // Add date to cell
-      const dateSpan = document.createElement('span');
-      dateSpan.className = 'calendar-date';
-      dateSpan.textContent = day;
-      cell.appendChild(dateSpan);
-      
-      // Check for activities on this day
-      const cellDate = new Date(currentYear, currentMonth - 1, day);
-      const activitiesOnDay = projectActivities.filter(activity => {
-        const activityDate = new Date(activity.startDate);
-        return activityDate.getDate() === day && 
-               activityDate.getMonth() === currentMonth - 1 && 
-               activityDate.getFullYear() === currentYear;
-      });
-      
-      // Add activity badges if there are activities
-      if (activitiesOnDay.length > 0) {
-        const badge = document.createElement('div');
-        badge.className = 'event-badge inprogress';
-        badge.textContent = activitiesOnDay.length > 1 ? `${activitiesOnDay.length} activités` : '1 activité';
-        cell.appendChild(badge);
+    // Store activities from the server
+    const projectActivities = [
+        {% for activity in calendar_activities %}
+        {
+            id: {{ activity.id }},
+            title: "{{ activity.title|escapejs }}",
+            start_date: "{{ activity.start_date|date:'Y-m-d' }}",
+            end_date: "{{ activity.end_date|date:'Y-m-d' }}",
+            type: "{{ activity.type|escapejs }}",
+            description: "{{ activity.description|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // Fonction pour générer le calendrier
+    const renderCalendar = () => {
+        calendarGrid.innerHTML = '';
         
-        // Add tooltip with activity details
-        cell.title = activitiesOnDay.map(act => `${act.title} (${act.employee})`).join('\n');
-        
-        // Make cell clickable to show details
-        cell.style.cursor = 'pointer';
-        cell.addEventListener('click', () => {
-          alert(`Activités du ${day}/${currentMonth}/${currentYear}:\n\n` + 
-                activitiesOnDay.map(act => `- ${act.title}\n  Par: ${act.employee}\n  Charge: ${act.charge} heures`).join('\n\n'));
+        // Ajout des en-têtes des jours
+        const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        dayNames.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            calendarGrid.appendChild(dayHeader);
         });
-      }
-      
-      calendarGridCalendrier.appendChild(cell);
+        
+        // Déterminer le premier jour du mois
+        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const startingDay = firstDay.getDay() || 7; // Convertir 0 (dimanche) en 7 pour le format européen
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+        
+        // Ajouter des cellules vides pour les jours avant le premier jour du mois
+        for (let i = 1; i < startingDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'calendar-cell inactive';
+            calendarGrid.appendChild(emptyCell);
+        }
+        
+        // Ajouter les cellules pour chaque jour du mois
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell';
+            
+            // Vérifier si c'est aujourd'hui
+            if (day === today.getDate() && 
+                currentDate.getMonth() === today.getMonth() && 
+                currentDate.getFullYear() === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+            
+            // Ajouter la date à la cellule
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'calendar-date';
+            dateSpan.textContent = day;
+            cell.appendChild(dateSpan);
+            
+            // Conteneur pour les activités
+            const activitiesContainer = document.createElement('div');
+            activitiesContainer.className = 'activities-container';
+            
+            // Vérifier les activités pour ce jour
+            const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const activitiesOnDay = projectActivities.filter(activity => {
+                const activityDate = new Date(activity.startDate);
+                return activityDate.getDate() === day && 
+                       activityDate.getMonth() === currentDate.getMonth() && 
+                       activityDate.getFullYear() === currentDate.getFullYear();
+            });
+            
+            // Afficher les activités (maximum 3 visibles)
+            const maxVisible = 3;
+            activitiesOnDay.slice(0, maxVisible).forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = `activity-item ${activity.status || 'inprogress'}`;
+                activityItem.textContent = activity.title;
+                
+                // Ajouter tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'activity-tooltip';
+                tooltip.innerHTML = `
+                    <div class="activity-tooltip-title">${activity.title}</div>
+                    <div class="activity-tooltip-info">Assigné à: ${activity.employee}</div>
+                    <div class="activity-tooltip-info">Charge: ${activity.charge} heures</div>
+                    <div class="activity-tooltip-description">${activity.description}</div>
+                `;
+                activityItem.appendChild(tooltip);
+                
+                activitiesContainer.appendChild(activityItem);
+            });
+            
+            // Afficher "+ X autres" si il y a plus d'activités
+            if (activitiesOnDay.length > maxVisible) {
+                const moreActivities = document.createElement('div');
+                moreActivities.className = 'more-activities';
+                moreActivities.textContent = `+ ${activitiesOnDay.length - maxVisible} autres`;
+                activitiesContainer.appendChild(moreActivities);
+            }
+            
+            cell.appendChild(activitiesContainer);
+            
+            // Ajouter événement de clic pour la vue journalière
+            cell.addEventListener('click', () => {
+                showDayView(day, activitiesOnDay);
+            });
+            
+            calendarGrid.appendChild(cell);
+        }
+    };
+    
+    // Fonction pour afficher la vue journalière
+    const showDayView = (day, activities) => {
+        selectedDay = day;
+        isMonthView = false;
+        
+        // Masquer la grille du calendrier et afficher la vue journalière
+        calendarGrid.classList.add('hidden');
+        dayView.classList.remove('hidden');
+        backToMonthBtn.classList.remove('hidden');
+        addActivityBtn.classList.add('hidden'); // Masquer le bouton en vue journalière
+        
+        // Mettre à jour l'en-tête
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        dayViewHeader.textContent = dayDate.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Générer le contenu de la vue journalière
+        dayViewContent.innerHTML = '';
+        
+        // Créer les créneaux horaires
+        for (let hour = 9; hour <= 20; hour++) {
+            const hourLabel = document.createElement('div');
+            hourLabel.className = 'hour-label';
+            hourLabel.textContent = `${hour}:00`;
+            
+            const hourActivities = document.createElement('div');
+            hourActivities.className = 'hour-activities';
+            
+            // Filtrer les activités pour cette heure
+            const hourActivitiesList = activities.filter(activity => {
+                const activityHour = new Date(activity.startDate).getHours();
+                return activityHour === hour;
+            });
+            
+            if (hourActivitiesList.length === 0) {
+                // Message "Aucune activité" supprimé - affichage vide
+                hourActivities.innerHTML = '';
+            } else {
+                hourActivitiesList.forEach(activity => {
+                    const dayActivity = document.createElement('div');
+                    dayActivity.className = `day-activity ${activity.status || 'inprogress'}`;
+                    dayActivity.innerHTML = `
+                        <div class="day-activity-title">${activity.title}</div>
+                        <div class="day-activity-time">${new Date(activity.startDate).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})} - ${new Date(activity.endDate).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}</div>
+                        <div class="day-activity-description">${activity.description}</div>
+                    `;
+                    hourActivities.appendChild(dayActivity);
+                });
+            }
+            
+            dayViewContent.appendChild(hourLabel);
+            dayViewContent.appendChild(hourActivities);
+        }
+    };
+    
+    // Fonction pour revenir à la vue mensuelle
+    const showMonthView = () => {
+        isMonthView = true;
+        selectedDay = null;
+        
+        // Afficher la grille du calendrier et masquer la vue journalière
+        calendarGrid.classList.remove('hidden');
+        dayView.classList.add('hidden');
+        backToMonthBtn.classList.add('hidden');
+        addActivityBtn.classList.remove('hidden'); // Afficher le bouton en vue mensuelle
+    };
+    
+    // Événements de navigation
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        currentMonth = currentDate.getMonth() + 1;
+        currentYear = currentDate.getFullYear();
+        monthYearDisplay.textContent = currentDate.toLocaleDateString('fr-FR', {
+            month: 'long',
+            year: 'numeric'
+        });
+        if (isMonthView) {
+            renderCalendar();
+        }
+    });
+    
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        currentMonth = currentDate.getMonth() + 1;
+        currentYear = currentDate.getFullYear();
+        monthYearDisplay.textContent = currentDate.toLocaleDateString('fr-FR', {
+            month: 'long',
+            year: 'numeric'
+        });
+        if (isMonthView) {
+            renderCalendar();
+        }
+    });
+    
+    backToMonthBtn.addEventListener('click', showMonthView);
+    
+    // Ouvrir le modal d'ajout d'activité
+    if (addActivityBtn && addActivityModal) {
+        addActivityBtn.addEventListener('click', () => {
+            console.log('Bouton cliqué - Modal ouvert');
+            addActivityModal.classList.remove('hidden');
+        });
     }
-  }
-  
-  // Initial render
-  renderCalendar();
-  
-  // Handle month navigation
-  prevMonthBtnCalendrier.addEventListener('click', () => {
-    currentMonth--;
-    if (currentMonth < 1) {
-      currentMonth = 12;
-      currentYear--;
+    
+    // Fermer le modal
+    if (closeAddActivityModal) {
+        closeAddActivityModal.addEventListener('click', () => {
+            addActivityModal.classList.add('hidden');
+        });
     }
-    currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
-    currentMonthYearCalendrier.textContent = `${currentDateCalendrier.toLocaleString('fr-FR', { month: 'long' })} ${currentYear}`;
+    
+    if (cancelAddActivity) {
+        cancelAddActivity.addEventListener('click', () => {
+            addActivityModal.classList.add('hidden');
+        });
+    }
+    
+    // Fermer le modal en cliquant à l'extérieur
+    if (addActivityModal) {
+        addActivityModal.addEventListener('click', (e) => {
+            if (e.target === addActivityModal) {
+                addActivityModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Rendu initial
     renderCalendar();
-  });
-  
-  nextMonthBtnCalendrier.addEventListener('click', () => {
-    currentMonth++;
-    if (currentMonth > 12) {
-      currentMonth = 1;
-      currentYear++;
-    }
-    currentDateCalendrier = new Date(currentYear, currentMonth - 1, 1);
-    currentMonthYearCalendrier.textContent = `${currentDateCalendrier.toLocaleString('fr-FR', { month: 'long' })} ${currentYear}`;
-    renderCalendar();
-  });
-  // End of calendar initialization
 });
 </script>
 
 {% endblock %}
 
-{% block active_tab %}showTab('calendrier');{% endblock %}
+{% block active_tab %}{% endblock %}
 
-{% block extra_scripts %}
-<style>
-  /* Add more space at the bottom of the calendar */
-  #calendarGridCalendrier {
-    margin-bottom: 60px;
-  }
-</style>
-{% endblock %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Appeler showTab après que le DOM soit chargé
+    if (typeof showTab === 'function') {
+        showTab('calendrier');
+    }
+    
+    // Déclaration de TOUS les éléments DOM ici
+    const calendarContainer = document.getElementById('calendar-container');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthYearDisplay = document.getElementById('month-year-display');
+    const prevMonthBtn = document.getElementById('prevMonthProject');
+    const nextMonthBtn = document.getElementById('nextMonthProject');
+    const backToMonthBtn = document.getElementById('back-to-month');
+    const addActivityBtn = document.getElementById('add-activity-btn');
+    const dayView = document.getElementById('day-view');
+    const dayViewHeader = document.getElementById('day-view-header');
+    const dayViewContent = document.getElementById('day-view-content');
+    
+    // Variables pour le modal d'ajout d'activité
+    const addActivityModal = document.getElementById('addActivityModal');
+    const closeAddActivityModal = document.getElementById('closeAddActivityModal');
+    const cancelAddActivity = document.getElementById('cancelAddActivity');
+    const addActivityForm = document.getElementById('addActivityForm');
+    
+    // Debug: vérifier si les éléments existent
+    console.log('addActivityBtn:', addActivityBtn);
+    console.log('addActivityModal:', addActivityModal);
+    
+    // Ouvrir le modal d'ajout d'activité
+    if (addActivityBtn && addActivityModal) {
+        addActivityBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Bouton cliqué - Modal ouvert');
+            addActivityModal.classList.remove('hidden');
+            addActivityModal.style.display = 'flex';
+        });
+    } else {
+        console.error('Éléments manquants:', { addActivityBtn, addActivityModal });
+    }
+    
+    // Fermer le modal
+    if (closeAddActivityModal) {
+        closeAddActivityModal.addEventListener('click', function() {
+            addActivityModal.classList.add('hidden');
+            addActivityModal.style.display = 'none';
+        });
+    }
+    
+    if (cancelAddActivity) {
+        cancelAddActivity.addEventListener('click', function() {
+            addActivityModal.classList.add('hidden');
+            addActivityModal.style.display = 'none';
+        });
+    }
+    
+    // Fermer le modal en cliquant à l'extérieur
+    if (addActivityModal) {
+        addActivityModal.addEventListener('click', function(e) {
+            if (e.target === addActivityModal) {
+                addActivityModal.classList.add('hidden');
+                addActivityModal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Gérer la soumission du formulaire d'ajout d'activité
+    if (addActivityForm) {
+        addActivityForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('activityTitle').value,
+                description: document.getElementById('activityDescription').value,
+                type: document.getElementById('activityType').value,
+                start_date: document.getElementById('activityStartDate').value,
+                end_date: document.getElementById('activityEndDate').value,
+                resource_id: document.getElementById('activityEmployee').value,
+                project_id: '{{ project.id }}' // Associer automatiquement au projet actuel
+            };
+    
+            // Ajouter l'ID du ticket si c'est un ticket
+            if (formData.type === 'TICKET') {
+                formData.ticket_id = document.getElementById('activityTicket').value;
+            }
+    
+            // Envoyer les données au serveur
+            fetch('/activities/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fermer le modal et recharger la page
+                    addActivityModal.classList.add('hidden');
+                    addActivityForm.reset();
+                    location.reload(); // Recharger pour voir la nouvelle activité
+                } else {
+                    console.error('Erreur lors de la création de l\'activité:', data.error);
+                    alert('Une erreur est survenue lors de la création de l\'activité');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la création de l\'activité:', error);
+                alert('Une erreur est survenue lors de la création de l\'activité');
+            });
+        });
+    }
+}
+
+// Fonction pour obtenir le token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+<!-- Modal pour ajouter une activité -->
+<div id="addActivityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all">
+        <div class="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
+            <h3 class="text-xl font-semibold text-[var(--text-color-dark)]">Ajouter une activité</h3>
+            <button id="closeAddActivityModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="addActivityForm" method="post" class="p-6 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="activityTitle" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Titre</label>
+                <input type="text" id="activityTitle" name="title" required 
+                       class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="activityDescription" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Description</label>
+                <textarea id="activityDescription" name="description" rows="3" 
+                          class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"></textarea>
+            </div>
+            
+            <div>
+                <label for="activityType" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Type</label>
+                <select id="activityType" required class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                    <option value="">Sélectionner un type</option>
+                    <option value="PROJECT">Projet</option>
+                    <option value="TICKET">Ticket</option>
+                </select>
+            </div>
+            
+            <div id="projectSelect" class="hidden">
+                <label for="activityProject" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Projet</label>
+                <select id="activityProject" class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                    <option value="">Sélectionner un projet</option>
+                </select>
+            </div>
+            
+            <div id="ticketSelect" class="hidden">
+                <label for="activityTicket" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Ticket</label>
+                <select id="activityTicket" class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                    <option value="">Sélectionner un ticket</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="activityEmployee" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Employé</label>
+                <select id="activityEmployee" required class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                    <option value="">Sélectionner un employé</option>
+                    {% for member in project.members.all %}
+                        <option value="{{ member.id }}">{{ member.first_name }} {{ member.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="activityStartDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de début</label>
+                    <input type="datetime-local" id="activityStartDate" name="start_datetime" required 
+                           class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                </div>
+                <div>
+                    <label for="activityEndDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de fin</label>
+                    <input type="datetime-local" id="activityEndDate" name="end_datetime" required 
+                           class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" id="cancelAddActivity" 
+                        class="px-4 py-2 text-[var(--text-color-medium)] bg-[var(--bg-light)] rounded-lg hover:bg-gray-200 transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
+                    Créer l'activité
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+function showTab(tabName) {
+    // Masquer tous les onglets
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        if (tab) {
+            tab.style.display = 'none';
+        }
+    });
+    
+    // Afficher l'onglet sélectionné
+    const selectedTab = document.getElementById(tabName);
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
+    
+    // Mettre à jour les boutons d'onglets
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        if (button) {
+            button.classList.remove('active');
+        }
+    });
+    
+    const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
