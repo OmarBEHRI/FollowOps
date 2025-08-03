@@ -1,240 +1,270 @@
 {% extends 'projectDetailsBase.html' %}
 
 {% block content %}
-    {{ block.super }}
-    <div class="space-y-6">
-        <!-- Section Informations générales -->
-        <div class="bg-[#FBF9F7] rounded-lg border border-[#EBE5E0] shadow-sm overflow-hidden">
-            <div class="bg-[#F0EDE9] px-4 py-3 border-b border-[#D4CCC1]">
-                <h2 class="text-[#191610] text-lg font-semibold flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-[#A08D80] rounded-full"></span>
-                    Informations générales
-                </h2>
-            </div>
-            <div class="p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Type -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Type</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.type }}</div>
-                        </div>
+    <!-- Informations générales -->
+    <div class="flex flex-col gap-4">
+        <h2 class="text-[#191610] text-lg font-bold leading-tight">Informations générales</h2>
+        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Colonne gauche -->
+                <div>
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Type</p>
+                    <p class="text-[#191610] text-base mb-4">{{ project.type }}</p>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Priorité</p>
+                    <div class="mb-4">
+                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_priority_display }}</span>
                     </div>
-
-                    <!-- Statut -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Statut</div>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#A08D80] text-white">
-                                {{ project.status }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Priorité -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Priorité</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.priority }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Chef de projet -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Chef de projet</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.project_manager }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Date de début prévue -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Début prévue</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.expected_start_date }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Date de fin prévue -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Fin prévue</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.expected_end_date }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Date de début réelle -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Début réelle</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.start_date|default:"Non définie" }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Date de fin réelle -->
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#F0EDE9] rounded-md transition-colors">
-                        <div class="w-6 h-6 bg-[#D4CCC1] rounded-md flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs"></span>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-[#6E6864] font-medium uppercase tracking-wide">Fin réelle</div>
-                            <div class="text-[#191610] font-semibold truncate">{{ project.end_date|default:"Non définie" }}</div>
-                        </div>
-                    </div>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de début prévue</p>
+                    <p class="text-[#191610] text-base mb-4">{{ project.expected_start_date|date:"d/m/Y" }}</p>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de début réelle</p>
+                    <p class="text-[#191610] text-base">{{ project.start_date|date:"d/m/Y"|default:"Non définie" }}</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Section Charge estimée et Tags côte à côte -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Charge estimée -->
-            <div class="bg-[#FBF9F7] rounded-lg border border-[#EBE5E0] shadow-sm overflow-hidden">
-                <div class="bg-[#F0EDE9] px-4 py-3 border-b border-[#D4CCC1]">
-                    <h2 class="text-[#191610] text-lg font-semibold flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-[#A08D80] rounded-full"></span>
-                        Charge estimée
-                    </h2>
-                </div>
-                <div class="p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-[#A08D80] to-[#8C7E72] rounded-lg flex items-center justify-center">
-                            <span class="text-white text-lg"></span>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-[#A08D80]">{{ project.estimated_charges }}</div>
-                            <div class="text-sm text-[#6E6864] font-medium">heures estimées</div>
-                        </div>
+                
+                <!-- Colonne droite -->
+                <div>
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Statut</p>
+                    <div class="mb-4">
+                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_status_display }}</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Tags/Catégories -->
-            <div class="bg-[#FBF9F7] rounded-lg border border-[#EBE5E0] shadow-sm overflow-hidden">
-                <div class="bg-[#F0EDE9] px-4 py-3 border-b border-[#D4CCC1]">
-                    <h2 class="text-[#191610] text-lg font-semibold flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-[#A08D80] rounded-full"></span>
-                        Tags/Catégories
-                    </h2>
-                </div>
-                <div class="p-4">
-                    <div class="flex gap-2 flex-wrap">
-                        {% for tag in project.tags.all %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#D4CCC1] text-[#6E6864] hover:bg-[#C5B4A8] transition-colors cursor-pointer">
-                            <span class="w-1.5 h-1.5 bg-[#A08D80] rounded-full mr-1.5"></span>
-                            {{ tag.name }}
-                        </span>
-                        {% empty %}
-                        <span class="text-[#9C9591] text-sm italic">Aucun tag défini</span>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section Avancement -->
-        <div class="bg-[#FBF9F7] rounded-lg border border-[#EBE5E0] shadow-sm overflow-hidden">
-            <div class="bg-[#F0EDE9] px-4 py-3 border-b border-[#D4CCC1]">
-                <h2 class="text-[#191610] text-lg font-semibold flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-[#A08D80] rounded-full"></span>
-                    Avancement du projet
-                </h2>
-            </div>
-            <div class="p-4">
-                <div class="bg-[#F0EDE9] rounded-md p-3">
-                    <canvas id="progressChart" height="160" class="w-full"></canvas>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Chef de projet</p>
+                    <p class="text-[#191610] text-base mb-4">{{ project.project_manager.first_name }} {{ project.project_manager.last_name }}</p>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de fin prévue</p>
+                    <p class="text-[#191610] text-base mb-4">{{ project.expected_end_date|date:"d/m/Y" }}</p>
+                    
+                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de fin réelle</p>
+                    <p class="text-[#191610] text-base">{{ project.end_date|date:"d/m/Y"|default:"En cours" }}</p>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Script pour le graphique -->
+    
+    <!-- Charge estimée -->
+    <div class="flex flex-col gap-4">
+        <h2 class="text-[#191610] text-lg font-bold leading-tight">Charge estimée</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                <p class="text-[#8c7e5a] text-sm font-medium">Heures totales estimées</p>
+                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ project.estimated_charges }}</p>
+            </div>
+            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                <p class="text-[#8c7e5a] text-sm font-medium">Membres assignés</p>
+                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ project.members.count }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Avancement du projet -->
+    <div class="flex flex-col gap-4">
+        <h2 class="text-[#191610] text-lg font-bold leading-tight">Avancement du projet</h2>
+        
+        <!-- Case d'avancement dans une grille pour avoir la même taille -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                <p class="text-[#8c7e5a] text-sm font-medium">Progression globale</p>
+                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ project.progress|default:0 }}%</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script pour le graphique de progression moderne -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .chart-container {
+            position: relative;
+        }
+    </style>
     <script>
-        const nudeColors = [
-            '#A08D80', '#6E6864', '#D4CCC1', '#9C9591', '#3F3C3A', '#C5B4A8', '#8C7E72', '#EDE8E2'
-        ];
-        
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        const progressValue = {{ project.progress|default:0 }};
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-                datasets: [{
-                    label: "Taux d'avancement",
-                    data: [0, 10, 25, 40, 55, 70, progressValue],
-                    borderColor: nudeColors[0],
-                    backgroundColor: 'rgba(160, 141, 128, 0.15)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: nudeColors[0],
-                    pointBorderColor: '#FBF9F7',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: '#6E6864',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            // Données simulées pour les différentes phases du projet
+            const progress = {{ project.progress|default:0 }};
+            
+            // Calcul des phases basé sur l'avancement global
+            const phases = {
+                'Planification': Math.min(100, Math.max(0, progress * 1.2)),
+                'Développement': Math.min(100, Math.max(0, (progress - 20) * 1.5)),
+                'Tests': Math.min(100, Math.max(0, (progress - 60) * 2)),
+                'Déploiement': Math.min(100, Math.max(0, (progress - 80) * 5))
+            };
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(phases),
+                    datasets: [{
+                        label: 'Avancement (%)',
+                        data: Object.values(phases),
+                        backgroundColor: [
+                            'rgba(140, 126, 90, 0.8)',
+                            'rgba(166, 149, 117, 0.8)',
+                            'rgba(184, 168, 136, 0.8)',
+                            'rgba(201, 187, 155, 0.8)'
+                        ],
+                        borderColor: [
+                            '#8c7e5a',
+                            '#a69575',
+                            '#b8a888',
+                            '#c9bb9b'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            color: '#6E6864',
-                            callback: function(value) {
-                                return value + '%';
-                            }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
                         },
-                        grid: {
-                            color: 'rgba(160, 141, 128, 0.1)'
+                        tooltip: {
+                            backgroundColor: 'rgba(140, 126, 90, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#8c7e5a',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(1) + '% complété';
+                                }
+                            }
                         }
                     },
-                    x: {
-                        ticks: {
-                            color: '#6E6864'
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#8c7e5a',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
                         },
-                        grid: {
-                            color: 'rgba(160, 141, 128, 0.1)'
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(227, 223, 211, 0.5)',
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                color: '#8c7e5a',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
                         }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutBounce',
+                        delay: (context) => {
+                            return context.dataIndex * 200;
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                     }
                 }
-            }
+            });
+        });
+    </script>
+
+       
+    
+    <!-- Tags et catégories -->
+    <div class="flex flex-col gap-4">
+        <h2 class="text-[#191610] text-lg font-bold leading-tight">Tags et catégories</h2>
+        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+            {% if project.tags.all %}
+                <div class="flex gap-3 flex-wrap">
+                    {% for tag in project.tags.all %}
+                    <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">
+                        {{ tag.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-[#8c7e5a] text-sm">Aucun tag défini pour ce projet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Bouton de modification -->
+    {% if user.is_staff %}
+    <div class="flex justify-end mt-6">
+        <button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#f1efe9] px-4 text-[#191610] text-sm font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='{% url 'edit_project' project.id %}'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.31,64l24-24L216,84.69Z"></path></svg>
+            Modifier le projet
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- Script pour le graphique de progression -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const progress = {{ project.progress|default:0 }};
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Terminé', 'Restant'],
+                    datasets: [{
+                        data: [progress, 100 - progress],
+                        backgroundColor: [
+                            '#8c7e5a',
+                            '#e3dfd3'
+                        ],
+                        borderColor: [
+                            '#8c7e5a',
+                            '#e3dfd3'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#8c7e5a',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
         });
     </script>
 {% endblock %}
