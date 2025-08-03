@@ -75,24 +75,13 @@
             flex-direction: column;
         }
 
-        .calendar-cell {
-            display: flex;
-            flex-direction: column;
-            min-height: 100px; /* Hauteur augmentée */
-            background-color: var(--bg-white);
-            padding: 1rem; /* Padding augmenté */
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
         .calendar-day-header {
             font-weight: 600;
             color: var(--text-color-medium);
             text-align: center;
-            padding: 0.5rem 0.25rem; /* Padding réduit pour les en-têtes */
+            padding: 1rem 0.5rem;
             background-color: var(--bg-light);
-            font-size: 0.75rem; /* Taille de police réduite */
+            font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -100,9 +89,9 @@
         .calendar-cell {
             display: flex;
             flex-direction: column;
-            min-height: 80px; /* Réduit de 120px à 80px pour correspondre au calendrier des tickets */
+            min-height: 100%;
             background-color: var(--bg-white);
-            padding: 0.5rem; /* Réduit de 0.75rem à 0.5rem */
+            padding: 0.75rem;
             position: relative;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -288,10 +277,10 @@
             border-color: var(--primary-color);
         }
 
-        /* Enhanced Day view styles */
+        /* Enhanced Day view styles - Timeline Design */
         .day-view {
             background-color: var(--bg-white);
-            border-radius: 12px;
+            border-radius: 2rem;
             padding: 1.5rem;
             width: 100%;
         }
@@ -307,19 +296,12 @@
         }
 
         .day-view-content {
-            display: grid;
-            grid-template-columns: 80px 1fr;
-            grid-template-columns: 80px 1fr;
-            gap: 1rem;
+            display: flex;
             max-height: 70vh;
             min-height: 600px;
             overflow-y: auto;
             padding-right: 0.5rem;
-        }            gap: 1rem;
-            max-height: 70vh; /* Utilise 70% de la hauteur de la fenêtre */
-            min-height: 600px;
-            overflow-y: auto; /* Cette propriété active le scroll vertical */
-            padding-right: 0.5rem;
+            position: relative;
         }
 
         /* Styles personnalisés pour la barre de défilement */
@@ -337,84 +319,313 @@
             border-radius: 3px;
         }
 
-        .hour-label {
+        #day-view {
+            border-radius: 2rem;
+        }
+
+        /* Timeline container */
+        .timeline-container {
+            display: flex;
+            width: 100%;
+            position: relative;
+            padding-top: 2rem;
+        }
+
+        /* Timeline axis (left side) */
+        .timeline-axis {
+            width: 80px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .timeline-hour {
+            position: absolute;
+            right: 1rem;
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--text-color-medium);
-            text-align: right;
-            padding-right: 1rem;
-            line-height: 3rem;
-            position: sticky;
-            top: 0;
+            transform: translateY(-50%);
             background-color: var(--bg-white);
+            padding: 0.25rem 0;
         }
 
-        .hour-activities {
+        /* Main timeline area */
+        .timeline-main {
+            flex: 1;
             position: relative;
-            min-height: 3rem;
             border-left: 2px solid var(--border-color);
-            padding-left: 1rem;
-            padding-bottom: 0.5rem;
+            margin-left: 1rem;
         }
 
-        .hour-activities::before {
+        /* Hour grid lines */
+        .timeline-grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--border-color);
+            opacity: 0.5;
+        }
+
+        .timeline-grid-line.major {
+            background-color: var(--text-color-medium);
+            opacity: 0.3;
+        }
+
+        /* Current time indicator */
+        .current-time-indicator {
+            position: absolute;
+            left: -2px;
+            right: 0;
+            height: 2px;
+            background-color: #FF4444;
+            z-index: 100;
+        }
+
+        .current-time-indicator::before {
             content: '';
             position: absolute;
-            left: -4px;
-            top: 1.5rem;
-            width: 6px;
-            height: 6px;
-            background-color: var(--primary-color);
+            left: -6px;
+            top: -4px;
+            width: 10px;
+            height: 10px;
+            background-color: #FF4444;
             border-radius: 50%;
         }
 
-        .day-activity {
+        /* Activity columns for overlapping activities */
+        .activity-columns {
+            position: absolute;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .activity-column {
+            flex: 1;
             position: relative;
-            margin-bottom: 0.75rem;
-            padding: 0.75rem;
+        }
+
+        /* Activity blocks */
+        .timeline-activity {
+            position: absolute;
+            left: 0;
+            right: 0;
             border-radius: 8px;
-            font-size: 0.875rem;
-            color: var(--bg-white);
+            padding: 0.5rem 0.75rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-height: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backdrop-filter: blur(8px);
         }
 
-        .day-activity:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        .timeline-activity:hover {
+            transform: scale(1.02) translateX(2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            z-index: 50;
         }
 
-        .day-activity.inprogress {
-            background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-            border-left-color: #8C7B71;
+        .timeline-activity.inprogress {
+            background: rgba(139, 123, 113, 0.15);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            border: 1px solid rgba(139, 123, 113, 0.3);
         }
 
-        .day-activity.completed {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            border-left-color: #45a049;
+        .timeline-activity.completed {
+            background: rgba(76, 175, 80, 0.15);
+            border-left-color: #4CAF50;
+            color: #2E7D32;
+            border: 1px solid rgba(76, 175, 80, 0.3);
         }
 
-        .day-activity.planned {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            border-left-color: #1976D2;
+        .timeline-activity.planned {
+            background: rgba(33, 150, 243, 0.15);
+            border-left-color: #2196F3;
+            color: #1565C0;
+            border: 1px solid rgba(33, 150, 243, 0.3);
         }
 
-        .day-activity-title {
+        .timeline-activity:hover.inprogress {
+            background: rgba(139, 123, 113, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        .timeline-activity:hover.completed {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: #4CAF50;
+        }
+
+        .timeline-activity:hover.planned {
+            background: rgba(33, 150, 243, 0.25);
+            border-color: #2196F3;
+        }
+
+        /* Activity content */
+        .timeline-activity-title {
             font-weight: 600;
+            font-size: 0.875rem;
             margin-bottom: 0.25rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 0;
         }
 
-        .day-activity-time {
+        .timeline-activity-time {
             font-size: 0.75rem;
-            opacity: 0.9;
+            opacity: 0.8;
             margin-bottom: 0.25rem;
+            font-weight: 500;
+            flex-shrink: 0;
         }
 
-        .day-activity-description {
+        .timeline-activity-description {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            opacity: 0.7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            flex: 1;
+        }
+
+        /* Special styling for very short activities */
+        .timeline-activity.short-duration {
+            min-height: 35px;
+            padding: 0.25rem 0.75rem;
+            justify-content: flex-start;
+        }
+
+        .timeline-activity.short-duration .timeline-activity-title {
             font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.125rem;
+        }
+
+        .timeline-activity.short-duration .timeline-activity-time {
+            font-size: 0.7rem;
+            margin-bottom: 0;
+        }
+
+        .timeline-activity.short-duration .timeline-activity-description {
+            display: none;
+        }
+
+        /* Ultra short activities (less than 20 minutes) */
+        .timeline-activity.ultra-short {
+            min-height: 28px;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .timeline-activity.ultra-short .timeline-activity-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            line-height: 1.1;
+        }
+
+        .timeline-activity.ultra-short .timeline-activity-time,
+        .timeline-activity.ultra-short .timeline-activity-description {
+            display: none;
+        }
+
+        /* Activity type indicators */
+        .timeline-activity::after {
+            content: '';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .timeline-activity.project::after {
+            background-color: #FFF;
+        }
+
+        .timeline-activity.ticket::after {
+            background-color: #FFD700;
+        }
+
+        /* Expanded activity tooltip */
+        .timeline-activity-tooltip {
+            position: absolute;
+            top: 0;
+            left: calc(100% + 15px);
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            width: 280px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .timeline-activity:hover .timeline-activity-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .timeline-activity-tooltip::before {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: -8px;
+            border: 8px solid transparent;
+            border-right-color: var(--bg-white);
+        }
+
+        .timeline-activity-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: -9px;
+            border: 9px solid transparent;
+            border-right-color: var(--border-color);
+            z-index: -1;
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .tooltip-info {
+            font-size: 0.8rem;
+            color: var(--text-color-medium);
+            margin-bottom: 0.375rem;
+        }
+
+        .tooltip-description {
+            font-size: 0.8rem;
+            color: var(--text-color-dark);
             line-height: 1.4;
-            opacity: 0.95;
+            background-color: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
         }
 
         .hidden {
@@ -604,12 +815,14 @@
         <!-- Main Content -->
         <main class="flex-1 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <!-- Calendrier des activités de la ressource -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
+            <div class="bg-[#f9f8f7] p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
                 <div class="calendar-header">
                     <button id="prevMonthResource" class="calendar-nav-button">◀</button>
                     <h3 id="month-year-display" class="text-xl font-semibold text-[var(--text-color-dark)]">Mois Année</h3>
                     <div class="flex items-center gap-2">
+                        {% if user.id == resource.id %}
                         <button id="add-activity-btn">+ Ajouter une activité</button>
+                        {% endif %}
                         <button id="back-to-month" class="hidden">Retour au mois</button>
                         <button id="nextMonthResource" class="calendar-nav-button">▶</button>
                     </div>
@@ -690,6 +903,12 @@
                     <input type="datetime-local" id="activityEndDate" name="end_datetime" required 
                            class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
                 </div>
+            </div>
+            
+            <!-- Error message for validation -->
+            <div id="validationError" class="hidden">
+                <p id="validationErrorText" class="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3">
+                </p>
             </div>
             
             <div class="flex justify-end space-x-3 pt-4">
@@ -811,6 +1030,11 @@
           addActivityBtn.addEventListener('click', () => {
               console.log('Bouton cliqué - Modal ouvert');
               addActivityModal.classList.remove('hidden');
+              // Hide error message when opening modal
+              const errorElement = document.getElementById('validationError');
+              if (errorElement) {
+                  errorElement.classList.add('hidden');
+              }
           });
       }
 
@@ -818,12 +1042,22 @@
       if (closeAddActivityModal) {
           closeAddActivityModal.addEventListener('click', () => {
               addActivityModal.classList.add('hidden');
+              // Hide error message when closing modal
+              const errorElement = document.getElementById('validationError');
+              if (errorElement) {
+                  errorElement.classList.add('hidden');
+              }
           });
       }
 
       if (cancelAddActivity) {
           cancelAddActivity.addEventListener('click', () => {
               addActivityModal.classList.add('hidden');
+              // Hide error message when canceling
+              const errorElement = document.getElementById('validationError');
+              if (errorElement) {
+                  errorElement.classList.add('hidden');
+              }
           });
       }
 
@@ -957,8 +1191,16 @@
         
         calendarGrid.appendChild(cell);
         
-        // Ajouter les événements pour ce jour
-        const eventsForDay = resourceEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
+        // Ajouter les événements pour ce jour (incluant les activités multi-jours)
+        const eventsForDay = resourceEvents.filter(event => {
+          const eventStartDate = new Date(event.startTime);
+          const eventEndDate = new Date(event.endTime);
+          const currentDayStart = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate());
+          const currentDayEnd = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate(), 23, 59, 59);
+          
+          // Vérifier si l'activité se déroule ce jour-là (même partiellement)
+          return (eventStartDate <= currentDayEnd && eventEndDate >= currentDayStart);
+        });
         
         // Trier les événements par heure de début
         eventsForDay.sort((a, b) => a.startTime - b.startTime);
@@ -992,12 +1234,49 @@
           const endTime = event.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
           tooltipTime.textContent = `${startTime} - ${endTime}`;
           
-          // Calculer la durée en minutes
-          const durationMs = event.endTime - event.startTime;
-          const durationMinutes = Math.round(durationMs / 60000);
+          // Calculer la durée en heures de travail
+          function calculateWorkingHoursForTooltip(startDate, endDate) {
+              function isWorkingDay(date) {
+                  const day = date.getDay();
+                  return day >= 1 && day <= 5;
+              }
+              
+              let totalWorkingMinutes = 0;
+              let currentDate = new Date(startDate);
+              
+              while (currentDate < endDate) {
+                  if (isWorkingDay(currentDate)) {
+                      const dayStart = new Date(currentDate);
+                      dayStart.setHours(8, 0, 0, 0);
+                      const dayEnd = new Date(currentDate);
+                      dayEnd.setHours(18, 0, 0, 0);
+                      
+                      const effectiveStart = new Date(Math.max(currentDate.getTime(), dayStart.getTime()));
+                      const effectiveEnd = new Date(Math.min(endDate.getTime(), dayEnd.getTime()));
+                      
+                      if (effectiveStart < effectiveEnd) {
+                          totalWorkingMinutes += (effectiveEnd - effectiveStart) / (1000 * 60);
+                      }
+                  }
+                  
+                  currentDate.setDate(currentDate.getDate() + 1);
+                  currentDate.setHours(0, 0, 0, 0);
+              }
+              
+              return Math.round(totalWorkingMinutes);
+          }
+          
+          const workingMinutes = calculateWorkingHoursForTooltip(event.startTime, event.endTime);
           const tooltipDuration = document.createElement('div');
           tooltipDuration.className = 'activity-tooltip-info';
-          tooltipDuration.textContent = `Durée: ${durationMinutes} minutes`;
+          
+          if (workingMinutes >= 60) {
+              const hours = Math.floor(workingMinutes / 60);
+              const minutes = workingMinutes % 60;
+              tooltipDuration.textContent = `Durée: ${hours}h${minutes > 0 ? ` ${minutes}min` : ''} (heures de travail)`;
+          } else {
+              tooltipDuration.textContent = `Durée: ${workingMinutes} minutes (heures de travail)`;
+          }
           
           const tooltipDescription = document.createElement('div');
           tooltipDescription.className = 'activity-tooltip-description';
@@ -1025,7 +1304,7 @@
         }
       };
       
-      // Fonction pour afficher la vue journalière avec toutes les activités pour un jour spécifique
+      // Fonction pour afficher la vue journalière avec timeline
       const showDayView = (date) => {
         selectedDay = date;
         isMonthView = false;
@@ -1040,66 +1319,216 @@
         // Masquer le bouton Ajouter une activité
         document.getElementById('add-activity-btn').classList.add('hidden');
         
-        // Générer des créneaux horaires (9h à 20h)
-    for (let hour = 9; hour <= 20; hour++) {
-      const hourLabel = document.createElement('div');
-      hourLabel.className = 'hour-label';
-      hourLabel.textContent = `${hour}:00`;
-      
-      const hourActivities = document.createElement('div');
-      hourActivities.className = 'hour-activities';
-      hourActivities.dataset.hour = hour;
-      
-      dayViewContent.appendChild(hourLabel);
-      dayViewContent.appendChild(hourActivities);
-    }
+        // Créer le conteneur de timeline
+        const timelineContainer = document.createElement('div');
+        timelineContainer.className = 'timeline-container';
         
-        // Ajouter les activités à la vue journalière
-        const dayActivities = resourceEvents.filter(event => 
-          new Date(event.date).toDateString() === date.toDateString()
-        );
+        // Créer l'axe temporel (8h à 18h)
+        const timelineAxis = document.createElement('div');
+        timelineAxis.className = 'timeline-axis';
         
-        // Trier les activités par heure de début
-        dayActivities.sort((a, b) => a.startTime - b.startTime);
+        const timelineMain = document.createElement('div');
+        timelineMain.className = 'timeline-main';
+        
+        // Hauteur totale de la timeline (10 heures * 60px par heure)
+        const timelineHeight = 10 * 60; // 600px
+        timelineMain.style.height = `${timelineHeight}px`;
+        
+        // Ajouter les marqueurs d'heure et les lignes de grille
+        for (let hour = 8; hour <= 18; hour++) {
+          const hourLabel = document.createElement('div');
+          hourLabel.className = 'timeline-hour';
+          hourLabel.textContent = `${hour}:00`;
+          hourLabel.style.top = `${(hour - 8) * 60}px`;
+          timelineAxis.appendChild(hourLabel);
+          
+          // Ligne de grille
+          const gridLine = document.createElement('div');
+          gridLine.className = `timeline-grid-line ${hour % 2 === 0 ? 'major' : ''}`;
+          gridLine.style.top = `${(hour - 8) * 60}px`;
+          timelineMain.appendChild(gridLine);
+        }
+        
+        // Ajouter l'indicateur de l'heure actuelle si c'est aujourd'hui
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        if (isToday && now.getHours() >= 8 && now.getHours() <= 18) {
+          const currentTimeIndicator = document.createElement('div');
+          currentTimeIndicator.className = 'current-time-indicator';
+          const currentMinutes = (now.getHours() - 8) * 60 + now.getMinutes();
+          currentTimeIndicator.style.top = `${currentMinutes}px`;
+          timelineMain.appendChild(currentTimeIndicator);
+        }
+        
+        // Filtrer les activités pour ce jour
+        const dayActivities = resourceEvents.filter(event => {
+          const eventStartDate = new Date(event.startTime);
+          const eventEndDate = new Date(event.endTime);
+          const selectedDayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          const selectedDayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+          
+          return (eventStartDate <= selectedDayEnd && eventEndDate >= selectedDayStart);
+        });
         
         if (dayActivities.length === 0) {
           const emptyMessage = document.createElement('div');
           emptyMessage.className = 'empty-day-message';
           emptyMessage.textContent = 'Aucune activité prévue pour cette journée';
-          dayViewContent.appendChild(emptyMessage);
+          timelineMain.appendChild(emptyMessage);
         } else {
-          // Ajouter les activités aux créneaux horaires appropriés
-          dayActivities.forEach(activity => {
-            const startHour = activity.startTime.getHours();
-            const hourSlot = document.querySelector(`.hour-activities[data-hour="${startHour}"]`);
+          // Créer les colonnes d'activités pour gérer les chevauchements
+          const activityColumns = createActivityColumns(dayActivities, date);
+          
+          const columnsContainer = document.createElement('div');
+          columnsContainer.className = 'activity-columns';
+          columnsContainer.style.height = `${timelineHeight}px`;
+          
+          activityColumns.forEach((column, columnIndex) => {
+            const columnDiv = document.createElement('div');
+            columnDiv.className = 'activity-column';
             
-            if (hourSlot) {
-              const activityEl = document.createElement('div');
-              activityEl.className = `day-activity ${activity.status}`;
-              
-              // Ajouter l'événement de clic
-              activityEl.addEventListener('click', () => {
-                showActivityModal(activity);
-              });
-              
-              const startTime = activity.startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-              const endTime = activity.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-              
-              activityEl.innerHTML = `
-                <div class="day-activity-title">${activity.name}</div>
-                <div class="day-activity-time">${startTime} - ${endTime}</div>
-                <div class="day-activity-description">${activity.description}</div>
-              `;
-              
-              hourSlot.appendChild(activityEl);
-            }
+            column.forEach(activity => {
+              const activityEl = createTimelineActivity(activity, date);
+              columnDiv.appendChild(activityEl);
+            });
+            
+            columnsContainer.appendChild(columnDiv);
           });
+          
+          timelineMain.appendChild(columnsContainer);
         }
+        
+        timelineContainer.appendChild(timelineAxis);
+        timelineContainer.appendChild(timelineMain);
+        dayViewContent.appendChild(timelineContainer);
         
         // Afficher la vue journalière, masquer la vue mensuelle
         calendarGrid.classList.add('hidden');
         dayView.classList.remove('hidden');
         backToMonthBtn.classList.remove('hidden');
+      };
+      
+      // Fonction pour créer les colonnes d'activités (gestion des chevauchements)
+      const createActivityColumns = (activities, date) => {
+        const columns = [];
+        const sortedActivities = [...activities].sort((a, b) => a.startTime - b.startTime);
+        
+        sortedActivities.forEach(activity => {
+          let placed = false;
+          
+          // Essayer de placer l'activité dans une colonne existante
+          for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
+            const lastActivity = column[column.length - 1];
+            
+            if (!lastActivity || new Date(lastActivity.endTime) <= new Date(activity.startTime)) {
+              column.push(activity);
+              placed = true;
+              break;
+            }
+          }
+          
+          // Si pas de place, créer une nouvelle colonne
+          if (!placed) {
+            columns.push([activity]);
+          }
+        });
+        
+        return columns;
+      };
+      
+      // Fonction pour créer un élément d'activité sur la timeline
+      const createTimelineActivity = (activity, date) => {
+        const activityEl = document.createElement('div');
+        activityEl.className = `timeline-activity ${activity.status}`;
+        
+        // Calculer la position et la hauteur
+        const startTime = new Date(activity.startTime);
+        const endTime = new Date(activity.endTime);
+        
+        // Ajuster les heures pour le jour sélectionné
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 8, 0, 0);
+        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0);
+        
+        const effectiveStart = new Date(Math.max(startTime.getTime(), dayStart.getTime()));
+        const effectiveEnd = new Date(Math.min(endTime.getTime(), dayEnd.getTime()));
+        
+        const startMinutes = (effectiveStart.getHours() - 8) * 60 + effectiveStart.getMinutes();
+        const endMinutes = (effectiveEnd.getHours() - 8) * 60 + effectiveEnd.getMinutes();
+        const duration = endMinutes - startMinutes;
+        
+        activityEl.style.top = `${startMinutes}px`;
+        activityEl.style.height = `${Math.max(duration, 30)}px`; // Hauteur minimum de 30px
+        
+        // Ajouter les classes pour les activités courtes
+        if (duration <= 20) {
+          activityEl.classList.add('ultra-short');
+        } else if (duration <= 45) {
+          activityEl.classList.add('short-duration');
+        }
+        
+        // Ajouter le type d'activité comme classe
+        if (activity.name.toLowerCase().includes('projet')) {
+          activityEl.classList.add('project');
+        } else if (activity.name.toLowerCase().includes('ticket')) {
+          activityEl.classList.add('ticket');
+        }
+        
+        // Contenu de l'activité
+        const title = document.createElement('div');
+        title.className = 'timeline-activity-title';
+        title.textContent = activity.name;
+        
+        const time = document.createElement('div');
+        time.className = 'timeline-activity-time';
+        const startTimeStr = startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        const endTimeStr = endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        time.textContent = `${startTimeStr} - ${endTimeStr}`;
+        
+        const description = document.createElement('div');
+        description.className = 'timeline-activity-description';
+        description.textContent = activity.description;
+        
+        // Tooltip pour plus d'informations
+        const tooltip = document.createElement('div');
+        tooltip.className = 'timeline-activity-tooltip';
+        
+        const tooltipTitle = document.createElement('div');
+        tooltipTitle.className = 'tooltip-title';
+        tooltipTitle.textContent = activity.name;
+        
+        const tooltipTime = document.createElement('div');
+        tooltipTime.className = 'tooltip-info';
+        tooltipTime.textContent = `${startTimeStr} - ${endTimeStr}`;
+        
+        const tooltipDuration = document.createElement('div');
+        tooltipDuration.className = 'tooltip-info';
+        const durationHours = Math.floor(duration / 60);
+        const durationMins = duration % 60;
+        tooltipDuration.textContent = `Durée: ${durationHours}h${durationMins > 0 ? ` ${durationMins}min` : ''}`;
+        
+        const tooltipDescription = document.createElement('div');
+        tooltipDescription.className = 'tooltip-description';
+        tooltipDescription.textContent = activity.description;
+        
+        tooltip.appendChild(tooltipTitle);
+        tooltip.appendChild(tooltipTime);
+        tooltip.appendChild(tooltipDuration);
+        tooltip.appendChild(tooltipDescription);
+        
+        activityEl.appendChild(title);
+        activityEl.appendChild(time);
+        if (duration > 60) { // Afficher la description seulement si assez de place
+          activityEl.appendChild(description);
+        }
+        activityEl.appendChild(tooltip);
+        
+        // Événement de clic
+        activityEl.addEventListener('click', () => {
+          showActivityModal(activity);
+        });
+        
+        return activityEl;
       };
       
       // Fonction pour revenir à la vue mensuelle
@@ -1217,19 +1646,107 @@
           addActivityForm.addEventListener('submit', function(e) {
               e.preventDefault();
               
+              // Validation des dates et heures de travail
+              const startDate = new Date(document.getElementById('activityStartDate').value);
+              const endDate = new Date(document.getElementById('activityEndDate').value);
+              const errorElement = document.getElementById('validationError');
+              const errorText = document.getElementById('validationErrorText');
+              
+              // Vérifier que la date de début est antérieure à la date de fin
+              if (startDate >= endDate) {
+                  errorText.textContent = 'La date de début doit être antérieure à la date de fin.';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              // Fonctions de validation pour les activités multi-jours
+              function isWorkingDay(date) {
+                  const day = date.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
+                  return day >= 1 && day <= 5;
+              }
+              
+              function isWorkingTime(date) {
+                  const hour = date.getHours();
+                  return hour >= 8 && hour < 18;
+              }
+              
+              function calculateWorkingHours(startDate, endDate) {
+                  let totalWorkingMinutes = 0;
+                  let currentDate = new Date(startDate);
+                  
+                  while (currentDate < endDate) {
+                      if (isWorkingDay(currentDate)) {
+                          const dayStart = new Date(currentDate);
+                          dayStart.setHours(8, 0, 0, 0);
+                          const dayEnd = new Date(currentDate);
+                          dayEnd.setHours(18, 0, 0, 0);
+                          
+                          const effectiveStart = new Date(Math.max(currentDate.getTime(), dayStart.getTime()));
+                          const effectiveEnd = new Date(Math.min(endDate.getTime(), dayEnd.getTime()));
+                          
+                          if (effectiveStart < effectiveEnd) {
+                              totalWorkingMinutes += (effectiveEnd - effectiveStart) / (1000 * 60);
+                          }
+                      }
+                      
+                      // Passer au jour suivant
+                      currentDate.setDate(currentDate.getDate() + 1);
+                      currentDate.setHours(0, 0, 0, 0);
+                  }
+                  
+                  return Math.round(totalWorkingMinutes);
+              }
+              
+              // Validation des activités multi-jours
+              if (!isWorkingDay(startDate)) {
+                  errorText.textContent = 'La date de début doit être un jour ouvrable (lundi-vendredi).';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              if (!isWorkingDay(endDate)) {
+                  errorText.textContent = 'La date de fin doit être un jour ouvrable (lundi-vendredi).';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              if (!isWorkingTime(startDate)) {
+                  errorText.textContent = 'L\'heure de début doit être pendant les heures de travail (8h-18h).';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              if (!isWorkingTime(endDate)) {
+                  errorText.textContent = 'L\'heure de fin doit être pendant les heures de travail (8h-18h).';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              // Calculer la durée en heures de travail
+              const workingMinutes = calculateWorkingHours(startDate, endDate);
+              if (workingMinutes <= 0) {
+                  errorText.textContent = 'L\'activité doit avoir une durée positive en heures de travail.';
+                  errorElement.classList.remove('hidden');
+                  return;
+              }
+              
+              // Cacher le message d'erreur si tout est valide
+              errorElement.classList.add('hidden');
+              
               const formData = {
                   title: document.getElementById('activityTitle').value,
                   description: document.getElementById('activityDescription').value,
-                  type: document.getElementById('activityType').value,
-                  start_date: document.getElementById('activityStartDate').value,
-                  end_date: document.getElementById('activityEndDate').value,
-                  resource_id: '{{ resource.id }}'
+                  activity_type: document.getElementById('activityType').value,
+                  start_datetime: document.getElementById('activityStartDate').value,
+                  end_datetime: document.getElementById('activityEndDate').value,
+                  resource_id: '{{ resource.id }}',
+                  working_hours_duration: workingMinutes
               };
 
               // Ajouter l'ID du projet ou du ticket selon le type sélectionné
-              if (formData.type === 'PROJECT') {
+              if (formData.activity_type === 'PROJECT') {
                   formData.project_id = document.getElementById('activityProject').value;
-              } else if (formData.type === 'TICKET') {
+              } else if (formData.activity_type === 'TICKET') {
                   formData.ticket_id = document.getElementById('activityTicket').value;
               }
 
@@ -1247,12 +1764,12 @@
                   if (data.success) {
                       // Ajouter la nouvelle activité à la liste des événements
                       const newActivity = {
-                          date: new Date(formData.start_date).toDateString(),
+                          date: new Date(formData.start_datetime).toDateString(),
                           name: formData.title,
                           status: 'planned',
                           description: formData.description,
-                          startTime: new Date(formData.start_date),
-                          endTime: new Date(formData.end_date)
+                          startTime: new Date(formData.start_datetime),
+                          endTime: new Date(formData.end_datetime)
                       };
                       
                       resourceEvents.push(newActivity);
@@ -1267,13 +1784,13 @@
                           showDayView(selectedDay);
                       }
                   } else {
-                      console.error('Erreur lors de la création de l\'activité:', data.error);
-                      alert('Une erreur est survenue lors de la création de l\'activité');
+                      console.error('Erreur lors de la création de l\'activité:', data.message || data.error);
+                      alert(data.message || 'Une erreur est survenue lors de la création de l\'activité');
                   }
               })
               .catch(error => {
                   console.error('Erreur lors de la création de l\'activité:', error);
-                  alert('Une erreur est survenue lors de la création de l\'activité');
+                  alert('Erreur de connexion lors de la création de l\'activité');
               });
           });
       }

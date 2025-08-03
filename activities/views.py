@@ -29,11 +29,25 @@ def create_activity(request):
             end_datetime=datetime.fromisoformat(data['end_datetime'])
         )
         
-        # Associer le projet ou ticket selon le type
+        # Associer le projet ou ticket selon le type avec validation des permissions
         if data['activity_type'] == 'PROJECT' and data.get('project_id'):
-            activity.project = get_object_or_404(Project, id=data['project_id'])
+            project = get_object_or_404(Project, id=data['project_id'])
+            # Vérifier que l'utilisateur est membre du projet
+            if not project.members.filter(id=resource.id).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Vous n\'êtes pas autorisé à créer une activité pour ce projet'
+                }, status=403)
+            activity.project = project
         elif data['activity_type'] == 'TICKET' and data.get('ticket_id'):
-            activity.ticket = get_object_or_404(Ticket, id=data['ticket_id'])
+            ticket = get_object_or_404(Ticket, id=data['ticket_id'])
+            # Vérifier que l'utilisateur est assigné au ticket
+            if not ticket.assigned_to.filter(id=resource.id).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Vous n\'êtes pas autorisé à créer une activité pour ce ticket'
+                }, status=403)
+            activity.ticket = ticket
         
         activity.save()
         
@@ -53,12 +67,16 @@ def get_projects_and_tickets(request, resource_id):
     try:
         resource = get_object_or_404(Ressource, id=resource_id)
         
-        # Utiliser 'name' pour correspondre au JavaScript
-        projects = [{'id': p.id, 'name': p.title} for p in Project.objects.all()]
-        tickets = [{'id': t.id, 'title': t.title} for t in Ticket.objects.all()]
+        # Filtrer les projets où l'utilisateur est membre
+        user_projects = Project.objects.filter(members=resource)
+        projects = [{'id': p.id, 'name': p.title} for p in user_projects]
+        
+        # Filtrer les tickets où l'utilisateur est assigné
+        user_tickets = Ticket.objects.filter(assigned_to=resource)
+        tickets = [{'id': t.id, 'title': t.title} for t in user_tickets]
         
         return JsonResponse({
-            'success': True,  # Ajouté pour correspondre au JavaScript
+            'success': True,
             'projects': projects,
             'tickets': tickets
         })
