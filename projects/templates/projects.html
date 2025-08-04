@@ -315,9 +315,7 @@
                             </div>
                         </div>
                         
-                        <button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1efe9] text-[#191610]" onclick="exportProjectsExcel()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
-                        </button>
+
                         
                     </form>
                 </div>
@@ -424,19 +422,7 @@
                     });
                 });
                 
-                function exportProjectsExcel() {
-                    const form = document.getElementById('project-filter-form');
-                    const params = new URLSearchParams(new FormData(form));
-                    const today = new Date();
-                    const dateStr = today.toISOString().slice(0,10);
-                    let filename = `projects_${dateStr}`;
-                    if(params.get('status')) filename += `_status-${params.get('status')}`;
-                    if(params.get('priority')) filename += `_priority-${params.get('priority')}`;
-                    if(params.get('project_manager')) filename += `_manager-${params.get('project_manager')}`;
-                    if(params.get('search')) filename += `_search-${params.get('search')}`;
-                    // Adapter l'URL selon votre structure d'URLs
-                    window.location.href = `/projects/export/?${params.toString()}&filename=${filename}`;
-                }
+
 
                 function confirmDelete(projectId) {
                     if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
