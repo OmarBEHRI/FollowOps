@@ -44,8 +44,7 @@
 
         /* Styles de la barre de navigation principale (header) */
         header {
-            background-color: var(--bg-white);
-            box-shadow: 0 2px 5px var(--shadow-light);
+            background-color: #f8f9fa;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -165,7 +164,7 @@
             <main class="layout-content-container flex flex-col max-w-full w-full flex-1">
                 
                 <!-- BARRE DE NAVIGATION PRINCIPALE -->
-                <header class="flex flex-col border-b border-solid border-b-[#f1efe9] px-10 py-3">
+                <header class="flex flex-col px-10 py-3">
                     <div class="flex items-center justify-between whitespace-nowrap pb-3">
                         <div class="flex items-center gap-4 text-[#191610] flex-1">
                             <div class="size-4">
@@ -192,12 +191,14 @@
                         </div>
                     </div>
 
-        <!-- BREADCRUMB -->
+                    <!-- BREADCRUMB -->
                     <div class="flex items-center gap-4 text-[#8c7e5a] text-sm font-medium">
                         <a href="/tickets/" class="hover:underline">Tickets</a>
                         <span>/</span>
                         <span>Détails du ticket</span>
                     </div>
+                </header>
+                
                 <div class="px-10 py-6 flex flex-col gap-8">
                     <!-- En-tête du ticket -->
                     <div class="flex items-center justify-between">
@@ -206,40 +207,39 @@
                             <p class="text-[#8c7e5a] text-base font-medium mt-2">Ticket #{{ ticket.id }} - Créé le {{ ticket.created_at|date:"d/m/Y" }}</p>
                         </div>
                         
-                        <!-- BOUTONS D'ACTION -->
-                        {% if user_role == 'ADMIN' or ticket.creator == user %}
-                        <div class="flex items-center gap-3">
-                            <button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#f1efe9] px-4 text-[#191610] text-sm font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='/tickets/edit/{{ ticket.id }}/'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.31,64l24-24L216,84.69Z"></path></svg>
-                                Modifier
-                            </button>
-                            <button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#fee2e2] px-4 text-[#991b1b] text-sm font-bold leading-normal tracking-[0.015em]" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) { window.location.href='/tickets/delete/{{ ticket.id }}/' }">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
-                                Supprimer
-                            </button>
-                        </div>
-                        {% endif %}
+
                     </div>
 
+                    <!-- Informations générales -->
                     <div class="flex flex-col gap-4">
-                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Détails du ticket</h2>
-                        <div class="py-4">
-                            <div class="grid grid-cols-2 gap-x-8 gap-y-5">
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Statut</p>
-                                    <p>
-                                        <span class="text-lg {% if ticket.status == 'En cours' %}status-en-cours{% else %}status-{{ ticket.status|lower }}{% endif %}">{{ ticket.status }}</span>
-                                    </p>
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Informations générales</h2>
+                        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <!-- Colonne gauche -->
+                                <div>
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Statut</p>
+                                    <div class="mb-4">
+                                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ ticket.get_status_display }}</span>
+                                    </div>
+                                    
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Priorité</p>
+                                    <div class="mb-4">
+                                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ ticket.get_priority_display }}</span>
+                                    </div>
+                                    
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Créé par</p>
+                                    <p class="text-[#191610] text-base mb-4">{{ ticket.created_by.get_full_name }}</p>
+                                    
+                                    {% if ticket.project %}
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Projet</p>
+                                    <p class="text-[#191610] text-base">{{ ticket.project.name }}</p>
+                                    {% endif %}
                                 </div>
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Priorité</p>
-                                    <p>
-                                        <span class="text-lg {% if ticket.priority == 'Haute' %}status-haute{% else %}status-{{ ticket.priority|lower }}{% endif %}">{{ ticket.priority }}</span>
-                                    </p>
-                                </div>
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Assigné à</p>
-                                    <p class="text-[#191610] text-base">
+                                
+                                <!-- Colonne droite -->
+                                <div>
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Assigné à</p>
+                                    <p class="text-[#191610] text-base mb-4">
                                         {% if ticket.assigned_to.all %}
                                             {% for resource in ticket.assigned_to.all %}
                                                 {{ resource.get_full_name }}{% if not forloop.last %}, {% endif %}
@@ -248,41 +248,36 @@
                                             Non assigné
                                         {% endif %}
                                     </p>
-                                </div>
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Créé par</p>
-                                    <p class="text-[#191610] text-base">{{ ticket.created_by.get_full_name }}</p>
-                                </div>
-                                {% if ticket.project %}
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Projet</p>
-                                    <p class="text-[#191610] text-base">{{ ticket.project.name }}</p>
-                                </div>
-                                {% endif %}
-                                {% if ticket.due_date %}
-                                <div class="border-b border-[var(--border-color)] pb-3">
-                                    <p class="text-[#8c7e5a] text-sm font-medium mb-2">Date d'échéance</p>
+                                    
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de création</p>
+                                    <p class="text-[#191610] text-base mb-4">{{ ticket.created_at|date:"d/m/Y" }}</p>
+                                    
+                                    {% if ticket.due_date %}
+                                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date d'échéance</p>
                                     <p class="text-[#191610] text-base">{{ ticket.due_date|date:"d/m/Y" }}</p>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
                     <!-- Description du ticket -->
                     <div class="flex flex-col gap-4">
                         <h2 class="text-[#191610] text-lg font-bold leading-tight">Description</h2>
-                        <p class="text-[#191610] text-sm font-normal leading-normal">{{ ticket.description }}</p>
+                        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+                            <p class="text-[#191610] text-base leading-relaxed">{{ ticket.description }}</p>
+                        </div>
                     </div>
 
                     <!-- Calendrier des activités du ticket -->
-                    <div class="flex flex-col gap-4 mt-6">
-                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Activités du ticket</h2>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Activités du ticket</h2>
+                        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
                             <div class="calendar-header">
                                 <button id="prevMonthTicket" class="calendar-nav-button">◀</button>
-                                <h3 id="month-year-display" class="text-xl font-semibold text-[var(--text-color-dark)]">Mois Année</h3>
+                                <h3 id="month-year-display" class="text-xl font-semibold text-[#191610]">Mois Année</h3>
                                 <div class="flex items-center gap-2">
-                                    <button id="back-to-month" class="px-3 py-1 rounded-md bg-[var(--button-bg-light)] text-[var(--nav-link-color)] hover:bg-gray-200 transition-colors duration-200 hidden">Retour au mois</button>
+                                    <button id="add-activity-btn" class="px-4 py-2 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-lg hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg">+ Ajouter une activité</button>
+                                    <button id="back-to-month" class="px-4 py-2 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-lg hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg hidden">Retour au mois</button>
                                     <button id="nextMonthTicket" class="calendar-nav-button">▶</button>
                                 </div>
                             </div>
@@ -301,15 +296,15 @@
                     </div>
 
                     <div class="flex flex-col gap-4">
-                        <h2 class="text-[#191610] text-xl font-bold leading-tight mb-2">Commentaires du ticket</h2>
+                        <h2 class="text-[#191610] text-lg font-bold leading-tight">Commentaires du ticket</h2>
                         
                         <!-- Comments Section with Project-style UI -->
-                        <div class="comments-section flex flex-col h-[calc(100vh-400px)] overflow-hidden border border-[#f1efe9] rounded-lg bg-white shadow-sm">
+                        <div class="comments-section flex flex-col h-[calc(100vh-400px)] overflow-hidden rounded-xl border border-[#e3dfd3] bg-[#fbfaf9]">
                             <!-- Comments List -->
                             <div id="comments-container" class="comments-list flex-grow overflow-y-auto px-6 py-4">
                                 {% if comments %}
                                     {% for comment in comments %}
-                                        <div class="comment-item mb-5 group hover:bg-[#f9f8f7] p-4 rounded-lg transition-all duration-200 border-b border-[#f1efe9]">
+                                        <div class="comment-item mb-4 group hover:bg-white p-4 rounded-lg transition-all duration-200 border border-[#e3dfd3] bg-white">
                                             <div class="comment-header flex justify-between items-center mb-2">
                                                 <div class="comment-author flex items-center">
                                                     <div class="author-avatar bg-[#A08D80] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 shadow-sm">
@@ -342,11 +337,11 @@
                             
                             <!-- Comment Form -->
                             {% if can_comment %}
-                            <div class="comment-form-container px-6 py-4 border-t border-[#f1efe9] bg-transparent">
+                            <div class="comment-form-container px-6 py-4 border-t border-[#e3dfd3] bg-white">
                                 <form id="comment-form" class="comment-form flex items-center" onsubmit="return false;">
                                     {% csrf_token %}
                                     <div class="form-group flex-grow mr-3">
-                                        <textarea id="comment-input" name="comment" class="w-full p-3 border border-[#eae6df] bg-white/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80] focus:border-transparent resize-none" rows="1" placeholder="Écrivez votre commentaire ici..."></textarea>
+                                        <textarea id="comment-input" name="comment" class="w-full p-3 border border-[#e3dfd3] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A08D80] focus:border-transparent resize-none" rows="1" placeholder="Écrivez votre commentaire ici..."></textarea>
                                     </div>
                                     <div class="form-actions flex-shrink-0">
                                         <button type="submit" class="bg-[#A08D80] text-white p-3 rounded-full hover:bg-[#8a7a6e] transition-colors flex items-center justify-center w-10 h-10">
@@ -505,7 +500,305 @@
             });
         }
     });
-</script>
+ </script>
+
+<!-- Modal pour ajouter une activité -->
+<div id="addActivityModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0 modal-content max-h-[90vh] overflow-hidden flex flex-col">
+        <!-- En-tête du modal -->
+        <div class="relative bg-gradient-to-r from-[#a08d80] to-[#8b7355] rounded-t-2xl p-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white">Nouvelle Activité</h3>
+            </div>
+            <button id="closeAddActivityModal" class="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Corps du formulaire -->
+        <div class="flex-1 overflow-y-auto">
+            <form id="addActivityForm" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Titre -->
+            <div class="space-y-2">
+                <label for="activityTitle" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Titre</span>
+                </label>
+                <input type="text" id="activityTitle" name="title" required 
+                       placeholder="Ex: Réunion équipe, Développement feature..."
+                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+            </div>
+            
+            <!-- Date -->
+            <div class="space-y-2">
+                <label for="activityDate" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Date</span>
+                </label>
+                <input type="date" id="activityDate" name="date" required 
+                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+            </div>
+            
+            <!-- Heures de début et fin -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="startTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Heure de début</span>
+                    </label>
+                    <input type="time" id="startTime" name="start_time" required 
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+                <div class="space-y-2">
+                    <label for="endTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Heure de fin</span>
+                    </label>
+                    <input type="time" id="endTime" name="end_time" required 
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+            </div>
+            
+            <!-- Description -->
+             <div class="space-y-2">
+                 <label for="activityDescription" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                     </svg>
+                     <span>Description</span>
+                 </label>
+                 <textarea id="activityDescription" name="description" rows="3" required
+                           placeholder="Décrivez brièvement cette activité..."
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80] resize-none"></textarea>
+             </div>
+             
+             <!-- Type d'activité et Ressource liée -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div class="space-y-2">
+                     <label for="activityType" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                         </svg>
+                         <span>Type d'activité</span>
+                     </label>
+                     <select id="activityType" name="type" required 
+                             class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                         <option value="">Sélectionner un type</option>
+                         <option value="meeting">Réunion</option>
+                         <option value="development">Développement</option>
+                         <option value="testing">Tests</option>
+                         <option value="documentation">Documentation</option>
+                         <option value="review">Révision</option>
+                         <option value="support">Support</option>
+                         <option value="other">Autre</option>
+                     </select>
+                 </div>
+                 <div class="space-y-2">
+                     <label for="linkedResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                         </svg>
+                         <span>Ressource liée</span>
+                     </label>
+                     <select id="linkedResource" name="linked_resource" 
+                             class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                         <option value="">Sélectionner une ressource</option>
+                         <option value="project">Projet</option>
+                         <option value="ticket">Ticket</option>
+                     </select>
+                 </div>
+             </div>
+             
+             <!-- Liste dynamique des ressources -->
+             <div id="resourceListContainer" class="space-y-2" style="display: none;">
+                 <label for="specificResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                     </svg>
+                     <span id="resourceListLabel">Sélectionner</span>
+                 </label>
+                 <select id="specificResource" name="specific_resource" 
+                         class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                     <option value="">Chargement...</option>
+                 </select>
+             </div>
+
+            
+            <!-- Boutons d'action -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t border-[#e3dfd3]">
+                <button type="button" id="cancelAddActivity" 
+                        class="px-6 py-3 text-[#191610] bg-[#f1efe9] rounded-xl hover:bg-[#e3dfd3] transition-all duration-200 font-medium border-2 border-transparent hover:border-[#e3dfd3] transform hover:scale-105">
+                    <span class="flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span>Annuler</span>
+                    </span>
+                </button>
+                <button type="submit" 
+                        class="px-6 py-3 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-xl hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <span class="flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Créer l'activité</span>
+                    </span>
+                </button>
+            </div>
+         </form>
+         </div>
+     </div>
+ </div>
+
+<!-- Modal pour afficher les détails d'une activité -->
+<div id="activityDetailsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all modal-content">
+        <!-- En-tête du modal -->
+        <div class="flex items-center justify-between p-6 border-b border-[#e3dfd3] bg-gradient-to-r from-[#fbfaf9] to-[#f5f3ee]">
+            <h3 class="text-xl font-bold text-[#191610] flex items-center space-x-2">
+                <svg class="w-5 h-5 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Détails de l'activité</span>
+            </h3>
+            <button id="closeActivityDetailsModal" class="text-[#a08d80] hover:text-[#8b7355] transition-colors p-2 rounded-full hover:bg-[#a08d80] hover:bg-opacity-10">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Corps du modal -->
+        <div class="p-6 space-y-4">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm font-semibold text-[#191610] block mb-1">Titre</label>
+                    <p id="activityDetailTitle" class="text-[#191610] bg-[#fbfaf9] p-3 rounded-lg border border-[#e3dfd3]"></p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-semibold text-[#191610] block mb-1">Description</label>
+                    <p id="activityDetailDescription" class="text-[#191610] bg-[#fbfaf9] p-3 rounded-lg border border-[#e3dfd3] min-h-[60px]"></p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-[#191610] block mb-1">Date de début</label>
+                        <p id="activityDetailStartDate" class="text-[#191610] bg-[#fbfaf9] p-3 rounded-lg border border-[#e3dfd3] text-sm"></p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-[#191610] block mb-1">Date de fin</label>
+                        <p id="activityDetailEndDate" class="text-[#191610] bg-[#fbfaf9] p-3 rounded-lg border border-[#e3dfd3] text-sm"></p>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-semibold text-[#191610] block mb-1">Assigné à</label>
+                    <p id="activityDetailEmployee" class="text-[#191610] bg-[#fbfaf9] p-3 rounded-lg border border-[#e3dfd3]"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pied du modal avec boutons -->
+        <div class="flex justify-between items-center p-6 border-t border-[#e3dfd3] bg-gradient-to-r from-[#fbfaf9] to-[#f5f3ee]">
+            <button id="deleteActivityBtn" 
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Supprimer</span>
+            </button>
+            <button id="closeActivityDetailsBtn" 
+                    class="px-4 py-2 bg-[#a08d80] text-white rounded-lg hover:bg-[#8b7355] transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105">
+                Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animation d'ouverture du modal */
+#addActivityModal:not(.hidden) .modal-content {
+    animation: modalSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Effet de focus amélioré pour les inputs */
+#addActivityForm input:focus,
+#addActivityForm textarea:focus {
+    box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.1);
+}
+
+/* Animation des labels */
+#addActivityForm label {
+    transition: all 0.2s ease;
+}
+
+#addActivityForm input:focus + label,
+#addActivityForm textarea:focus + label {
+    color: #a08d80;
+}
+
+/* Effet de survol sur les champs */
+#addActivityForm input:hover,
+#addActivityForm textarea:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(160, 141, 128, 0.1);
+}
+
+/* Styles de la barre de défilement personnalisée */
+.modal-content .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1efe9;
+    border-radius: 4px;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #a08d80;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #8b7355;
+}
+
+/* Assurer un défilement fluide */
+.modal-content .overflow-y-auto {
+    scroll-behavior: smooth;
+}
+</style>
+
 </body>
 </html>
 
@@ -870,6 +1163,11 @@
     font-weight: 600;
 }
 
+/* Masquer le bouton d'ajout d'activité en vue journalière */
+.day-view:not(.hidden) ~ .calendar-header #add-activity-btn {
+    display: none !important;
+}
+
 .calendar-nav-button:hover {
     background-color: var(--primary-color);
     color: var(--bg-white);
@@ -977,10 +1275,12 @@ document.addEventListener('DOMContentLoaded', function() {
           const endTime = new Date(activity.end);
           
           ticketEvents.push({
+            id: activity.id, // Ajouter l'ID de l'activité
             date: startTime.toDateString(),
             name: activity.title,
             status: activity.status === 'completed' ? 'completed' : 'inprogress',
             description: `${activity.description}\nAssigné à: ${activity.employee || 'Non assigné'}`,
+            employee: activity.employee || 'Non assigné',
             startTime: startTime,
             endTime: endTime
           });
@@ -1086,6 +1386,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const activityItem = document.createElement('div');
       activityItem.className = `activity-item ${event.status}`;
       activityItem.textContent = event.name;
+      activityItem.style.cursor = 'pointer';
+      
+      // Ajouter un événement de clic pour ouvrir le modal de détails
+      activityItem.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showActivityDetails(event);
+      });
       
       // Créer une infobulle pour le survol
       const tooltip = document.createElement('div');
@@ -1138,6 +1445,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const showDayView = (date) => {
     selectedDay = date;
     isMonthView = false;
+    
+    // Masquer le bouton d'ajout d'activité en vue journalière
+    const addActivityBtn = document.getElementById('add-activity-btn');
+    if (addActivityBtn) {
+      addActivityBtn.style.display = 'none';
+    }
     
     // Mettre à jour l'en-tête de la vue journalière
     const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
@@ -1209,6 +1522,12 @@ document.addEventListener('DOMContentLoaded', function() {
     calendarGrid.classList.remove('hidden');
     dayView.classList.add('hidden');
     backToMonthBtn.classList.add('hidden');
+    
+    // Réafficher le bouton d'ajout d'activité en vue mensuelle
+    const addActivityBtn = document.getElementById('add-activity-btn');
+    if (addActivityBtn) {
+      addActivityBtn.style.display = 'block';
+    }
   };
 
   // Navigation entre les mois/jours
@@ -1240,5 +1559,330 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialiser le calendrier
   renderCalendar();
+  
+  // Gestion du modal d'ajout d'activité
+  const addActivityBtn = document.getElementById('add-activity-btn');
+  const addActivityModal = document.getElementById('addActivityModal');
+  const closeAddActivityModal = document.getElementById('closeAddActivityModal');
+  const cancelAddActivity = document.getElementById('cancelAddActivity');
+  const addActivityForm = document.getElementById('addActivityForm');
+  
+  // Ouvrir le modal
+  if (addActivityBtn) {
+    addActivityBtn.addEventListener('click', () => {
+      addActivityModal.classList.remove('hidden');
+      // Masquer la barre de navigation
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.display = 'none';
+      }
+    });
+  }
+  
+  // Fermer le modal
+  if (closeAddActivityModal) {
+    closeAddActivityModal.addEventListener('click', () => {
+      addActivityModal.classList.add('hidden');
+      // Restaurer la barre de navigation
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.display = '';
+      }
+    });
+  }
+  
+  if (cancelAddActivity) {
+    cancelAddActivity.addEventListener('click', () => {
+      addActivityModal.classList.add('hidden');
+      // Restaurer la barre de navigation
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.display = '';
+      }
+    });
+  }
+  
+  // Fermer le modal en cliquant à l'extérieur
+  if (addActivityModal) {
+    addActivityModal.addEventListener('click', (e) => {
+      if (e.target === addActivityModal) {
+        addActivityModal.classList.add('hidden');
+      }
+    });
+  }
+  
+  // Gérer la soumission du formulaire
+  if (addActivityForm) {
+    addActivityForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const date = document.getElementById('activityDate').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      
+      const formData = {
+        title: document.getElementById('activityTitle').value,
+        description: document.getElementById('activityDescription').value,
+        start_datetime: `${date}T${startTime}:00`,
+        end_datetime: `${date}T${endTime}:00`
+      };
+      
+      // Envoyer les données à l'API
+      fetch('/activities/ticket/{{ ticket.id }}/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Ajouter la nouvelle activité à la liste des événements
+          const newActivity = {
+            date: new Date(formData.start_datetime).toDateString(),
+            name: formData.title,
+            status: 'planned',
+            description: formData.description,
+            startTime: new Date(formData.start_datetime),
+            endTime: new Date(formData.end_datetime)
+          };
+          
+          ticketEvents.push(newActivity);
+          
+          // Fermer le modal et rafraîchir le calendrier
+          addActivityModal.classList.add('hidden');
+          addActivityForm.reset();
+          // Restaurer la barre de navigation
+          const header = document.querySelector('header');
+          if (header) {
+            header.style.display = '';
+          }
+          renderCalendar();
+          
+          // Si on est en vue journalière, rafraîchir la vue
+          if (!isMonthView && selectedDay) {
+            showDayView(selectedDay);
+          }
+        } else {
+          console.error('Erreur lors de la création de l\'activité:', data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+      });
+    });
+  }
+  
+  // Gestion de la sélection dynamique des ressources
+  const linkedResourceSelect = document.getElementById('linkedResource');
+  const resourceListContainer = document.getElementById('resourceListContainer');
+  const specificResourceSelect = document.getElementById('specificResource');
+  const resourceListLabel = document.getElementById('resourceListLabel');
+  
+  if (linkedResourceSelect) {
+    linkedResourceSelect.addEventListener('change', function() {
+      const selectedType = this.value;
+      
+      if (selectedType === 'project' || selectedType === 'ticket') {
+        // Afficher le conteneur de la liste
+        resourceListContainer.style.display = 'block';
+        
+        // Mettre à jour le label
+        if (selectedType === 'project') {
+          resourceListLabel.textContent = 'Sélectionner un projet';
+        } else {
+          resourceListLabel.textContent = 'Sélectionner un ticket';
+        }
+        
+        // Afficher "Chargement..." pendant la requête
+        specificResourceSelect.innerHTML = '<option value="">Chargement...</option>';
+        
+        // Faire la requête AJAX pour récupérer les ressources
+        fetch(`/tickets/get_resources/?type=${selectedType}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Vider le select et ajouter les options
+              specificResourceSelect.innerHTML = '<option value="">Sélectionner...</option>';
+              
+              data.resources.forEach(resource => {
+                const option = document.createElement('option');
+                option.value = resource.id;
+                option.textContent = resource.title;
+                specificResourceSelect.appendChild(option);
+              });
+            } else {
+              specificResourceSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+              console.error('Erreur:', data.error);
+            }
+          })
+          .catch(error => {
+            specificResourceSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            console.error('Erreur:', error);
+          });
+      } else {
+        // Cacher le conteneur si aucune ressource n'est sélectionnée
+        resourceListContainer.style.display = 'none';
+      }
+    });
+  }
+  
+  // Fonction pour recharger les activités du ticket
+  function loadTicketActivities() {
+    // Réinitialiser les événements du ticket (garder seulement les événements de base)
+    ticketEvents = [
+      { 
+        date: new Date('{{ ticket.created_at|date:"Y-m-d" }}').toDateString(), 
+        name: 'Création du ticket', 
+        status: 'planned',
+        description: 'Le ticket a été créé par {{ ticket.created_by.get_full_name }}',
+        startTime: new Date('{{ ticket.created_at|date:"Y-m-d" }}'),
+        endTime: new Date('{{ ticket.created_at|date:"Y-m-d" }}')
+      },
+      {
+        date: today.toDateString(),
+        name: 'Statut: {{ ticket.status }}',
+        status: '{{ ticket.status|lower }}' === 'en cours' ? 'inprogress' : 
+                ('{{ ticket.status|lower }}' === 'terminé' ? 'completed' : 'planned'),
+        description: 'Le statut actuel du ticket est {{ ticket.status }}',
+        startTime: today,
+        endTime: new Date(today.getTime() + 60 * 60000)
+      }
+    ];
+    
+    // Récupérer les activités depuis l'API
+    fetch('/activities/ticket/{{ ticket.id }}/activities/')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Ajouter les activités récupérées à notre liste d'événements
+          data.activities.forEach(activity => {
+            const startTime = new Date(activity.start);
+            const endTime = new Date(activity.end);
+            
+            ticketEvents.push({
+              id: activity.id,
+              date: startTime.toDateString(),
+              name: activity.title,
+              status: activity.status === 'completed' ? 'completed' : 'inprogress',
+              description: `${activity.description}\nAssigné à: ${activity.employee || 'Non assigné'}`,
+              employee: activity.employee || 'Non assigné',
+              startTime: startTime,
+              endTime: endTime
+            });
+          });
+          
+          // Mettre à jour le calendrier avec les nouvelles activités
+          renderCalendar();
+        } else {
+          console.error('Erreur lors de la récupération des activités:', data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des activités:', error);
+      });
+  }
+  
+  // Variables globales pour le modal de détails d'activité
+  let currentActivityId = null;
+  const activityDetailsModal = document.getElementById('activityDetailsModal');
+  const closeActivityDetailsModal = document.getElementById('closeActivityDetailsModal');
+  const closeActivityDetailsBtn = document.getElementById('closeActivityDetailsBtn');
+  const deleteActivityBtn = document.getElementById('deleteActivityBtn');
+  
+  // Fonction pour afficher les détails d'une activité
+  function showActivityDetails(activity) {
+    // Vérifier si l'activité a un ID (les événements système n'en ont pas)
+    if (!activity.id) {
+      alert('Cette activité ne peut pas être supprimée car elle fait partie des événements système.');
+      return;
+    }
+    
+    currentActivityId = activity.id;
+    
+    // Remplir les champs du modal avec les données de l'activité
+    document.getElementById('activityDetailTitle').textContent = activity.name || 'Sans titre';
+    document.getElementById('activityDetailDescription').textContent = activity.description || 'Aucune description';
+    
+    // Formater les dates
+    const startDate = new Date(activity.startTime);
+    const endDate = new Date(activity.endTime);
+    
+    const formatOptions = {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    
+    document.getElementById('activityDetailStartDate').textContent = startDate.toLocaleDateString('fr-FR', formatOptions);
+    document.getElementById('activityDetailEndDate').textContent = endDate.toLocaleDateString('fr-FR', formatOptions);
+    document.getElementById('activityDetailEmployee').textContent = activity.employee || 'Non assigné';
+    
+    // Afficher le modal
+    activityDetailsModal.classList.remove('hidden');
+  }
+  
+  // Fonction pour fermer le modal de détails
+  function closeActivityDetailsModalFunc() {
+    activityDetailsModal.classList.add('hidden');
+    currentActivityId = null;
+  }
+  
+  // Événements pour fermer le modal
+  if (closeActivityDetailsModal) {
+    closeActivityDetailsModal.addEventListener('click', closeActivityDetailsModalFunc);
+  }
+  
+  if (closeActivityDetailsBtn) {
+    closeActivityDetailsBtn.addEventListener('click', closeActivityDetailsModalFunc);
+  }
+  
+  // Fermer le modal en cliquant à l'extérieur
+  if (activityDetailsModal) {
+    activityDetailsModal.addEventListener('click', (e) => {
+      if (e.target === activityDetailsModal) {
+        closeActivityDetailsModalFunc();
+      }
+    });
+  }
+  
+  // Fonction pour supprimer une activité
+  if (deleteActivityBtn) {
+    deleteActivityBtn.addEventListener('click', () => {
+      if (!currentActivityId) {
+        alert('Aucune activité sélectionnée');
+        return;
+      }
+      
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette activité ?')) {
+        fetch(`/activities/delete/${currentActivityId}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Activité supprimée avec succès');
+            closeActivityDetailsModalFunc();
+            // Recharger les activités
+            loadTicketActivities();
+          } else {
+            alert('Erreur lors de la suppression: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Erreur lors de la suppression de l\'activité');
+        });
+      }
+    });
+  }
 });
 </script>

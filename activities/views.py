@@ -63,6 +63,93 @@ def create_activity(request):
             'message': str(e)
         }, status=400)
 
+@require_http_methods(["POST"])
+@csrf_exempt
+def create_ticket_activity(request, ticket_id):
+    try:
+        data = json.loads(request.body)
+        
+        # Récupérer le ticket
+        ticket = get_object_or_404(Ticket, id=ticket_id)
+        
+        # Pour l'instant, utiliser la première ressource assignée au ticket
+        # Dans une vraie application, cela devrait être l'utilisateur connecté
+        if ticket.assigned_to.exists():
+            resource = ticket.assigned_to.first()
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Aucune ressource assignée à ce ticket'
+            }, status=400)
+        
+        # Créer l'activité
+        activity = Activity(
+            title=data['title'],
+            description=data.get('description', ''),
+            employee=resource,
+            activity_type='TICKET',
+            start_datetime=datetime.fromisoformat(data['start_datetime']),
+            end_datetime=datetime.fromisoformat(data['end_datetime']),
+            ticket=ticket
+        )
+        
+        activity.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Activité créée avec succès',
+            'activity_id': activity.id
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@require_http_methods(["GET"])
+def get_ticket_activities(request, ticket_id):
+    try:
+        # Récupérer le ticket
+        ticket = get_object_or_404(Ticket, id=ticket_id)
+        
+        # Récupérer toutes les activités liées à ce ticket
+        activities = Activity.objects.filter(ticket=ticket).order_by('start_datetime')
+        
+        activities_data = []
+        for activity in activities:
+            # Déterminer le statut basé sur les dates
+            now = datetime.now().date()
+            activity_date = activity.start_datetime.date()
+            
+            if activity_date < now:
+                status = 'completed'
+            elif activity_date == now:
+                status = 'inprogress'
+            else:
+                status = 'planned'
+            
+            activities_data.append({
+                'id': activity.id,
+                'title': activity.title,
+                'description': activity.description,
+                'start': activity.start_datetime.isoformat(),
+                'end': activity.end_datetime.isoformat(),
+                'status': status,
+                'employee': f"{activity.employee.first_name} {activity.employee.last_name}"
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'activities': activities_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
 def get_projects_and_tickets(request, resource_id):
     try:
         resource = get_object_or_404(Ressource, id=resource_id)
@@ -83,3 +170,33 @@ def get_projects_and_tickets(request, resource_id):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@require_http_methods(["DELETE"])
+@csrf_exempt
+def delete_activity(request, activity_id):
+    try:
+        activity = get_object_or_404(Activity, id=activity_id)
+        
+        # Vérifier que l'utilisateur a le droit de supprimer cette activité
+        # (par exemple, si c'est son activité ou s'il a les permissions)
+        # Pour l'instant, on permet la suppression à tous
+        
+        activity.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Activité supprimée avec succès'
+        })
+        
+    except Activity.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Activité non trouvée'
+        }, status=404)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'Erreur lors de la suppression',
+            'error': str(e)
+        }, status=400)

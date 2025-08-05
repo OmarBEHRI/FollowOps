@@ -404,7 +404,18 @@
                     });
                 });
                 
-
+                function exportTicketsExcel() {
+                    const form = document.getElementById('ticket-filter-form');
+                    const params = new URLSearchParams(new FormData(form));
+                    const today = new Date();
+                    const dateStr = today.toISOString().slice(0,10);
+                    let filename = `tickets_${dateStr}`;
+                    if(params.get('status')) filename += `_status-${params.get('status')}`;
+                    if(params.get('priority')) filename += `_priority-${params.get('priority')}`;
+                    if(params.get('search')) filename += `_search-${params.get('search')}`;
+                    // Adapter l'URL selon votre structure d'URLs
+                    window.location.href = `/tickets/export/?${params.toString()}&filename=${filename}`;
+                }
 
                 function confirmDelete(ticketId) {
                     if (confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) {

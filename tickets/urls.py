@@ -8,4 +8,5 @@ urlpatterns = [
     path('edit/<int:ticket_id>/', views.edit_ticket, name='edit_ticket'),
     path('delete/<int:ticket_id>/', views.delete_ticket, name='delete_ticket'),
     path('add_comment/<int:ticket_id>/', views.add_comment_ajax, name='add_comment_ajax'),
+    path('get_resources/', views.get_resources_list, name='get_resources'),
 ]

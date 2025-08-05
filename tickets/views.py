@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from .models import Ticket, CommentTicket
 from ressources.models import Ressource
+from projects.models import Project
 from django.contrib import messages
 import json
 
@@ -322,3 +323,27 @@ def _handle_comment_creation(request, ticket, user):
     
     # Redirection normale
     return redirect('ticketDetails', ticket_id=ticket.id)
+
+
+@login_required
+def get_resources_list(request):
+    """Récupérer la liste des projets et tickets pour le formulaire d'activité"""
+    resource_type = request.GET.get('type')
+    user = request.user
+    
+    if resource_type == 'project':
+        # Filtrer les projets où l'utilisateur est membre
+        projects = Project.objects.filter(members=user).values('id', 'title')
+        return JsonResponse({
+            'success': True,
+            'resources': list(projects)
+        })
+    elif resource_type == 'ticket':
+        # Filtrer les tickets assignés à l'utilisateur
+        tickets = Ticket.objects.filter(assigned_to=user).values('id', 'title')
+        return JsonResponse({
+            'success': True,
+            'resources': list(tickets)
+        })
+    
+    return JsonResponse({'success': False, 'error': 'Type de ressource invalide'})
