@@ -14,4 +14,6 @@ urlpatterns = [
     path('api/tags/search/', views.search_tags, name='search_tags'),
     path('api/tags/all/', views.get_all_tags, name='get_all_tags'),
     path('api/tags/create/', views.create_tag, name='create_tag'),
+    # Global search API endpoint
+    path('api/global-search/', views.global_search, name='global_search')
 ]

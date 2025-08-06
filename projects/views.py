@@ -6,6 +6,8 @@ import json
 from .models import Project, Tag, CommentProject
 from .forms import ProjectForm
 from ressources.models import Ressource
+from tickets.models import Ticket
+from django.db.models import Q
 
 @login_required
 def projects(request):
@@ -360,3 +362,90 @@ def delete_project(request, pk):
         return redirect('projects')
     
     return render(request, 'delete_project.html', {'project': project})
+
+
+@login_required
+def global_search(request):
+    """
+    Global search function that searches across Projects, Resources, and Tickets
+    Returns JSON response with search results for dropdown suggestions
+    """
+    query = request.GET.get('q', '').strip()
+    
+    if not query or len(query) < 2:
+        return JsonResponse({'results': []})
+    
+    user = request.user
+    results = []
+    
+    # Search Projects
+    if user.appRole == 'ADMIN':
+        projects = Project.objects.all()
+    elif user.appRole == 'MANAGER':
+        projects = Project.objects.filter(project_manager=user)
+    else:
+        projects = Project.objects.filter(members=user)
+    
+    project_results = projects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query)
+    )[:5]  # Limit to 5 results
+    
+    for project in project_results:
+        results.append({
+            'type': 'project',
+            'id': project.id,
+            'title': project.title,
+            'description': project.description[:100] + '...' if len(project.description) > 100 else project.description,
+            'url': f'/projects/details/{project.id}/',
+            'status': project.status,
+            'priority': project.priority
+        })
+    
+    # Search Resources
+    resource_results = Ressource.objects.filter(
+        Q(first_name__icontains=query) | 
+        Q(last_name__icontains=query) |
+        Q(role__icontains=query) |
+        Q(skills__icontains=query)
+    )[:5]  # Limit to 5 results
+    
+    for resource in resource_results:
+        results.append({
+            'type': 'resource',
+            'id': resource.id,
+            'title': f'{resource.first_name} {resource.last_name}',
+            'description': f'{resource.role} - {resource.skills[:50]}...' if resource.skills and len(resource.skills) > 50 else resource.role,
+            'url': f'/ressources/details/{resource.id}/',
+            'status': resource.status,
+            'role': resource.role
+        })
+    
+    # Search Tickets
+    if user.appRole == 'ADMIN':
+        tickets = Ticket.objects.all()
+    else:
+        tickets = Ticket.objects.filter(
+            Q(assigned_to=user) | Q(created_by=user)
+        )
+    
+    ticket_results = tickets.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query)
+    )[:5]  # Limit to 5 results
+    
+    for ticket in ticket_results:
+        results.append({
+            'type': 'ticket',
+            'id': ticket.id,
+            'title': ticket.title,
+            'description': ticket.description[:100] + '...' if len(ticket.description) > 100 else ticket.description,
+            'url': f'/tickets/details/{ticket.id}/',
+            'status': ticket.status,
+            'priority': ticket.priority
+        })
+    
+    return JsonResponse({
+        'results': results,
+        'total_count': len(results)
+    })

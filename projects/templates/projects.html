@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -453,7 +454,15 @@
                         }
                     });
                 }
+                
+                // Initialize Global Search
+                document.addEventListener('DOMContentLoaded', function() {
+                    new GlobalSearch('header-search-input');
+                });
                 </script>
+                
+                <!-- Global Search JavaScript -->
+  <script src="{% static 'projects/js/global_search.js' %}?v=2"></script>
             </main>
         </div>
     </div>
