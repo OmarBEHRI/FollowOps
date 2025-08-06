@@ -150,6 +150,36 @@ def get_ticket_activities(request, ticket_id):
             'error': str(e)
         }, status=400)
 
+@require_http_methods(["GET"])
+def get_project_activities(request, project_id):
+    try:
+        activities = Activity.objects.filter(
+            project_id=project_id,
+            activity_type='PROJECT'
+        ).select_related('employee')
+        
+        activities_data = []
+        for activity in activities:
+            activities_data.append({
+                'id': activity.id,
+                'title': activity.title,
+                'description': activity.description,
+                'start_datetime': activity.start_datetime.isoformat(),
+                'end_datetime': activity.end_datetime.isoformat(),
+                'employee': activity.employee.get_full_name() if activity.employee else None,
+                'status': 'completed' if hasattr(activity, 'is_completed') and activity.is_completed else 'inprogress'
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'activities': activities_data
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
 def get_projects_and_tickets(request, resource_id):
     try:
         resource = get_object_or_404(Ressource, id=resource_id)

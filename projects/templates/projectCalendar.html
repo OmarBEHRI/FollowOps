@@ -429,7 +429,7 @@ body {
     z-index: 100;
 }
 
-#back-to-month, #add-activity-btn {
+#back-to-month {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
@@ -443,12 +443,12 @@ body {
     box-shadow: 0 4px 15px rgba(160, 141, 128, 0.3);
 }
 
-#back-to-month:hover, #add-activity-btn:hover {
+#back-to-month:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(160, 141, 128, 0.4);
 }
 
-#back-to-month::before, #add-activity-btn::before {
+#back-to-month::before {
     content: '';
     position: absolute;
     top: 0;
@@ -459,8 +459,161 @@ body {
     transition: left 0.5s;
 }
 
-#back-to-month:hover::before, #add-activity-btn:hover::before {
+#back-to-month:hover::before {
     left: 100%;
+}
+
+/* Style pour le bouton Ajouter une activité */
+#add-activity-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
+    min-width: 140px;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+#add-activity-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(160, 141, 128, 0.4);
+}
+
+#add-activity-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
+}
+
+#add-activity-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.3);
+}
+
+/* Correction complète pour le modal d'ajout d'activité */
+#addActivityModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Utiliser une classe spécifique pour éviter les conflits Tailwind */
+#addActivityModal.modal-show {
+    display: flex !important;
+}
+
+#addActivityModal.modal-hidden {
+    display: none !important;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animation d'ouverture du modal */
+#addActivityModal.modal-show .modal-content {
+    animation: modalSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Styles pour l'animation du modal */
+.modal-content {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+    transition: all 0.3s ease-out;
+}
+
+#addActivityModal.modal-show .modal-content {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* Effet de focus amélioré pour les inputs */
+#addActivityForm input:focus,
+#addActivityForm textarea:focus,
+#addActivityForm select:focus {
+    box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.1);
+    outline: none;
+}
+
+/* Animation des labels */
+#addActivityForm label {
+    transition: all 0.2s ease;
+}
+
+#addActivityForm input:focus + label,
+#addActivityForm textarea:focus + label {
+    color: #a08d80;
+}
+
+/* Effet de survol sur les champs */
+#addActivityForm input:hover,
+#addActivityForm textarea:hover,
+#addActivityForm select:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(160, 141, 128, 0.1);
+}
+
+/* Styles de la barre de défilement personnalisée */
+.modal-content .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1efe9;
+    border-radius: 4px;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #a08d80;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.modal-content .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #8b7355;
+}
+
+/* Assurer un défilement fluide */
+.modal-content .overflow-y-auto {
+    scroll-behavior: smooth;
 }
 </style>
 {% endblock %}
@@ -727,40 +880,191 @@ document.addEventListener('DOMContentLoaded', function() {
     
     backToMonthBtn.addEventListener('click', showMonthView);
     
-    // Ouvrir le modal d'ajout d'activité
-    if (addActivityBtn && addActivityModal) {
-        addActivityBtn.addEventListener('click', () => {
-            console.log('Bouton cliqué - Modal ouvert');
-            addActivityModal.classList.remove('hidden');
-        });
-    }
-    
-    // Fermer le modal
-    if (closeAddActivityModal) {
-        closeAddActivityModal.addEventListener('click', () => {
-            addActivityModal.classList.add('hidden');
-        });
-    }
-    
-    if (cancelAddActivity) {
-        cancelAddActivity.addEventListener('click', () => {
-            addActivityModal.classList.add('hidden');
-        });
-    }
-    
-    // Fermer le modal en cliquant à l'extérieur
-    if (addActivityModal) {
-        addActivityModal.addEventListener('click', (e) => {
-            if (e.target === addActivityModal) {
-                addActivityModal.classList.add('hidden');
-            }
-        });
-    }
-    
     // Rendu initial
     renderCalendar();
 });
 </script>
+
+<!-- Modal pour ajouter une activité -->
+<div id="addActivityModal" class="modal-hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all duration-300 modal-content max-h-[90vh] overflow-hidden flex flex-col">
+        <!-- En-tête du modal -->
+        <div class="relative bg-gradient-to-r from-[#a08d80] to-[#8b7355] rounded-t-2xl p-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white">Nouvelle Activité</h3>
+            </div>
+            <button id="closeAddActivityModal" class="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Corps du formulaire -->
+        <div class="flex-1 overflow-y-auto">
+            <form id="addActivityForm" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Titre -->
+            <div class="space-y-2">
+                <label for="activityTitle" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Titre</span>
+                </label>
+                <input type="text" id="activityTitle" name="title" required 
+                       placeholder="Ex: Réunion équipe, Développement feature..."
+                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+            </div>
+            
+            <!-- Date -->
+            <div class="space-y-2">
+                <label for="activityDate" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Date</span>
+                </label>
+                <input type="date" id="activityDate" name="date" required 
+                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+            </div>
+            
+            <!-- Heures de début et fin -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="startTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Heure de début</span>
+                    </label>
+                    <input type="time" id="startTime" name="start_time" required 
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+                <div class="space-y-2">
+                    <label for="endTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Heure de fin</span>
+                    </label>
+                    <input type="time" id="endTime" name="end_time" required 
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+            </div>
+            
+            <!-- Description -->
+             <div class="space-y-2">
+                 <label for="activityDescription" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                     </svg>
+                     <span>Description</span>
+                 </label>
+                 <textarea id="activityDescription" name="description" rows="3" required
+                           placeholder="Décrivez brièvement cette activité..."
+                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80] resize-none"></textarea>
+             </div>
+             
+             <!-- Type d'activité et Ressource liée -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div class="space-y-2">
+                     <label for="activityType" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                         </svg>
+                         <span>Type d'activité</span>
+                     </label>
+                     <select id="activityType" name="type" required 
+                             class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                         <option value="">Sélectionner un type</option>
+                         <option value="meeting">Réunion</option>
+                         <option value="development">Développement</option>
+                         <option value="testing">Tests</option>
+                         <option value="documentation">Documentation</option>
+                         <option value="review">Révision</option>
+                         <option value="support">Support</option>
+                         <option value="other">Autre</option>
+                     </select>
+                 </div>
+                 <div class="space-y-2">
+                     <label for="linkedResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                         </svg>
+                         <span>Ressource liée</span>
+                     </label>
+                     <select id="linkedResource" name="linked_resource" 
+                             class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                         <option value="">Sélectionner une ressource</option>
+                         <option value="project">Projet</option>
+                         <option value="ticket">Ticket</option>
+                     </select>
+                 </div>
+             </div>
+             
+             <!-- Liste dynamique des ressources -->
+             <div id="resourceListContainer" class="space-y-2" style="display: none;">
+                 <label for="specificResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                     </svg>
+                     <span id="resourceListLabel">Sélectionner</span>
+                 </label>
+                 <select id="specificResource" name="specific_resource" 
+                         class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                     <option value="">Chargement...</option>
+                 </select>
+             </div>
+
+             <!-- Employé assigné -->
+             <div class="space-y-2">
+                 <label for="activityEmployee" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                     </svg>
+                     <span>Employé assigné</span>
+                 </label>
+                 <select id="activityEmployee" name="employee" required 
+                         class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                     <option value="">Sélectionner un employé</option>
+                     {% for member in project.members.all %}
+                         <option value="{{ member.id }}">{{ member.first_name }} {{ member.last_name }}</option>
+                     {% endfor %}
+                 </select>
+             </div>
+            
+            <!-- Boutons d'action -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t border-[#e3dfd3]">
+                <button type="button" id="cancelAddActivity" 
+                        class="px-6 py-3 text-[#191610] bg-[#f1efe9] rounded-xl hover:bg-[#e3dfd3] transition-all duration-200 font-medium border-2 border-transparent hover:border-[#e3dfd3] transform hover:scale-105">
+                    <span class="flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span>Annuler</span>
+                    </span>
+                </button>
+                <button type="submit" 
+                        class="px-6 py-3 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-xl hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <span class="flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Créer l'activité</span>
+                    </span>
+                </button>
+            </div>
+         </form>
+         </div>
+     </div>
+ </div>
 
 {% endblock %}
 
@@ -799,35 +1103,49 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addActivityBtn && addActivityModal) {
         addActivityBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             console.log('Bouton cliqué - Modal ouvert');
-            addActivityModal.classList.remove('hidden');
-            addActivityModal.style.display = 'flex';
+            
+            // Retirer les classes de masquage et ajouter la classe d'affichage
+            addActivityModal.classList.remove('hidden', 'modal-hidden');
+            addActivityModal.classList.add('modal-show');
+            
+            // Empêcher le scroll du body
+            document.body.style.overflow = 'hidden';
         });
     } else {
         console.error('Éléments manquants:', { addActivityBtn, addActivityModal });
     }
     
     // Fermer le modal
+    function closeModal() {
+        if (addActivityModal) {
+            addActivityModal.classList.remove('modal-show');
+            addActivityModal.classList.add('modal-hidden');
+            
+            // Restaurer le scroll du body
+            document.body.style.overflow = 'auto';
+            
+            // Réinitialiser le formulaire
+            if (addActivityForm) {
+                addActivityForm.reset();
+            }
+        }
+    }
+    
     if (closeAddActivityModal) {
-        closeAddActivityModal.addEventListener('click', function() {
-            addActivityModal.classList.add('hidden');
-            addActivityModal.style.display = 'none';
-        });
+        closeAddActivityModal.addEventListener('click', closeModal);
     }
     
     if (cancelAddActivity) {
-        cancelAddActivity.addEventListener('click', function() {
-            addActivityModal.classList.add('hidden');
-            addActivityModal.style.display = 'none';
-        });
+        cancelAddActivity.addEventListener('click', closeModal);
     }
     
     // Fermer le modal en cliquant à l'extérieur
     if (addActivityModal) {
         addActivityModal.addEventListener('click', function(e) {
             if (e.target === addActivityModal) {
-                addActivityModal.classList.add('hidden');
-                addActivityModal.style.display = 'none';
+                closeModal();
             }
         });
     }
@@ -865,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Fermer le modal et recharger la page
-                    addActivityModal.classList.add('hidden');
+                    addActivityModal.classList.add('modal-hidden');
                     addActivityForm.reset();
                     location.reload(); // Recharger pour voir la nouvelle activité
                 } else {
@@ -896,93 +1214,9 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+</script>
 
-<!-- Modal pour ajouter une activité -->
-<div id="addActivityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all">
-        <div class="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
-            <h3 class="text-xl font-semibold text-[var(--text-color-dark)]">Ajouter une activité</h3>
-            <button id="closeAddActivityModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <form id="addActivityForm" method="post" class="p-6 space-y-4">
-            {% csrf_token %}
-            <div>
-                <label for="activityTitle" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Titre</label>
-                <input type="text" id="activityTitle" name="title" required 
-                       class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-            </div>
-            
-            <div>
-                <label for="activityDescription" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Description</label>
-                <textarea id="activityDescription" name="description" rows="3" 
-                          class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"></textarea>
-            </div>
-            
-            <div>
-                <label for="activityType" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Type</label>
-                <select id="activityType" required class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                    <option value="">Sélectionner un type</option>
-                    <option value="PROJECT">Projet</option>
-                    <option value="TICKET">Ticket</option>
-                </select>
-            </div>
-            
-            <div id="projectSelect" class="hidden">
-                <label for="activityProject" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Projet</label>
-                <select id="activityProject" class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                    <option value="">Sélectionner un projet</option>
-                </select>
-            </div>
-            
-            <div id="ticketSelect" class="hidden">
-                <label for="activityTicket" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Ticket</label>
-                <select id="activityTicket" class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                    <option value="">Sélectionner un ticket</option>
-                </select>
-            </div>
-            
-            <div>
-                <label for="activityEmployee" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Employé</label>
-                <select id="activityEmployee" required class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                    <option value="">Sélectionner un employé</option>
-                    {% for member in project.members.all %}
-                        <option value="{{ member.id }}">{{ member.first_name }} {{ member.last_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="activityStartDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de début</label>
-                    <input type="datetime-local" id="activityStartDate" name="start_datetime" required 
-                           class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                </div>
-                <div>
-                    <label for="activityEndDate" class="block text-sm font-medium text-[var(--text-color-dark)] mb-2">Date de fin</label>
-                    <input type="datetime-local" id="activityEndDate" name="end_datetime" required 
-                           class="w-full px-3 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent">
-                </div>
-            </div>
-            
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" id="cancelAddActivity" 
-                        class="px-4 py-2 text-[var(--text-color-medium)] bg-[var(--bg-light)] rounded-lg hover:bg-gray-200 transition-colors">
-                    Annuler
-                </button>
-                <button type="submit" 
-                        class="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
-                    Créer l'activité
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
+<script>
 function showTab(tabName) {
     // Masquer tous les onglets
     const tabs = document.querySelectorAll('.tab-content');

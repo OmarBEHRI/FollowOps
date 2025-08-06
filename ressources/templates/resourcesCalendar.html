@@ -23,56 +23,27 @@
         }
 
         /* Enhanced Calendar styles */
-        /* Supprimer les marges automatiques et faire occuper tout l'espace */
-        main {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        
         .calendar-container {
             position: relative;
             width: 100%;
-            height: 100vh; /* Utilise toute la hauteur de la fenêtre */
             background-color: var(--bg-white);
-            border-radius: 0; /* Supprime les coins arrondis pour occuper tout l'espace */
-            overflow: visible; /* Changé de hidden à visible pour permettre le scroll */
+            border-radius: 12px;
+            overflow: visible;
             display: flex;
             flex-direction: column;
-            margin: 0;
-            padding: 0;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background-color: var(--border-color);
-            flex: 1;
+            gap: 2px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            margin-bottom: 0.5rem;
             width: 100%;
-            height: 100%;
-        }
-
-        /* Supprimer les marges et padding du conteneur principal */
-        body {
-            margin: 0;
-            padding: 0;
-        }
-        
-        .bg-white {
-            margin: 0 !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
-
-        .calendar-section {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            min-height: 600px;
         }
 
         .calendar-day-header {
@@ -87,14 +58,19 @@
         }
 
         .calendar-cell {
+            background-color: var(--bg-light);
+            min-height: 80px;
+            height: auto;
+            max-height: 120px;
+            padding: 0.25rem 0.3rem 0.1rem 0.3rem;
             display: flex;
             flex-direction: column;
-            min-height: 100%;
-            background-color: var(--bg-white);
-            padding: 0.75rem;
+            align-items: flex-start;
             position: relative;
+            border-radius: 0.25rem;
+            transition: box-shadow 0.15s;
+            overflow: hidden;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .calendar-cell:hover {
@@ -177,110 +153,12 @@
             border-left-color: #1976D2;
         }
 
-        /* Enhanced Activity Tooltip */
-        .activity-tooltip {
-            position: absolute;
-            top: 50%;
-            left: calc(100% + 15px);
-            transform: translateY(-50%);
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem;
-            width: 280px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-50%) translateX(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-        }
 
-        .activity-item:hover .activity-tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(-50%) translateX(0);
-        }
-
-        /* Arrow for tooltip */
-        .activity-tooltip::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: -8px;
-            transform: translateY(-50%);
-            border: 8px solid transparent;
-            border-right-color: var(--bg-white);
-        }
-
-        .activity-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: -9px;
-            transform: translateY(-50%);
-            border: 9px solid transparent;
-            border-right-color: var(--border-color);
-            z-index: -1;
-        }
-
-        .activity-tooltip-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-color-dark);
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .activity-tooltip-info {
-            font-size: 0.8rem;
-            color: var(--text-color-medium);
-            margin-bottom: 0.375rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .activity-tooltip-info::before {
-            content: '•';
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .activity-tooltip-description {
-            font-size: 0.8rem;
-            color: var(--text-color-dark);
-            line-height: 1.4;
-            background-color: var(--bg-light);
-            padding: 0.5rem;
-            border-radius: 6px;
-            border-left: 3px solid var(--primary-color);
-        }
-
-        .more-activities {
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: var(--text-color-medium);
-            text-align: center;
-            background-color: var(--bg-light);
-            border-radius: 4px;
-            padding: 0.25rem;
-            border: 1px dashed var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .more-activities:hover {
-            background-color: var(--primary-color);
-            color: var(--bg-white);
-            border-color: var(--primary-color);
-        }
 
         /* Enhanced Day view styles - Timeline Design */
         .day-view {
-            background-color: var(--bg-white);
-            border-radius: 2rem;
+            background-color: var(--bg-light);
+            border-radius: 12px;
             padding: 1.5rem;
             width: 100%;
         }
@@ -296,15 +174,15 @@
         }
 
         .day-view-content {
-            display: flex;
-            max-height: 70vh;
-            min-height: 600px;
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 1rem;
+            max-height: 500px;
             overflow-y: auto;
             padding-right: 0.5rem;
-            position: relative;
         }
 
-        /* Styles personnalisés pour la barre de défilement */
+        /* Custom scrollbar */
         .day-view-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -319,313 +197,246 @@
             border-radius: 3px;
         }
 
-        #day-view {
-            border-radius: 2rem;
-        }
-
-        /* Timeline container */
-        .timeline-container {
-            display: flex;
-            width: 100%;
-            position: relative;
-            padding-top: 2rem;
-        }
-
-        /* Timeline axis (left side) */
-        .timeline-axis {
-            width: 80px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .timeline-hour {
-            position: absolute;
-            right: 1rem;
+        .hour-label {
             font-size: 0.875rem;
             font-weight: 600;
-            color: var(--text-color-medium);
-            transform: translateY(-50%);
-            background-color: var(--bg-white);
-            padding: 0.25rem 0;
+            color: rgba(93, 78, 55, 0.7);
+            text-align: right;
+            padding-right: 1rem;
+            line-height: 3rem;
+            position: sticky;
+            top: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(251, 250, 249, 0.9));
+            backdrop-filter: blur(5px);
         }
 
-        /* Main timeline area */
-        .timeline-main {
-            flex: 1;
+        .hour-activities {
             position: relative;
-            border-left: 2px solid var(--border-color);
-            margin-left: 1rem;
+            min-height: 3rem;
+            border-left: 2px solid rgba(160, 141, 128, 0.3);
+            padding-left: 1rem;
+            padding-bottom: 0.5rem;
         }
 
-        /* Hour grid lines */
-        .timeline-grid-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background-color: var(--border-color);
-            opacity: 0.5;
-        }
-
-        .timeline-grid-line.major {
-            background-color: var(--text-color-medium);
-            opacity: 0.3;
-        }
-
-        /* Current time indicator */
-        .current-time-indicator {
-            position: absolute;
-            left: -2px;
-            right: 0;
-            height: 2px;
-            background-color: #FF4444;
-            z-index: 100;
-        }
-
-        .current-time-indicator::before {
+        .hour-activities::before {
             content: '';
             position: absolute;
-            left: -6px;
-            top: -4px;
-            width: 10px;
-            height: 10px;
-            background-color: #FF4444;
+            left: -4px;
+            top: 1.5rem;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, rgba(160, 141, 128, 0.6), rgba(139, 115, 85, 0.8));
             border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(160, 141, 128, 0.2);
         }
 
-        /* Activity columns for overlapping activities */
-        .activity-columns {
-            position: absolute;
-            left: 1rem;
-            right: 1rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .activity-column {
-            flex: 1;
+        .timeline-main {
             position: relative;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        /* Activity blocks */
-        .timeline-activity {
-            position: absolute;
-            left: 0;
-            right: 0;
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            min-height: 45px;
+        .timeline-axis {
             display: flex;
             flex-direction: column;
+        }
+
+        .hour-slot {
+            height: 80px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            padding: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .hour-slot:hover {
+            background-color: var(--bg-light);
+        }
+
+        .activity-block {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .activity-description {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        /* Styles de boutons modernes */
+        .btn {
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-
-        .timeline-activity:hover {
-            transform: scale(1.02) translateX(2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            z-index: 50;
-        }
-
-        .timeline-activity.inprogress {
-            background: rgba(139, 123, 113, 0.15);
-            border-left-color: var(--primary-color);
-            color: var(--primary-color);
-            border: 1px solid rgba(139, 123, 113, 0.3);
-        }
-
-        .timeline-activity.completed {
-            background: rgba(76, 175, 80, 0.15);
-            border-left-color: #4CAF50;
-            color: #2E7D32;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .timeline-activity.planned {
-            background: rgba(33, 150, 243, 0.15);
-            border-left-color: #2196F3;
-            color: #1565C0;
-            border: 1px solid rgba(33, 150, 243, 0.3);
-        }
-
-        .timeline-activity:hover.inprogress {
-            background: rgba(139, 123, 113, 0.25);
-            border-color: var(--primary-color);
-        }
-
-        .timeline-activity:hover.completed {
-            background: rgba(76, 175, 80, 0.25);
-            border-color: #4CAF50;
-        }
-
-        .timeline-activity:hover.planned {
-            background: rgba(33, 150, 243, 0.25);
-            border-color: #2196F3;
-        }
-
-        /* Activity content */
-        .timeline-activity-title {
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
             font-weight: 600;
             font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex-shrink: 0;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
         }
 
-        .timeline-activity-time {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(160, 141, 128, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(160, 141, 128, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--button-bg-light);
+            color: var(--text-color-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        /* Amélioration des activités avec style nude transparent moderne */
+        .day-activity {
+            position: relative;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            color: #5D4E37;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(160, 141, 128, 0.1);
+        }
+
+        .day-activity:hover {
+            transform: translateX(4px) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 141, 128, 0.2);
+        }
+
+        .day-activity.inprogress {
+            background: rgba(160, 141, 128, 0.15);
+            border-left-color: rgba(160, 141, 128, 0.8);
+            color: #5D4E37;
+        }
+
+        .day-activity.completed {
+            background: rgba(139, 115, 85, 0.12);
+            border-left-color: rgba(139, 115, 85, 0.7);
+            color: #4A3728;
+        }
+
+        .day-activity.planned {
+            background: rgba(180, 165, 150, 0.1);
+            border-left-color: rgba(180, 165, 150, 0.6);
+            color: #6B5B4F;
+        }
+
+        .day-activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #5D4E37;
+        }
+
+        .day-activity-time {
             font-size: 0.75rem;
             opacity: 0.8;
             margin-bottom: 0.25rem;
-            font-weight: 500;
-            flex-shrink: 0;
+            color: #8B7355;
         }
 
-        .timeline-activity-description {
-            font-size: 0.75rem;
-            line-height: 1.3;
-            opacity: 0.7;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            flex: 1;
-        }
-
-        /* Special styling for very short activities */
-        .timeline-activity.short-duration {
-            min-height: 35px;
-            padding: 0.25rem 0.75rem;
-            justify-content: flex-start;
-        }
-
-        .timeline-activity.short-duration .timeline-activity-title {
+        .day-activity-description {
             font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 0.125rem;
+            line-height: 1.4;
+            opacity: 0.85;
+            color: #6B5B4F;
         }
 
-        .timeline-activity.short-duration .timeline-activity-time {
-            font-size: 0.7rem;
-            margin-bottom: 0;
+        /* Amélioration du message vide */
+        .empty-day-message {
+            text-align: center;
+            color: var(--text-color-light);
+            font-style: italic;
+            font-size: 0.8rem;
+            padding: 2rem;
         }
 
-        .timeline-activity.short-duration .timeline-activity-description {
-            display: none;
+        /* Styles modernes pour les boutons principaux */
+        #add-activity-btn, #back-to-month {
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: 0.025em;
         }
 
-        /* Ultra short activities (less than 20 minutes) */
-        .timeline-activity.ultra-short {
-            min-height: 28px;
-            padding: 0.125rem 0.5rem;
-            font-size: 0.7rem;
-        }
-
-        .timeline-activity.ultra-short .timeline-activity-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-bottom: 0;
-            line-height: 1.1;
-        }
-
-        .timeline-activity.ultra-short .timeline-activity-time,
-        .timeline-activity.ultra-short .timeline-activity-description {
-            display: none;
-        }
-
-        /* Activity type indicators */
-        .timeline-activity::after {
+        #add-activity-btn::before, #back-to-month::before {
             content: '';
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.7);
-        }
-
-        .timeline-activity.project::after {
-            background-color: #FFF;
-        }
-
-        .timeline-activity.ticket::after {
-            background-color: #FFD700;
-        }
-
-        /* Expanded activity tooltip */
-        .timeline-activity-tooltip {
             position: absolute;
             top: 0;
-            left: calc(100% + 15px);
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem;
-            width: 280px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
 
-        .timeline-activity:hover .timeline-activity-tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
+        #add-activity-btn:hover::before, #back-to-month:hover::before {
+            left: 100%;
         }
 
-        .timeline-activity-tooltip::before {
-            content: '';
-            position: absolute;
-            top: 1rem;
-            left: -8px;
-            border: 8px solid transparent;
-            border-right-color: var(--bg-white);
+        #add-activity-btn:active, #back-to-month:active {
+            transform: scale(0.98) translateY(1px);
         }
 
-        .timeline-activity-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 1rem;
-            left: -9px;
-            border: 9px solid transparent;
-            border-right-color: var(--border-color);
-            z-index: -1;
+        /* Animation de pulsation subtile */
+        @keyframes pulse-subtle {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(160, 141, 128, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(160, 141, 128, 0); }
         }
 
-        .tooltip-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-color-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .tooltip-info {
-            font-size: 0.8rem;
-            color: var(--text-color-medium);
-            margin-bottom: 0.375rem;
-        }
-
-        .tooltip-description {
-            font-size: 0.8rem;
-            color: var(--text-color-dark);
-            line-height: 1.4;
-            background-color: var(--bg-light);
-            padding: 0.5rem;
-            border-radius: 6px;
-            border-left: 3px solid var(--primary-color);
+        #add-activity-btn:focus {
+            animation: pulse-subtle 1.5s infinite;
+            outline: none;
         }
 
         .hidden {
@@ -662,152 +473,7 @@
             padding: 0 0.5rem;
         }
 
-        /* Empty state for days with no activities */
-        .empty-day-message {
-            text-align: center;
-            color: var(--text-color-light);
-            font-style: italic;
-            font-size: 0.8rem;
-            padding: 2rem;
-        }
 
-        /* Tooltip positioning adjustments for edge cases */
-        .calendar-cell:nth-child(7n) .activity-tooltip,
-        .calendar-cell:nth-child(7n-1) .activity-tooltip {
-            left: auto;
-            right: calc(100% + 15px);
-            transform: translateY(-50%) translateX(10px);
-        }
-
-        .calendar-cell:nth-child(7n):hover .activity-tooltip,
-        .calendar-cell:nth-child(7n-1):hover .activity-tooltip {
-            transform: translateY(-50%) translateX(0);
-        }
-
-        .calendar-cell:nth-child(7n) .activity-tooltip::before,
-        .calendar-cell:nth-child(7n-1) .activity-tooltip::before {
-            left: auto;
-            right: -8px;
-            border-right-color: transparent;
-            border-left-color: var(--bg-white);
-        }
-
-        .calendar-cell:nth-child(7n) .activity-tooltip::after,
-        .calendar-cell:nth-child(7n-1) .activity-tooltip::after {
-            left: auto;
-            right: -9px;
-            border-right-color: transparent;
-            border-left-color: var(--border-color);
-        }
-
-        /* Style pour le bouton Retour au mois */
-        #back-to-month {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-            min-width: 140px;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #back-to-month::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        #back-to-month:hover {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(160, 141, 128, 0.4);
-        }
-
-        #back-to-month:hover::before {
-            left: 100%;
-        }
-
-        #back-to-month:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-        }
-
-        #back-to-month:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.3);
-        }
-
-        /* Style pour le bouton Ajouter une activité - même style que Retour au mois */
-        #add-activity-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-            min-width: 140px;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #add-activity-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        #add-activity-btn:hover {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(160, 141, 128, 0.4);
-        }
-
-        #add-activity-btn:hover::before {
-            left: 100%;
-        }
-
-        #add-activity-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-        }
-
-        #add-activity-btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.3);
-        }
-
-        /* Masquer le bouton en vue journalière */
-        .day-view:not(.hidden) ~ .calendar-header #add-activity-btn {
-            display: none;
-        }
 
         /* Animation du modal */
         .modal-content {
@@ -818,11 +484,16 @@
             transform: scale(1) !important;
             opacity: 1 !important;
         }
+        
+        /* Notification au-dessus de tout */
+        #notification-container {
+            z-index: 1001 !important;
+        }
     </style>
 </head>
-<body class="bg-[#f9f8f7] font-sans">
+<body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
     <!-- Conteneur de notifications -->
-    <div id="notification-container" class="fixed top-0 left-0 right-0 z-50 hidden">
+    <div id="notification-container" class="fixed top-0 left-0 right-0 z-[1001] hidden">
         <div id="notification" class="mx-4 mt-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform -translate-y-full">
             <div class="flex items-center justify-between">
                 <span id="notification-message" class="font-medium"></span>
@@ -837,28 +508,46 @@
 
     <div class="min-h-screen flex flex-col">
         <!-- Main Content -->
-        <main class="flex-1 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <main class="flex-1 w-full py-6 px-4 sm:px-6 lg:px-8">
             <!-- Calendrier des activités de la ressource -->
-            <div class="bg-[#f9f8f7] p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
-                <div class="calendar-header">
-                    <button id="prevMonthResource" class="calendar-nav-button">◀</button>
-                    <h3 id="month-year-display" class="text-xl font-semibold text-[var(--text-color-dark)]">Mois Année</h3>
-                    <div class="flex items-center gap-2">
-                        {% if user.is_authenticated %}{% if user.pk == resource.pk or user.appRole == 'ADMIN' or user.appRole == 'MANAGER' %}
-                        <button id="add-activity-btn">+ Ajouter une activité</button>
-                        {% endif %}{% endif %}
-                        <button id="back-to-month" class="hidden">Retour au mois</button>
-                        <button id="nextMonthResource" class="calendar-nav-button">▶</button>
+            <div class="flex flex-col gap-4">
+                <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+                    <div class="calendar-header">
+                        <button id="prevMonthResource" class="calendar-nav-button">◀</button>
+                        <h3 id="month-year-display" class="text-xl font-semibold text-[#191610]">Mois Année</h3>
+                        <div class="flex items-center gap-2">
+                            {% if user.is_authenticated %}
+                            <button id="add-activity-btn" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20">
+                                <span class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    <span class="font-medium">Ajouter une activité</span>
+                                </span>
+                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </button>
+                            {% endif %}
+                            <button id="back-to-month" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20 hidden">
+                                <span class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                    <span class="font-medium">Retour au mois</span>
+                                </span>
+                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </button>
+                            <button id="nextMonthResource" class="calendar-nav-button">▶</button>
+                        </div>
                     </div>
-                </div>
-                <div id="calendar-container" class="calendar-container">
-                    <div id="calendar-grid" class="calendar-grid">
-                        <!-- Les en-têtes des jours seront générés par JavaScript -->
-                    </div>
-                    <div id="day-view" class="day-view hidden">
-                        <div id="day-view-header" class="day-view-header">Jour</div>
-                        <div id="day-view-content" class="day-view-content">
-                            <!-- Le contenu de la vue journalière sera généré par JavaScript -->
+                    <div id="calendar-container" class="calendar-container">
+                        <div id="calendar-grid" class="calendar-grid">
+                            <!-- Les en-têtes des jours seront générés par JavaScript -->
+                        </div>
+                        <div id="day-view" class="day-view hidden">
+                            <div id="day-view-header" class="day-view-header">Jour</div>
+                            <div id="day-view-content" class="day-view-content">
+                                <!-- Le contenu de la vue journalière sera généré par JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1004,8 +693,17 @@
                  </select>
              </div>
 
-            
-            <!-- Boutons d'action -->
+             <!-- Message d'erreur de validation -->
+             <div id="validationError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
+                 <div class="flex items-center space-x-2">
+                     <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                     </svg>
+                     <span id="validationErrorText">Message d'erreur</span>
+                 </div>
+             </div>
+             
+             <!-- Boutons d'action -->
             <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t border-[#e3dfd3]">
                 <button type="button" id="cancelAddActivity" 
                         class="px-6 py-3 text-[#191610] bg-[#f1efe9] rounded-xl hover:bg-[#e3dfd3] transition-all duration-200 font-medium border-2 border-transparent hover:border-[#e3dfd3] transform hover:scale-105">
@@ -1143,7 +841,7 @@
                         <span>Fermer</span>
                     </span>
                 </button>
-                {% if user.is_authenticated %}{% if user.pk == resource.pk or user.appRole == 'ADMIN' or user.appRole == 'MANAGER' %}
+                {% if user.is_authenticated and user.pk == resource.pk or user.appRole == 'ADMIN' or user.appRole == 'MANAGER' %}
                 <button id="deleteActivityBtn" type="button" 
                         class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
                     <span class="flex items-center justify-center space-x-2">
@@ -1153,7 +851,6 @@
                         <span>Supprimer</span>
                     </span>
                 </button>
-                {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -1479,81 +1176,14 @@
             showActivityModal(event);
           });
           
-          // Créer une infobulle pour le survol
-          const tooltip = document.createElement('div');
-          tooltip.className = 'activity-tooltip';
-          
-          const tooltipTitle = document.createElement('div');
-          tooltipTitle.className = 'activity-tooltip-title';
-          tooltipTitle.textContent = event.name;
-          
-          const tooltipTime = document.createElement('div');
-          tooltipTime.className = 'activity-tooltip-info';
-          const startTime = event.startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-          const endTime = event.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-          tooltipTime.textContent = `${startTime} - ${endTime}`;
-          
-          // Calculer la durée en heures de travail
-          function calculateWorkingHoursForTooltip(startDate, endDate) {
-              function isWorkingDay(date) {
-                  const day = date.getDay();
-                  return day >= 1 && day <= 5;
-              }
-              
-              let totalWorkingMinutes = 0;
-              let currentDate = new Date(startDate);
-              
-              while (currentDate < endDate) {
-                  if (isWorkingDay(currentDate)) {
-                      const dayStart = new Date(currentDate);
-                      dayStart.setHours(8, 0, 0, 0);
-                      const dayEnd = new Date(currentDate);
-                      dayEnd.setHours(18, 0, 0, 0);
-                      
-                      const effectiveStart = new Date(Math.max(currentDate.getTime(), dayStart.getTime()));
-                      const effectiveEnd = new Date(Math.min(endDate.getTime(), dayEnd.getTime()));
-                      
-                      if (effectiveStart < effectiveEnd) {
-                          totalWorkingMinutes += (effectiveEnd - effectiveStart) / (1000 * 60);
-                      }
-                  }
-                  
-                  currentDate.setDate(currentDate.getDate() + 1);
-                  currentDate.setHours(0, 0, 0, 0);
-              }
-              
-              return Math.round(totalWorkingMinutes);
-          }
-          
-          const workingMinutes = calculateWorkingHoursForTooltip(event.startTime, event.endTime);
-          const tooltipDuration = document.createElement('div');
-          tooltipDuration.className = 'activity-tooltip-info';
-          
-          if (workingMinutes >= 60) {
-              const hours = Math.floor(workingMinutes / 60);
-              const minutes = workingMinutes % 60;
-              tooltipDuration.textContent = `Durée: ${hours}h${minutes > 0 ? ` ${minutes}min` : ''} (heures de travail)`;
-          } else {
-              tooltipDuration.textContent = `Durée: ${workingMinutes} minutes (heures de travail)`;
-          }
-          
-          const tooltipDescription = document.createElement('div');
-          tooltipDescription.className = 'activity-tooltip-description';
-          tooltipDescription.textContent = event.description;
-          
-          tooltip.appendChild(tooltipTitle);
-          tooltip.appendChild(tooltipTime);
-          tooltip.appendChild(tooltipDuration);
-          tooltip.appendChild(tooltipDescription);
-          
-          activityItem.appendChild(tooltip);
+
           activitiesContainer.appendChild(activityItem);
         });
         
         // Ajouter l'indicateur 'plus' si nécessaire
         if (eventsForDay.length > maxVisible) {
           const moreIndicator = document.createElement('div');
-          moreIndicator.className = 'more-activities';
+          moreIndicator.className = 'text-xs text-[#8C7E5A] text-center bg-[#F9F8F7] rounded px-2 py-1 border border-dashed border-[#E3DFD3] cursor-pointer hover:bg-[#A08D80] hover:text-white transition-all';
           moreIndicator.textContent = `+${eventsForDay.length - maxVisible} plus`;
           moreIndicator.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1563,10 +1193,16 @@
         }
       };
       
-      // Fonction pour afficher la vue journalière avec timeline
+      // Fonction pour afficher la vue journalière avec toutes les activités pour un jour spécifique
       const showDayView = (date) => {
         selectedDay = date;
         isMonthView = false;
+        
+        // Masquer le bouton d'ajout d'activité en vue journalière
+        const addActivityBtn = document.getElementById('add-activity-btn');
+        if (addActivityBtn) {
+          addActivityBtn.style.display = 'none';
+        }
         
         // Mettre à jour l'en-tête de la vue journalière
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
@@ -1575,91 +1211,67 @@
         // Effacer le contenu précédent de la vue journalière
         dayViewContent.innerHTML = '';
         
-        // Masquer le bouton Ajouter une activité
-        document.getElementById('add-activity-btn').classList.add('hidden');
-        
-        // Créer le conteneur de timeline
-        const timelineContainer = document.createElement('div');
-        timelineContainer.className = 'timeline-container';
-        
-        // Créer l'axe temporel (8h à 18h)
-        const timelineAxis = document.createElement('div');
-        timelineAxis.className = 'timeline-axis';
-        
-        const timelineMain = document.createElement('div');
-        timelineMain.className = 'timeline-main';
-        
-        // Hauteur totale de la timeline (10 heures * 60px par heure)
-        const timelineHeight = 10 * 60; // 600px
-        timelineMain.style.height = `${timelineHeight}px`;
-        
-        // Ajouter les marqueurs d'heure et les lignes de grille
-        for (let hour = 8; hour <= 18; hour++) {
+        // Générer des créneaux horaires (8h à 20h)
+        for (let hour = 8; hour <= 20; hour++) {
           const hourLabel = document.createElement('div');
-          hourLabel.className = 'timeline-hour';
+          hourLabel.className = 'hour-label';
           hourLabel.textContent = `${hour}:00`;
-          hourLabel.style.top = `${(hour - 8) * 60}px`;
-          timelineAxis.appendChild(hourLabel);
           
-          // Ligne de grille
-          const gridLine = document.createElement('div');
-          gridLine.className = `timeline-grid-line ${hour % 2 === 0 ? 'major' : ''}`;
-          gridLine.style.top = `${(hour - 8) * 60}px`;
-          timelineMain.appendChild(gridLine);
-        }
-        
-        // Ajouter l'indicateur de l'heure actuelle si c'est aujourd'hui
-        const now = new Date();
-        const isToday = date.toDateString() === now.toDateString();
-        if (isToday && now.getHours() >= 8 && now.getHours() <= 18) {
-          const currentTimeIndicator = document.createElement('div');
-          currentTimeIndicator.className = 'current-time-indicator';
-          const currentMinutes = (now.getHours() - 8) * 60 + now.getMinutes();
-          currentTimeIndicator.style.top = `${currentMinutes}px`;
-          timelineMain.appendChild(currentTimeIndicator);
+          const hourActivities = document.createElement('div');
+          hourActivities.className = 'hour-activities';
+          hourActivities.dataset.hour = hour;
+          
+          dayViewContent.appendChild(hourLabel);
+          dayViewContent.appendChild(hourActivities);
         }
         
         // Filtrer les activités pour ce jour
         const dayActivities = resourceEvents.filter(event => {
-          const eventStartDate = new Date(event.startTime);
-          const eventEndDate = new Date(event.endTime);
-          const selectedDayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-          const selectedDayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
-          
-          return (eventStartDate <= selectedDayEnd && eventEndDate >= selectedDayStart);
+          const eventDate = new Date(event.startTime);
+          return eventDate.toDateString() === date.toDateString();
         });
+        
+        // Trier les activités par heure de début
+        dayActivities.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
         
         if (dayActivities.length === 0) {
           const emptyMessage = document.createElement('div');
           emptyMessage.className = 'empty-day-message';
           emptyMessage.textContent = 'Aucune activité prévue pour cette journée';
-          timelineMain.appendChild(emptyMessage);
+          dayViewContent.appendChild(emptyMessage);
         } else {
-          // Créer les colonnes d'activités pour gérer les chevauchements
-          const activityColumns = createActivityColumns(dayActivities, date);
-          
-          const columnsContainer = document.createElement('div');
-          columnsContainer.className = 'activity-columns';
-          columnsContainer.style.height = `${timelineHeight}px`;
-          
-          activityColumns.forEach((column, columnIndex) => {
-            const columnDiv = document.createElement('div');
-            columnDiv.className = 'activity-column';
+          // Ajouter les activités aux créneaux horaires appropriés
+          dayActivities.forEach(activity => {
+            const startTime = new Date(activity.startTime);
+            const startHour = startTime.getHours();
+            const hourSlot = document.querySelector(`.hour-activities[data-hour="${startHour}"]`);
             
-            column.forEach(activity => {
-              const activityEl = createTimelineActivity(activity, date);
-              columnDiv.appendChild(activityEl);
-            });
-            
-            columnsContainer.appendChild(columnDiv);
+            if (hourSlot) {
+              const activityEl = document.createElement('div');
+              activityEl.className = `day-activity ${activity.status || 'planned'}`;
+              
+              const startTimeStr = startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+              const endTime = new Date(activity.endTime);
+              const endTimeStr = endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+              
+              activityEl.innerHTML = `
+                <div class="day-activity-title">${activity.name}</div>
+                <div class="day-activity-time">${startTimeStr} - ${endTimeStr}</div>
+                <div class="day-activity-description">${activity.description || ''}</div>
+              `;
+              
+              // Ajouter un événement de clic pour afficher les détails
+              if (activity.id) {
+                activityEl.addEventListener('click', () => {
+                  showActivityModal(activity);
+                });
+                activityEl.style.cursor = 'pointer';
+              }
+              
+              hourSlot.appendChild(activityEl);
+            }
           });
-          
-          timelineMain.appendChild(columnsContainer);
         }
-        
-        timelineContainer.appendChild(timelineAxis);
-        timelineContainer.appendChild(timelineMain);
-        dayViewContent.appendChild(timelineContainer);
         
         // Afficher la vue journalière, masquer la vue mensuelle
         calendarGrid.classList.add('hidden');
@@ -1706,14 +1318,14 @@
         const endTime = new Date(activity.endTime);
         
         // Ajuster les heures pour le jour sélectionné
-        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 8, 0, 0);
-        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0);
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0, 0);
+        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0);
         
         const effectiveStart = new Date(Math.max(startTime.getTime(), dayStart.getTime()));
         const effectiveEnd = new Date(Math.min(endTime.getTime(), dayEnd.getTime()));
         
-        const startMinutes = (effectiveStart.getHours() - 8) * 60 + effectiveStart.getMinutes();
-        const endMinutes = (effectiveEnd.getHours() - 8) * 60 + effectiveEnd.getMinutes();
+        const startMinutes = (effectiveStart.getHours() - 9) * 60 + effectiveStart.getMinutes();
+        const endMinutes = (effectiveEnd.getHours() - 9) * 60 + effectiveEnd.getMinutes();
         const duration = endMinutes - startMinutes;
         
         activityEl.style.top = `${startMinutes}px`;
@@ -1798,7 +1410,10 @@
         backToMonthBtn.classList.add('hidden');
         
         // Réafficher le bouton Ajouter une activité
-        document.getElementById('add-activity-btn').classList.remove('hidden');
+        const addBtn = document.getElementById('add-activity-btn');
+        if (addBtn) {
+          addBtn.style.display = '';
+        }
       };
 
       // Navigation entre les mois/jours
@@ -1896,7 +1511,7 @@
           status.innerHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               activity.status === 'completed' ? 'bg-green-100 text-green-800' :
               activity.status === 'inprogress' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-blue-100 text-blue-800'
+              'bg-amber-100 text-amber-800'
           }">${statusText}</span>`;
           
           // Gérer l'employé
@@ -2036,7 +1651,7 @@
               
               function isWorkingTime(date) {
                   const hour = date.getHours();
-                  return hour >= 8 && hour < 18;
+                  return hour >= 9 && hour < 20;
               }
               
               function calculateWorkingHours(startDate, endDate) {
@@ -2046,9 +1661,9 @@
                   while (currentDate < endDate) {
                       if (isWorkingDay(currentDate)) {
                           const dayStart = new Date(currentDate);
-                          dayStart.setHours(8, 0, 0, 0);
+                          dayStart.setHours(9, 0, 0, 0);
                           const dayEnd = new Date(currentDate);
-                          dayEnd.setHours(18, 0, 0, 0);
+                          dayEnd.setHours(20, 0, 0, 0);
                           
                           const effectiveStart = new Date(Math.max(currentDate.getTime(), dayStart.getTime()));
                           const effectiveEnd = new Date(Math.min(endDate.getTime(), dayEnd.getTime()));
@@ -2080,13 +1695,13 @@
               }
               
               if (!isWorkingTime(startDate)) {
-                  errorText.textContent = 'L\'heure de début doit être pendant les heures de travail (8h-18h).';
+                  errorText.textContent = 'L\'heure de début doit être pendant les heures de travail (9h-20h).';
                   errorElement.classList.remove('hidden');
                   return;
               }
               
               if (!isWorkingTime(endDate)) {
-                  errorText.textContent = 'L\'heure de fin doit être pendant les heures de travail (8h-18h).';
+                  errorText.textContent = 'L\'heure de fin doit être pendant les heures de travail (9h-20h).';
                   errorElement.classList.remove('hidden');
                   return;
               }
@@ -2181,11 +1796,14 @@
           
           // Définir les couleurs selon le type
           if (type === 'success') {
-              notification.className = 'mx-4 mt-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform bg-green-500 text-white';
+              notification.className = 'mx-4 mt-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform text-white';
+              notification.style.backgroundColor = '#A08D80';
           } else if (type === 'error') {
               notification.className = 'mx-4 mt-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform bg-red-500 text-white';
+              notification.style.backgroundColor = '#A08D80';
           } else if (type === 'warning') {
               notification.className = 'mx-4 mt-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform bg-orange-500 text-white';
+              notification.style.backgroundColor = '#A08D80';
           }
           
           messageElement.textContent = message;
