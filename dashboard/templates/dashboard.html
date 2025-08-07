@@ -271,22 +271,22 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="kpi-card">
                             <p class="label">Projets en cours</p>
-                            <p class="value">12</p>
+                            <p class="value">{{ projets_en_cours }}</p>
                             <p class="change-positive">+10%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Taux d'occupation des ressources</p>
-                            <p class="value">60%</p>
+                            <p class="value">{{ taux_occupation }}%</p>
                             <p class="change-positive">+5%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Taux d'avancement des projets</p>
-                            <p class="value">73%</p>
+                            <p class="value">{{ taux_avancement }}%</p>
                             <p class="change-negative">-3%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Budget restant</p>
-                            <p class="value">50 000 DH</p>
+                            <p class="value">{{ budget_restant }}</p>
                             <p class="change-positive">+8%</p>
                         </div>
                     </div>
@@ -308,68 +308,39 @@
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Allocation des ressources par rôle</h1>
                     <div class="flex flex-col gap-3">
-                        <p class="text-[#191610] text-sm font-medium">20 <span class="text-[#8c7e5a] ml-1">Total</span></p>
+                        <p class="text-[#191610] text-sm font-medium">{{ total_resources }} <span class="text-[#8c7e5a] ml-1">Total</span></p>
+                        {% for role in role_allocation %}
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Développeur</span>
-                                <span class="text-[#8c7e5a]">10</span>
+                                <span class="text-[#191610] font-medium">{{ role.role|default:"Non spécifié" }}</span>
+                                <span class="text-[#8c7e5a]">{{ role.count }}</span>
                             </div>
                             <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 50%;"></div>
+                                <div class="allocation-bar-fill" style="width: {% widthratio role.count total_resources 100 %}%;"></div>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Chef de Projet</span>
-                                <span class="text-[#8c7e5a]">3</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 15%;"></div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Testeur</span>
-                                <span class="text-[#8c7e5a]">3</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 15%;"></div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Concepteur</span>
-                                <span class="text-[#8c7e5a]">4</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 20%;"></div>
-                            </div>
-                        </div>
+                        {% empty %}
+                        <p class="text-[#8c7e5a] text-sm">Aucune ressource trouvée</p>
+                        {% endfor %}
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Activités Récentes</h1>
                     <div class="flex flex-col gap-4">
+                        {% for activity in recent_activities %}
                         <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                            <div class="activity-avatar" style='background-image: url("{% if activity.author.profile_picture %}{{ activity.author.profile_picture.url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4{% endif %}")'></div>
                             <div class="flex flex-col">
-                                <p class="activity-text">Nouveau projet "Refonte CRM" créé par <span class="font-bold">Sara RIYAD</span>(<span class="font-bold">BUILD</span>)</p>
-                                <p class="activity-time">Il y a 4 heures</p>
+                                <p class="activity-text">{{ activity.text }}</p>
+                                <p class="activity-time">{{ activity.created_at|timesince }} ago</p>
                             </div>
                         </div>
+                        {% empty %}
                         <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
                             <div class="flex flex-col">
-                                <p class="activity-text"><span class="font-bold">Ahmed CHERIF</span> a rejoint l'équipe</p>
-                                <p class="activity-time">Il y a 4 heures</p>
+                                <p class="activity-text text-[#8c7e5a]">Aucune activité récente trouvée</p>
                             </div>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text">Ticket critique <span class="font-bold">#123</span> résolu par <span class="font-bold">Karim Wahbi</span></p>
-                                <p class="activity-time">Il y a 2 jours</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -396,18 +367,36 @@
 
         // Graphique circulaire - Répartition des tickets par statut
         const pieCtx = document.getElementById('pieChart').getContext('2d');
+        
+        // Get ticket statistics from Django context
+        const ticketStats = {{ ticket_stats_json|safe }};
+        
+        // Prepare data for the chart
+        const labels = [];
+        const data = [];
+        const statusOrder = ['Ouvert', 'En cours', 'Résolu', 'Fermé'];
+        
+        // Use predefined order for consistent display
+        statusOrder.forEach(status => {
+            if (ticketStats[status]) {
+                labels.push(status);
+                data.push(ticketStats[status].percentage);
+            }
+        });
+        
+        // If no data, show placeholder
+        if (labels.length === 0) {
+            labels.push('Aucun ticket');
+            data.push(100);
+        }
+        
         new Chart(pieCtx, {
             type: 'pie',
             data: {
-                labels: ['Ouvert', 'En Cours', 'Résolu', 'Fermé'],
+                labels: labels,
                 datasets: [{
-                    data: [30, 20, 40, 10], // Données d'exemple
-                    backgroundColor: [
-                        nudeColors[0], // Premier statut
-                        nudeColors[1], // Deuxième statut
-                        nudeColors[2], // Troisième statut
-                        nudeColors[3]  // Quatrième statut
-                    ],
+                    data: data,
+                    backgroundColor: nudeColors.slice(0, labels.length),
                     borderColor: 'var(--bg-white)', // Bordure blanche pour une meilleure séparation
                     borderWidth: 2,
                     hoverOffset: 4 // Effet de survol
@@ -440,14 +429,11 @@
                         },
                         callbacks: {
                             label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
+                                const status = context.label;
+                                if (ticketStats[status]) {
+                                    return status + ': ' + ticketStats[status].count + ' tickets (' + context.parsed.toFixed(1) + '%)';
                                 }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%'; // Afficher le pourcentage
-                                }
-                                return label;
+                                return context.label + ': ' + context.parsed.toFixed(1) + '%';
                             }
                         }
                     },

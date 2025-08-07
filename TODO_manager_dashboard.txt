@@ -1,0 +1,15 @@
+TODO: Manager Dashboard Dynamic Data Implementation
+
+[ ] 1. Projets en cours: Count projects with status "En cours" where current user is manager (chef_de_projet)
+[ ] 2. Ressources disponibles: Count resources with availability_rate > 50
+[ ] 3. Tickets ouverts: Count tickets with status "Ouvert" created by current user
+[ ] 4. Taux d'avancement moyen: Average progress of "En cours" projects and tickets where user is manager/creator
+[ ] 5. Répartition des tickets par statut: Percentage breakdown of ticket statuses for user's created tickets
+[ ] 6. Tickets créés vs. Tickets résolus: Leave hardcoded for now
+[ ] 7. Équipe: Count resources per role (all resources in app)
+[ ] 8. Projets En Cours: Display user's "En cours" projects in card layout
+[ ] 9. Activités Récentes: Latest comments/activities from user's projects and tickets
+[ ] 10. Update dashboard view to calculate and pass dynamic data
+[ ] 11. Update HTML template to use dynamic data instead of hardcoded values
+
+Status: Starting implementation...

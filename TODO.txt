@@ -1,0 +1,94 @@
+ADMIN DASHBOARD DYNAMIC DATA IMPLEMENTATION - TODO LIST
+================================================================
+
+TASKS COMPLETED:
+
+1. [COMPLETED] Projets en cours
+   ✓ Count projects with status "En cours"
+   ✓ Updated dashboard/views.py to calculate this value
+   ✓ Updated dashboard.html to display dynamic value
+
+2. [COMPLETED] Taux d'occupation des ressources
+   ✓ Calculate average of all resources "availability_rate"
+   ✓ Updated dashboard/views.py with calculation logic
+   ✓ Updated dashboard.html to display dynamic percentage
+
+3. [COMPLETED] Taux d'avancement des projets
+   ✓ Calculate average "progress" of projects with status "En cours"
+   ✓ Updated dashboard/views.py with calculation logic
+   ✓ Updated dashboard.html to display dynamic percentage
+
+4. [SKIPPED] Budget Restant
+   ✓ Kept hardcoded as requested by user
+   ✓ No changes needed
+
+5. [COMPLETED] Répartition des tickets par statut
+   ✓ Calculate percentage of tickets by status for pie chart
+   ✓ Updated dashboard/views.py to get ticket statistics
+   ✓ Updated dashboard.html to use dynamic data in pie chart
+   ✓ Added JSON serialization for JavaScript chart integration
+
+6. [SKIPPED] Tickets créés vs. Tickets résolus
+   ✓ Kept hardcoded as requested by user
+   ✓ No changes needed
+
+7. [COMPLETED] Allocation des ressources par rôle
+   ✓ Count number of resources per role
+   ✓ Updated dashboard/views.py to calculate role distribution
+   ✓ Updated dashboard.html to display dynamic allocation bars
+
+8. [COMPLETED] Activités Récentes
+   ✓ Get latest comments from projects and tickets
+   ✓ Get latest activity logs
+   ✓ Updated dashboard/views.py to fetch recent activities
+   ✓ Updated dashboard.html to display dynamic activity list
+
+FILES MODIFIED:
+✓ dashboard/views.py (added all calculation logic and imports)
+✓ dashboard/templates/dashboard.html (updated all template variables)
+
+IMPLEMENTATION SUMMARY:
+- All dynamic data is now calculated from actual database models
+- Maintained existing UI/UX design and styling
+- Added proper error handling for empty data scenarios
+- Pie chart now uses dynamic ticket statistics with JSON integration
+- Resource allocation bars show actual role distribution
+- Recent activities display real project/ticket comments and activities
+- KPI cards show calculated values from database
+
+STATUS: ALL TASKS COMPLETED SUCCESSFULLY! 🎉
+The admin dashboard now displays fully dynamic data instead of hardcoded values.
+
+================================================================
+MANAGER DASHBOARD DYNAMIC DATA IMPLEMENTATION - TODO LIST
+================================================================
+
+TODO for Manager Dashboard:
+
+- [x] Update `dashboard` function in `dashboard/views.py` to call a new `get_manager_dashboard_data` function.
+- [x] Implement `get_manager_dashboard_data` function in `dashboard/views.py` to fetch and calculate the following data:
+    - [x] Projets en cours: Projects with status "En cours" where the current user (manager) is the manager.
+    - [x] Ressources disponibles: Resources with an "availability_rate" greater than 50 percent.
+    - [x] Tickets ouverts: Tickets with status "Ouvert" created by the current user.
+    - [x] Taux d'avancement moyen: Average progress of "En cours" projects and "En cours" tickets created by or managed by the current user.
+    - [x] Répartition des tickets par statut: Percentage of ticket statuses for all tickets created by the current user.
+    - [x] Equipe: Number of resources per role for all resources in the app.
+    - [x] Projets En Cours: Display projects created by the user and that are "En cours" in the HTML.
+    - [x] Activités Récentes: Latest comments and created activities in projects and tickets created by or managed by the current user.
+- [x] Pass the calculated data to the `dashboard_manager.html` template.
+- [x] Modify `dashboard_manager.html` to display the dynamic data instead of hardcoded values.
+- [x] Ensure all new HTML elements have unique IDs.
+- [x] Keep "Tickets créés vs. Tickets résolus" hardcoded for now.
+
+COMPLETED TASKS:
+✅ All dynamic data integration completed
+✅ KPI cards now show real data from database
+✅ Pie chart displays actual ticket distribution
+✅ Team section shows dynamic role counts
+✅ Projects section displays manager's ongoing projects
+✅ Recent activities show real comments and activities
+✅ All HTML elements have unique IDs
+✅ Line chart remains hardcoded as requested
+
+STATUS: MANAGER DASHBOARD TASKS COMPLETED SUCCESSFULLY! 🎉
+The manager dashboard now displays fully dynamic data instead of hardcoded values.
