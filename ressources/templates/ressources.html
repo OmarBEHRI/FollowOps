@@ -25,10 +25,18 @@
             --border-color: #EBE5E0; /* Soft, warm border */
 
             /* Couleurs pour les statuts */
-            --status-active-bg: #EAE6DF; /* Beige clair pour "Active", "En cours", "Terminé" */
-            --status-active-text: #6E6864; /* Texte moyen pour ces statuts */
-            --status-inactive-bg: #F7EAE3; /* Pêche clair pour "Inactive", "À initier", "Suspendu", "Annulé" */
-            --status-inactive-text: #A08D80; /* Texte primaire pour ces statuts */
+            --status-active-bg: #8B7355; /* Brun doré pour actif */
+            --status-active-text: #FFFFFF;
+            --status-inactive-bg: #A08D80; /* Beige foncé pour inactif */
+            --status-inactive-text: #FFFFFF;
+            --priority-high-bg: #B8860B;
+            --priority-high-text: #FFFFFF;
+            --priority-medium-bg: #CD853F;
+            --priority-medium-text: #FFFFFF;
+            --priority-low-bg: #D2B48C;
+            --priority-low-text: #3F3C3A;
+            --type-bg: #DEB887;
+            --type-text: #3F3C3A;
 
             /* Couleurs de navigation et boutons */
             --nav-link-color: #191610; /* Couleur du texte par défaut pour les liens de navigation */
@@ -39,8 +47,8 @@
             --button-bg-light: #F0EDE9; /* Fond pour les boutons secondaires/filtres */
 
             /* Couleurs des barres d'availability */
-            --availability-bar-color: #D4A88D; /* Muted terracotta/orange */
-            --availability-bar-bg: #EBE5E0;
+            --availability-bar-color: #8B7355; /* Brun doré pour la disponibilité */
+            --availability-bar-bg: #E0E0E0;
             --availability-dot-color: #D4A88D; /* Couleur pour le point de disponibilité */
 
             /* Couleurs pour les boutons d'action */
@@ -185,15 +193,26 @@
             display: inline-block;
         }
 
-        /* Couleurs spécifiques pour les statuts */
+        /* Badges avec coins arrondis et couleurs alignées sur le thème */
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Couleurs pour les statuts - Thème nude/beige */
         .status-active {
-            background-color: var(--status-active-bg);
-            color: var(--status-active-text);
+            background-color: #8B7355; /* Brun doré pour actif */
+            color: #FFFFFF;
         }
 
         .status-inactive {
-            background-color: var(--status-inactive-bg);
-            color: var(--status-inactive-text);
+            background-color: #A08D80; /* Beige foncé pour inactif */
+            color: #FFFFFF;
         }
 
         /* Styles pour la barre d'availability (sur la page Ressources) */
@@ -207,13 +226,13 @@
             width: 80px;
             height: 8px;
             border-radius: 4px;
-            background-color: var(--availability-bar-bg);
+            background-color: #E0E0E0; /* Gris clair pour le fond */
             overflow: hidden;
         }
 
         .availability-bar {
             height: 100%;
-            background-color: var(--availability-bar-color);
+            background-color: #8B7355; /* Brun doré pour la barre de disponibilité */
             border-radius: 4px;
         }
 
@@ -374,10 +393,10 @@
                                         <span class="status-badge {% if ressource.status == 'Active' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ressource.status }}</span>
                                     </td>
                                     <td class="px-4 py-5 text-center availability-cell">
-                                        <div class="availability-bar-container bg-[#EBE5E0]">
-                                            <div class="availability-bar bg-[#D4A88D]" style="width: {{ ressource.availability_rate|default:0 }}%;"></div>
+                                        <div class="availability-bar-container">
+                                            <div class="availability-bar" style="width: {{ ressource.availability_rate|default:0 }}%;"></div>
                                         </div>
-                                        <span class="text-[#8c7e5a] text-xs ml-2">{{ ressource.availability_rate|default:0 }}</span>
+                                        <span class="text-[#8c7e5a] text-xs ml-2">{{ ressource.availability_rate|default:0 }}%</span>
                                     </td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.skills }}</td>
                                     {% if user_role == 'ADMIN' %}

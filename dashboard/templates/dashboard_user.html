@@ -258,22 +258,22 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="kpi-card">
                             <p class="label">Projets en cours</p>
-                            <p class="value">2</p>
+                            <p class="value">{{ projets_en_cours }}</p>
                             <p class="change-positive">+15%</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="label">Nombres de projet assignés</p>
-                            <p class="value">12</p>
+                            <p class="label">Nombres de tickets en cours</p>
+                            <p class="value">{{ tickets_en_cours }}</p>
                             <p class="change-positive">+10%</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="label">Tickets clotures ce mois/semaine</p>
-                            <p class="value">5/14</p>
-                            <p class="change-positive">+42%/+54%</p>
+                            <p class="label">Tickets Résolus</p>
+                            <p class="value">{{ tickets_resolus }}</p>
+                            <p class="change-positive">+42%</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="label">Taux moyen de Tickets en jour</p>
-                            <p class="value">20</p>
+                            <p class="label">Temps moyen de résolution</p>
+                            <p class="value">{{ average_resolution_time }}</p>
                             <p class="change-positive">+50%</p>
                         </div>
                     </div>
@@ -291,90 +291,75 @@
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Projets en cours</h1>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for project in projets_en_cours_list %}
                         <div class="project-card">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="project-title">Refonte CRM (BUILD)</h3>
-                                    <p class="project-manager">Chef de projet: Sara RIAD | 12 tickets assignés</p>
+                                    <h3 class="project-title">{{ project.title }} ({{ project.type }})</h3>
+                                    <p class="project-manager">Chef de projet: {{ project.project_manager.first_name }} {{ project.project_manager.last_name }}</p>
                                 </div>
-                                <a href="#" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
+                                <a href="/projects/details/{{ project.id }}/" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
                             </div>
                             <div class="project-progress">
-                                <div class="project-progress-bar" style="width: 65%;"></div>
+                                <div class="project-progress-bar" style="width: {{ project.progress }}%;"></div>
                             </div>
-                            <p class="text-xs text-[#6E6864] mt-1">65% complété</p>
+                            <p class="text-xs text-[#6E6864] mt-1">{{ project.progress }}% complété</p>
                         </div>
-                        
-                        <div class="project-card">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 class="project-title">Projet Beta</h3>
-                                    <p class="project-manager">Chef de projet: Sara RIAD | 8 tickets assignés</p>
-                                </div>
-                                <a href="#" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
-                            </div>
-                            <div class="project-progress">
-                                <div class="project-progress-bar" style="width: 40%;"></div>
-                            </div>
-                            <p class="text-xs text-[#6E6864] mt-1">40% complété</p>
+                        {% empty %}
+                        <div class="col-span-2 text-center text-[#6E6864] py-8">
+                            <p>Aucun projet en cours pour le moment.</p>
                         </div>
+                        {% endfor %}
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Mes tickets récents</h1>
                     <div class="bg-white rounded-xl border border-[#EBE5E0] overflow-hidden">
+                        {% for ticket in mes_tickets_recents %}
                         <div class="ticket-item">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-medium">#123</span>
-                                <span class="text-sm">Problème de connexion à l'application</span>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm font-medium text-[#8B5A3C]">#{{ ticket.id|stringformat:"03d" }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-[#191610]">{{ ticket.title }}</span>
+                                        <div class="flex items-center gap-2 text-xs text-[#6E6864]">
+                                            <span>Créé le {{ ticket.created_at|date:"d/m/Y" }}</span>
+                                            {% if ticket.assigned_to.all %}
+                                            <span>• Assigné à 
+                                                {% for assignee in ticket.assigned_to.all %}
+                                                    {{ assignee.first_name }} {{ assignee.last_name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="ticket-status status-{{ ticket.status|lower|cut:' ' }}">{{ ticket.status }}</span>
                             </div>
-                            <span class="ticket-status status-in-progress">En cours</span>
                         </div>
+                        {% empty %}
                         <div class="ticket-item">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-medium">#118</span>
-                                <span class="text-sm">Mise à jour de la documentation</span>
+                            <div class="text-center text-[#6E6864] py-8">
+                                <p>Aucun ticket récent pour le moment.</p>
                             </div>
-                            <span class="ticket-status status-open">Ouvert</span>
                         </div>
-                        <div class="ticket-item">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-medium">#115</span>
-                                <span class="text-sm">Correction du bug d'affichage</span>
-                            </div>
-                            <span class="ticket-status status-closed">Fermé</span>
-                        </div>
-                        <div class="ticket-item">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-medium">#112</span>
-                                <span class="text-sm">Optimisation des performances</span>
-                            </div>
-                            <span class="ticket-status status-closed">Fermé</span>
-                        </div>
+                        {% endfor %}
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Activités récentes</h1>
                     <div class="flex flex-col gap-4">
+                        {% for activity in recent_activities %}
                         <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text">Nouveau projet "Refonte CRM" créé par <span class="font-bold">Sara RIYAD</span>(<span class="font-bold">BUILD</span>)</p>
-                                <p class="activity-time">Il y a 4 heures</p>
+                            <div class="activity-avatar" style='background-image: url("{{ activity.author.profile_picture|default:"https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4" }}")'></div>
+                            <div class="activity-content">
+                                <p class="activity-text">{{ activity.text|safe }}</p>
+                                <p class="activity-time">{{ activity.created_at|timesince }}</p>
                             </div>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text"><span class="font-bold">Ahmed CHERIF</span> a rejoint l'équipe</p>
-                                <p class="activity-time">Il y a 4 heures</p>
-                            </div>
+                        {% empty %}
+                        <div class="text-center text-[#6E6864] py-8">
+                            <p>Aucune activité récente pour le moment.</p>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text">Ticket critique <span class="font-bold">#123</span> résolu par <span class="font-bold">Karim Wahbi</span></p>
-                                <p class="activity-time">Il y a 2 jours</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </main>
@@ -400,23 +385,38 @@
 
         // Graphique circulaire - Répartition des tickets par statut
         const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Ouvert', 'En Cours', 'Résolu', 'Fermé'],
-                datasets: [{
-                    data: [30, 20, 40, 10], // Données d'exemple
-                    backgroundColor: [
-                        nudeColors[0], // Premier statut
-                        nudeColors[1], // Deuxième statut
-                        nudeColors[2], // Troisième statut
-                        nudeColors[3]  // Quatrième statut
-                    ],
-                    borderColor: 'var(--bg-white)', // Bordure blanche pour une meilleure séparation
-                    borderWidth: 2,
-                    hoverOffset: 4 // Effet de survol
-                }]
-            },
+        
+        // Get ticket stats from Django context
+        const ticketStats = {{ ticket_stats_json|safe }};
+        console.log('Debug - ticketStats:', ticketStats);
+        
+        // Check if there are any tickets
+        if (!ticketStats || Object.keys(ticketStats).length === 0) {
+            console.log('No ticket data found');
+            // Show "No data" message
+            const pieChartContainer = document.getElementById('pieChart').parentNode;
+            pieChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun ticket trouvé</p>';
+        } else {
+            console.log('Creating pie chart with data');
+            const labels = Object.keys(ticketStats);
+            const data = labels.map(label => ticketStats[label].percentage);
+            console.log('Labels:', labels, 'Data:', data);
+            
+            // Generate dynamic colors based on number of statuses
+            const backgroundColors = labels.map((label, index) => nudeColors[index % nudeColors.length]);
+            
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: 'var(--bg-white)', // Bordure blanche pour une meilleure séparation
+                        borderWidth: 2,
+                        hoverOffset: 4 // Effet de survol
+                    }]
+                },
             options: {
                 responsive: true,
                 maintainAspectRatio: false, // Permet de mieux contrôler la taille
@@ -449,7 +449,8 @@
                                     label += ': ';
                                 }
                                 if (context.parsed !== null) {
-                                    label += context.parsed + '%'; // Afficher le pourcentage
+                                    const count = ticketStats[context.label].count;
+                                    label += count + ' tickets (' + context.parsed + '%)';
                                 }
                                 return label;
                             }
@@ -467,8 +468,10 @@
                         bottom: 0
                     }
                 }
-            }
-        });
+                }
+            });
+            console.log('Pie chart created successfully');
+        } // Close else block
         
         // Initialize Global Search
         document.addEventListener('DOMContentLoaded', function() {

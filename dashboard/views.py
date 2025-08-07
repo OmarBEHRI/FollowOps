@@ -23,7 +23,9 @@ def dashboard(request):
         context = get_manager_dashboard_data(user)
         return render(request, 'dashboard_manager.html', context)  # Manager dashboard
     else:  # USER role
-        return render(request, 'dashboard_user.html')  # User dashboard
+        # Calculate dynamic data for user dashboard
+        context = get_user_dashboard_data(user)
+        return render(request, 'dashboard_user.html', context)  # User dashboard
 
 def get_admin_dashboard_data():
     """Calculate and return data for admin dashboard"""
@@ -261,4 +263,127 @@ def get_manager_dashboard_data(user):
         'equipe': equipe,
         'projets_en_cours_list': projets_en_cours_list,
         'activites_recentes': recent_activities,
+    }
+
+def get_user_dashboard_data(user):
+    """Calculate and return data for user dashboard"""
+    
+    # 1. Projets en cours: Projects where user is a member and status is "En cours"
+    user_projects_en_cours = Project.objects.filter(members=user, status='En cours')
+    projets_en_cours = user_projects_en_cours.count()
+    
+    # 2. Nombres de tickets assignés: Tickets "En cours" where user is assigned or created
+    tickets_en_cours = Ticket.objects.filter(
+        Q(assigned_to=user) ,
+        status='En cours'
+    ).distinct().count()
+    
+    # 3. Tickets Résolus: Tickets with status "Résolu" where user is assigned or created
+    tickets_resolus = Ticket.objects.filter(
+        Q(assigned_to=user) ,
+        status='Résolu'
+    ).distinct().count()
+    
+    # 4. Average Time of resolution: Keep hardcoded for now
+    average_resolution_time = "20 jours"
+    
+    # 5. Répartition des tickets par statut: User's tickets only
+    user_tickets = Ticket.objects.filter(
+        Q(assigned_to=user)
+    ).distinct()
+    
+    total_user_tickets = user_tickets.count()
+    ticket_stats = {}
+    if total_user_tickets > 0:
+        ticket_counts = user_tickets.values('status').annotate(count=Count('status'))
+        for item in ticket_counts:
+            percentage = round((item['count'] / total_user_tickets) * 100, 1)
+            ticket_stats[item['status']] = {
+                'count': item['count'],
+                'percentage': percentage
+            }
+    
+    # Convert ticket stats to JSON for JavaScript
+    ticket_stats_json = json.dumps(ticket_stats)
+    
+    # 6. Projets en cours list: Projects "En cours" where user is a member
+    projets_en_cours_list = user_projects_en_cours.select_related('project_manager')
+    
+    # 7. Mes tickets récents: User's tickets ordered by created_at
+    recent_tickets = user_tickets.order_by('-created_at')[:10]
+    
+    # 8. Activités récentes: Comments and Activities from user's projects and tickets
+    recent_activities = []
+    
+    # Get user's projects (where user is member or manager)
+    user_all_projects = Project.objects.filter(
+        Q(members=user) 
+    ).distinct()
+    
+    # Get recent project comments from user's projects
+    recent_project_comments = CommentProject.objects.filter(
+        project__in=user_all_projects
+    ).select_related('author', 'project').order_by('-created_at')[:5]
+    
+    for comment in recent_project_comments:
+        recent_activities.append({
+            'type': 'project_comment',
+            'text': f"Nouveau commentaire sur le projet '{comment.project.title}' par {comment.author.first_name} {comment.author.last_name}",
+            'author': comment.author,
+            'created_at': comment.created_at,
+            'related_object': comment.project
+        })
+    
+    # Get recent ticket comments from user's tickets
+    recent_ticket_comments = CommentTicket.objects.filter(
+        ticket__in=user_tickets
+    ).select_related('author', 'ticket').order_by('-created_at')[:5]
+    
+    for comment in recent_ticket_comments:
+        recent_activities.append({
+            'type': 'ticket_comment',
+            'text': f"Nouveau commentaire sur le ticket '{comment.ticket.title}' par {comment.author.first_name} {comment.author.last_name}",
+            'author': comment.author,
+            'created_at': comment.created_at,
+            'related_object': comment.ticket
+        })
+    
+    # Get recent activities from user's projects and tickets
+    recent_activity_logs = Activity.objects.filter(
+        Q(project__in=user_all_projects) | Q(ticket__in=user_tickets)
+    ).select_related('employee', 'project', 'ticket').order_by('-created_at')[:5]
+    
+    for activity in recent_activity_logs:
+        if activity.project:
+            text = f"Activité '{activity.title}' créée sur le projet '{activity.project.title}' par {activity.employee.first_name} {activity.employee.last_name}"
+            related_obj = activity.project
+        elif activity.ticket:
+            text = f"Activité '{activity.title}' créée sur le ticket '{activity.ticket.title}' par {activity.employee.first_name} {activity.employee.last_name}"
+            related_obj = activity.ticket
+        else:
+            text = f"Activité '{activity.title}' créée par {activity.employee.first_name} {activity.employee.last_name}"
+            related_obj = None
+            
+        recent_activities.append({
+            'type': 'activity',
+            'text': text,
+            'author': activity.employee,
+            'created_at': activity.created_at,
+            'related_object': related_obj
+        })
+    
+    # Sort all activities by creation date and take the most recent 8
+    recent_activities.sort(key=lambda x: x['created_at'], reverse=True)
+    recent_activities = recent_activities[:8]
+    
+    return {
+        'projets_en_cours': projets_en_cours,
+        'tickets_en_cours': tickets_en_cours,
+        'tickets_resolus': tickets_resolus,
+        'average_resolution_time': average_resolution_time,
+        'ticket_stats': ticket_stats,
+        'ticket_stats_json': ticket_stats_json,
+        'projets_en_cours_list': projets_en_cours_list,
+        'mes_tickets_recents': recent_tickets,
+        'recent_activities': recent_activities,
     }

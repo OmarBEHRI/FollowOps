@@ -25,10 +25,10 @@
             --border-color: #EBE5E0; /* Soft, warm border */
 
             /* Couleurs pour les statuts */
-            --status-active-bg: #EAE6DF; /* Beige clair pour "Active", "En cours", "Terminé" */
-            --status-active-text: #6E6864; /* Texte moyen pour ces statuts */
-            --status-inactive-bg: #F7EAE3; /* Pêche clair pour "Inactive", "À initier", "Suspendu", "Annulé" */
-            --status-inactive-text: #A08D80; /* Texte primaire pour ces statuts */
+            --status-active-bg: #8B7355; /* Brun doré pour actif */
+            --status-active-text: #FFFFFF;
+            --status-inactive-bg: #A08D80; /* Beige foncé pour inactif */
+            --status-inactive-text: #FFFFFF;
 
             /* Couleurs de navigation et boutons */
             --nav-link-color: #191610; /* Couleur du texte par défaut pour les liens de navigation */
@@ -179,31 +179,42 @@
             display: inline-block;
         }
 
-        /* Couleurs spécifiques pour les statuts */
+        /* Badges avec coins arrondis et couleurs alignées sur le thème */
+        .status-badge, .priority-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Couleurs pour les statuts - Thème nude/beige */
         .status-active {
-            background-color: var(--status-active-bg);
-            color: var(--status-active-text);
+            background-color: #8B7355; /* Brun doré pour ouvert/en cours */
+            color: #FFFFFF;
         }
 
         .status-inactive {
-            background-color: var(--status-inactive-bg);
-            color: var(--status-inactive-text);
+            background-color: #A08D80; /* Beige foncé pour fermé/résolu */
+            color: #FFFFFF;
         }
 
-        /* Couleurs pour les priorités */
+        /* Couleurs pour les priorités - Tons chauds */
         .priority-high {
-            background-color: #F7EAE3;
-            color: #A08D80;
+            background-color: #B8860B; /* Or foncé pour haute priorité */
+            color: #FFFFFF;
         }
 
         .priority-medium {
-            background-color: #EAE6DF;
-            color: #6E6864;
+            background-color: #CD853F; /* Brun sable pour priorité moyenne */
+            color: #FFFFFF;
         }
 
         .priority-low {
-            background-color: #F1EFE9;
-            color: #8C7E5A;
+            background-color: #D2B48C; /* Beige clair pour basse priorité */
+            color: #3F3C3A;
         }
 
         /* Ajustements visuels pour les tables générales */

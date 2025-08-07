@@ -438,11 +438,17 @@
                         callbacks: {
                             label: function(context) {
                                 let label = context.label || '';
+                                const ticketData = {
+                                    {% for status, data in repartition_tickets_par_statut.items %}
+                                    '{{ status }}': { count: {{ data.count }}, percentage: {{ data.percentage }} }{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                };
                                 if (label) {
                                     label += ': ';
                                 }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%'; // Afficher le pourcentage
+                                if (context.parsed !== null && ticketData[context.label]) {
+                                    const count = ticketData[context.label].count;
+                                    label += count + ' tickets (' + context.parsed + '%)';
                                 }
                                 return label;
                             }
