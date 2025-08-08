@@ -180,13 +180,20 @@ def projectCalendar(request, pk):
             'description': activity.description,
             'start_date': activity.start_datetime,  # Garder l'objet datetime complet
             'end_date': activity.end_datetime,      # Garder l'objet datetime complet
+            'type': activity.activity_type,  # Ajouter le type d'activité
             'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
-            'charge': activity.charge
+            'charge': float(activity.charge) if activity.charge else 0  # Convertir en float
         })
     
     # Get calendar information for the current month
     cal = calendar.monthcalendar(current_year, current_month)
-    month_name = calendar.month_name[current_month]
+    
+    # Noms des mois en français
+    mois_francais = [
+        '', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ]
+    month_name = mois_francais[current_month]
     
     # Check if user is admin or project manager
     user = request.user
@@ -448,4 +455,70 @@ def global_search(request):
     return JsonResponse({
         'results': results,
         'total_count': len(results)
+    })
+
+
+@login_required
+def get_user_projects_api(request):
+    """API endpoint pour récupérer les projets de l'utilisateur connecté"""
+    user = request.user
+    
+    # Filtrer les projets selon le rôle de l'utilisateur
+    if user.appRole == 'ADMIN':
+        # Admin voit tous les projets
+        projects = Project.objects.all()
+    elif user.appRole == 'MANAGER':
+        # Manager voit les projets qu'il gère
+        projects = Project.objects.filter(project_manager=user)
+    else:
+        # Utilisateur normal voit les projets où il est membre
+        projects = Project.objects.filter(members=user)
+    
+    projects_data = [{
+        'id': project.id,
+        'name': project.title,
+        'title': project.title
+    } for project in projects]
+    
+    return JsonResponse(projects_data, safe=False)
+
+
+@login_required
+def get_project_activities(request, pk):
+    from django.http import JsonResponse
+    from activities.models import Activity
+    from datetime import datetime
+    import json
+    
+    project = get_object_or_404(Project, pk=pk)
+    month = int(request.GET.get('month', datetime.now().month))
+    year = int(request.GET.get('year', datetime.now().year))
+    
+    activities = Activity.objects.filter(
+        project=project,
+        start_datetime__year=year,
+        start_datetime__month=month
+    ).order_by('start_datetime')
+    
+    activities_data = []
+    for activity in activities:
+        activities_data.append({
+            'id': activity.id,
+            'title': activity.title,
+            'description': activity.description,
+            'start_datetime': activity.start_datetime.isoformat(),
+            'end_datetime': activity.end_datetime.isoformat(),
+            # Ajouter les propriétés attendues par le frontend
+            'startDate': activity.start_datetime.isoformat(),
+            'endDate': activity.end_datetime.isoformat(),
+            'start_date': activity.start_datetime.isoformat(),
+            'end_date': activity.end_datetime.isoformat(),
+            'type': activity.activity_type,
+            'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+            'charge': float(activity.charge) if activity.charge else 0
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'activities': activities_data
     })

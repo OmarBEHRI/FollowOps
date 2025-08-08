@@ -9,4 +9,6 @@ urlpatterns = [
     path('delete/<int:ticket_id>/', views.delete_ticket, name='delete_ticket'),
     path('add_comment/<int:ticket_id>/', views.add_comment_ajax, name='add_comment_ajax'),
     path('get_resources/', views.get_resources_list, name='get_resources'),
+    # Nouvel endpoint pour les tickets de l'utilisateur
+    path('api/tickets/', views.get_user_tickets_api, name='get_user_tickets_api'),
 ]

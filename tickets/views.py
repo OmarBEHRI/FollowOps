@@ -347,3 +347,27 @@ def get_resources_list(request):
         })
     
     return JsonResponse({'success': False, 'error': 'Type de ressource invalide'})
+
+
+@login_required
+def get_user_tickets_api(request):
+    """API endpoint pour récupérer les tickets de l'utilisateur connecté"""
+    user = request.user
+    
+    # Filtrer les tickets selon le rôle de l'utilisateur
+    if user.appRole == 'ADMIN':
+        # Admin voit tous les tickets
+        tickets = Ticket.objects.all()
+    elif user.appRole == 'MANAGER':
+        # Manager voit les tickets qu'il a créés
+        tickets = Ticket.objects.filter(created_by=user)
+    else:
+        # Utilisateur normal voit les tickets qui lui sont assignés
+        tickets = Ticket.objects.filter(assigned_to=user)
+    
+    tickets_data = [{
+        'id': ticket.id,
+        'title': ticket.title
+    } for ticket in tickets]
+    
+    return JsonResponse(tickets_data, safe=False)
