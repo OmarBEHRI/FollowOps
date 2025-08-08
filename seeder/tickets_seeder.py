@@ -34,7 +34,7 @@ def seed_tickets(users, projects):
         {
             'title': 'Correction du bug d\'affichage sur mobile',
             'description': 'Sur les appareils mobiles, le menu de navigation ne s\'affiche pas correctement.',
-            'status': 'Ferm '
+            'status': 'Fermé'
         },
         {
             'title': 'Ajout de nouvelles fonctionnalités de recherche',
@@ -49,7 +49,7 @@ def seed_tickets(users, projects):
         {
             'title': 'Mise à jour des dépendances',
             'description': 'Mettre à jour toutes les bibliothèques et dépendances vers les dernières versions stables.',
-            'status': 'Ferm '
+            'status': 'Fermé'
         }
     ]
     

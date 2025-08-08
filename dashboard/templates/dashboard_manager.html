@@ -244,7 +244,23 @@
                                     <input type="search" id="header-search-input-dashboard-manager" placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#191610] focus:outline-0 focus:ring-0 border-none bg-[#f1efe9] focus:border-none h-full placeholder:text-[#8c7e5a] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal">
                                 </div>
                             </label>
-                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                            <div class="profile-dropdown-container">
+                                <div class="profile-picture bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                                <div class="profile-dropdown-menu">
+                                    <a href="#" class="profile-dropdown-item" onclick="window.profileDropdown.handleViewProfile(); return false;">
+                                        <svg class="profile-dropdown-icon" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                        View Profile
+                                    </a>
+                                    <a href="#" class="profile-dropdown-item" onclick="window.profileDropdown.handleLogout(); return false;">
+                                        <svg class="profile-dropdown-icon" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                                        </svg>
+                                        Logout
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -253,24 +269,24 @@
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Tableau de bord</h1>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="kpi-card">
+                        <div class="kpi-card" id="kpi-projets-en-cours">
                             <p class="label">Projets en cours</p>
-                            <p class="value">8</p>
+                            <p class="value">{{ projets_en_cours }}</p>
                             <p class="change-positive">+15%</p>
                         </div>
-                        <div class="kpi-card">
+                        <div class="kpi-card" id="kpi-ressources-disponibles">
                             <p class="label">Ressources disponibles</p>
-                            <p class="value">15</p>
+                            <p class="value">{{ ressources_disponibles }}</p>
                             <p class="change-positive">+10%</p>
                         </div>
-                        <div class="kpi-card">
+                        <div class="kpi-card" id="kpi-tickets-ouverts">
                             <p class="label">Tickets ouverts</p>
-                            <p class="value">32</p>
+                            <p class="value">{{ tickets_ouverts }}</p>
                             <p class="change-negative">-5%</p>
                         </div>
-                        <div class="kpi-card">
+                        <div class="kpi-card" id="kpi-taux-avancement">
                             <p class="label">Taux d'avancement moyen</p>
-                            <p class="value">65%</p>
+                            <p class="value">{{ taux_avancement_moyen }}%</p>
                             <p class="change-positive">+8%</p>
                         </div>
                     </div>
@@ -280,8 +296,14 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="graph-card">
                             <h2 class="text-base font-semibold text-color-dark mb-4">Répartition des tickets par statut</h2>
+                            {% if repartition_tickets_par_statut %}
                             <div class="relative h-64 w-full"> <canvas id="pieChart"></canvas>
                             </div>
+                            {% else %}
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <p class="text-[#8c7e5a] text-sm">Aucun ticket trouvé</p>
+                            </div>
+                            {% endif %}
                         </div>
                         <div class="graph-card">
                             <h2 class="text-base font-semibold text-color-dark mb-4">Tickets créés vs. Tickets résolus</h2>
@@ -291,101 +313,60 @@
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Équipe</h1>
-                    <div class="flex flex-col gap-3">
-                        <p class="text-[#191610] text-sm font-medium">15 <span class="text-[#8c7e5a] ml-1">Membres</span></p>
-                        <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-3" id="equipe-section">
+                        <p class="text-[#191610] text-sm font-medium">{{ equipe.total }} <span class="text-[#8c7e5a] ml-1">Membres</span></p>
+                        {% for role, count in equipe.roles.items %}
+                        <div class="flex flex-col gap-2" id="role-{{ role|slugify }}">
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Développeur</span>
-                                <span class="text-[#8c7e5a]">8</span>
+                                <span class="text-[#191610] font-medium">{{ role }}</span>
+                                <span class="text-[#8c7e5a]">{{ count }}</span>
                             </div>
                             <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 53%;"></div>
+                                <div class="allocation-bar-fill" style="width: {% widthratio count equipe.total 100 %}%;"></div>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Chef de Projet</span>
-                                <span class="text-[#8c7e5a]">2</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 13%;"></div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Testeur</span>
-                                <span class="text-[#8c7e5a]">3</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 20%;"></div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-[#191610] font-medium">Concepteur</span>
-                                <span class="text-[#8c7e5a]">2</span>
-                            </div>
-                            <div class="allocation-bar-container">
-                                <div class="allocation-bar-fill" style="width: 13%;"></div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Projets en cours</h1>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="project-card">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="projets-en-cours-section">
+                        {% for project in projets_en_cours_list %}
+                        <div class="project-card" id="project-card-{{ project.id }}">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="project-title">Refonte CRM (BUILD)</h3>
-                                    <p class="project-manager">Chef de projet: Sara RIAD | 12 tickets assignés</p>
+                                    <h3 class="project-title">{{ project.name }}</h3>
+                                    <p class="project-manager">Chef de projet: {{ project.project_manager.first_name }} {{ project.project_manager.last_name }} | {{ project.ticket_count }} tickets assignés</p>
                                 </div>
-                                <a href="#" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
+                                <a href="{% url 'projectDetails' project.id %}" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
                             </div>
                             <div class="project-progress">
-                                <div class="project-progress-bar" style="width: 65%;"></div>
+                                <div class="project-progress-bar" style="width: {{ project.progress }}%;"></div>
                             </div>
-                            <p class="text-xs text-[#6E6864] mt-1">65% complété</p>
+                            <p class="text-xs text-[#6E6864] mt-1">{{ project.progress }}% complété</p>
                         </div>
-                        
-                        <div class="project-card">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 class="project-title">Projet Beta</h3>
-                                    <p class="project-manager">Chef de projet: Sara RIAD | 8 tickets assignés</p>
-                                </div>
-                                <a href="#" class="text-sm text-[#A08D80] hover:underline">Voir le projet</a>
-                            </div>
-                            <div class="project-progress">
-                                <div class="project-progress-bar" style="width: 40%;"></div>
-                            </div>
-                            <p class="text-xs text-[#6E6864] mt-1">40% complété</p>
+                        {% empty %}
+                        <div class="col-span-2 text-center text-[#6E6864] py-8" id="no-projects-message">
+                            <p>Aucun projet en cours pour le moment.</p>
                         </div>
+                        {% endfor %}
                     </div>
 
                     <h1 class="text-[#191610] text-xl font-bold leading-tight">Activités Récentes</h1>
-                    <div class="flex flex-col gap-4">
-                        <div class="activity-item">
+                    <div class="flex flex-col gap-4" id="activites-recentes-section">
+                        {% for activity in activites_recentes %}
+                        <div class="activity-item" id="activity-{{ activity.type }}-{{ forloop.counter }}">
                             <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
                             <div class="flex flex-col">
-                                <p class="activity-text">Nouveau projet "Refonte CRM" créé par <span class="font-bold">Sara RIYAD</span>(<span class="font-bold">BUILD</span>)</p>
-                                <p class="activity-time">Il y a 4 heures</p>
+                                <p class="activity-text">{{ activity.text }}</p>
+                                <p class="activity-time">{{ activity.created_at|timesince }} ago</p>
                             </div>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text"><span class="font-bold">Ahmed CHERIF</span> a rejoint l'équipe</p>
-                                <p class="activity-time">Il y a 4 heures</p>
-                            </div>
+                        {% empty %}
+                        <div class="text-center text-[#6E6864] py-8" id="no-activities-message">
+                            <p>Aucune activité récente pour le moment.</p>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
-                            <div class="flex flex-col">
-                                <p class="activity-text">Ticket critique <span class="font-bold">#123</span> résolu par <span class="font-bold">Karim Wahbi</span></p>
-                                <p class="activity-time">Il y a 2 jours</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </main>
@@ -410,13 +391,14 @@
         Chart.defaults.color = 'var(--text-color-medium)'; // Couleur par défaut pour les textes des graphiques
 
         // Graphique circulaire - Répartition des tickets par statut
+        {% if repartition_tickets_par_statut %}
         const pieCtx = document.getElementById('pieChart').getContext('2d');
         new Chart(pieCtx, {
             type: 'pie',
             data: {
-                labels: ['Ouvert', 'En Cours', 'Résolu', 'Fermé'],
+                labels: [{% for status, data in repartition_tickets_par_statut.items %}'{{ status }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
                 datasets: [{
-                    data: [30, 20, 40, 10], // Données d'exemple
+                    data: [{% for status, data in repartition_tickets_par_statut.items %}{{ data.percentage }}{% if not forloop.last %}, {% endif %}{% endfor %}], // Données dynamiques
                     backgroundColor: [
                         nudeColors[0], // Premier statut
                         nudeColors[1], // Deuxième statut
@@ -456,11 +438,17 @@
                         callbacks: {
                             label: function(context) {
                                 let label = context.label || '';
+                                const ticketData = {
+                                    {% for status, data in repartition_tickets_par_statut.items %}
+                                    '{{ status }}': { count: {{ data.count }}, percentage: {{ data.percentage }} }{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                };
                                 if (label) {
                                     label += ': ';
                                 }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%'; // Afficher le pourcentage
+                                if (context.parsed !== null && ticketData[context.label]) {
+                                    const count = ticketData[context.label].count;
+                                    label += count + ' tickets (' + context.parsed + '%)';
                                 }
                                 return label;
                             }
@@ -480,6 +468,7 @@
                 }
             }
         });
+        {% endif %}
 
         // Graphique linéaire - Tickets créés vs. Tickets résolus
         const lineCtx = document.getElementById('lineChart').getContext('2d');
@@ -590,5 +579,7 @@
     
     <!-- Global Search JavaScript -->
     <script src="{% static 'projects/js/global_search.js' %}?v=2"></script>
+    <!-- Profile Dropdown JavaScript -->
+    <script src="{% static 'projects/js/profile_dropdown.js' %}"></script>
 </body>
 </html>
