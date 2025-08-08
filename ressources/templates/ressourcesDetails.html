@@ -299,17 +299,17 @@
                             <div class="profile-dropdown-container">
                                 <div class="profile-picture bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
                                 <div class="profile-dropdown-menu">
-                                    <a href="#" class="profile-dropdown-item" onclick="window.profileDropdown.handleViewProfile(); return false;">
+                                    <a href="/ressources/details/{{ user.id }}" class="profile-dropdown-item">
                                         <svg class="profile-dropdown-icon" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                         </svg>
-                                        View Profile
+                                        Voir Profil
                                     </a>
                                     <a href="#" class="profile-dropdown-item" onclick="window.profileDropdown.handleLogout(); return false;">
                                         <svg class="profile-dropdown-icon" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                                         </svg>
-                                        Logout
+                                        Se déconnecter
                                     </a>
                                 </div>
                             </div>
