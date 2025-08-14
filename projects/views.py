@@ -27,6 +27,14 @@ def projects(request):
     # Filtrer les projets avec des IDs valides
     projects = projects.exclude(id__isnull=True)
     
+    # Apply search filter
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        projects = projects.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query)
+        )
+    
     # Apply additional filters from query parameters
     status_filter = request.GET.get('status')
     priority_filter = request.GET.get('priority')
@@ -58,7 +66,8 @@ def projects(request):
         'project_managers': project_managers,
         'current_status': status_filter,
         'current_priority': priority_filter,
-        'current_project_manager': project_manager_filter
+        'current_project_manager': project_manager_filter,
+        'search_query': search_query  # Add this line
     })
 
 
@@ -641,3 +650,65 @@ def create_project_activity(request, pk):
             'success': False,
             'message': str(e)
         }, status=400)
+
+
+@login_required
+def project_search_suggestions(request):
+    """
+    API endpoint for project search suggestions with partial matching
+    Returns JSON response with project suggestions for autocomplete
+    """
+    query = request.GET.get('q', '').strip()
+    
+    # Permettre la recherche dès 1 caractère au lieu de 2
+    if not query or len(query) < 1:
+        return JsonResponse({'suggestions': []})
+    
+    user = request.user
+    
+    # Filter projects based on user role
+    if user.appRole == 'ADMIN':
+        projects = Project.objects.all()
+    elif user.appRole == 'MANAGER':
+        projects = Project.objects.filter(project_manager=user)
+    else:
+        projects = Project.objects.filter(members=user)
+    
+    # Search with partial matching
+    project_results = projects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(project_manager__first_name__icontains=query) |
+        Q(project_manager__last_name__icontains=query) |
+        Q(status__icontains=query) |
+        Q(priority__icontains=query)
+    ).distinct()[:10]  # Limit to 10 suggestions
+    
+    suggestions = []
+    for project in project_results:
+        # Calculate relevance score for better ordering
+        relevance = 0
+        query_lower = query.lower()
+        if query_lower in project.title.lower():
+            relevance += 10
+            # Bonus pour les correspondances au début du titre
+            if project.title.lower().startswith(query_lower):
+                relevance += 5
+        if query_lower in project.description.lower():
+            relevance += 5
+        
+        suggestions.append({
+            'id': project.id,
+            'title': project.title,
+            'description': project.description[:80] + '...' if len(project.description) > 80 else project.description,
+            'status': project.status,
+            'priority': project.priority,
+            'manager': f"{project.project_manager.first_name} {project.project_manager.last_name}",
+            'relevance': relevance,
+            'url': f'/projects/details/{project.id}/'
+        })
+    
+    # Sort by relevance score
+    suggestions.sort(key=lambda x: x['relevance'], reverse=True)
+    
+    return JsonResponse({'suggestions': suggestions})

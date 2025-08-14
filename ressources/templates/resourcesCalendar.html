@@ -110,20 +110,14 @@
             align-self: flex-start;
         }
 
-        .activities-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            width: 100%;
-            flex-grow: 1;
-        }
 
+
+        /* Activités avec le même thème que le calendrier des tickets */
         .activity-item {
             padding: 0.375rem 0.5rem;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: 500;
-            color: var(--bg-white);
             cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
@@ -131,29 +125,59 @@
             position: relative;
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(160, 141, 128, 0.08);
+            outline: none !important; /* Force la suppression du contour bleu */
+            border: none; /* Supprime toute bordure par défaut */
+        }
+
+        .activity-item:focus {
+            outline: none !important; /* Force la suppression du contour bleu au focus */
+            border: none !important; /* Supprime toute bordure au focus */
+            box-shadow: 0 3px 8px rgba(160, 141, 128, 0.15);
+        }
+
+        .activity-item:focus-visible {
+            outline: none !important; /* Supprime le contour pour focus-visible */
+            border: none !important;
+        }
+
+        /* Supprime tous les contours bleus pour tous les éléments d'activité */
+        .activity-item, .activity-item * {
+            outline: none !important;
+            border: none !important;
         }
 
         .activity-item:hover {
-            transform: translateX(2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transform: translateX(2px) translateY(-1px);
+            box-shadow: 0 3px 8px rgba(160, 141, 128, 0.15);
         }
 
         .activity-item.inprogress {
-            background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-            border-left-color: #8C7B71;
+            background: rgba(160, 141, 128, 0.12);
+            border-left-color: rgba(160, 141, 128, 0.7);
+            color: #5D4E37;
         }
 
         .activity-item.completed {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            border-left-color: #45a049;
+            background: rgba(139, 115, 85, 0.1);
+            border-left-color: rgba(139, 115, 85, 0.6);
+            color: #4A3728;
         }
 
         .activity-item.planned {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            border-left-color: #1976D2;
+            background: rgba(180, 165, 150, 0.08);
+            border-left-color: rgba(180, 165, 150, 0.5);
+            color: #6B5B4F;
         }
 
-
+        .activities-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            width: 100%;
+            flex-grow: 1;
+        }
 
         /* Enhanced Day view styles - Timeline Design */
         .day-view {

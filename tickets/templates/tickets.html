@@ -181,40 +181,43 @@
 
         /* Badges avec coins arrondis et couleurs alignées sur le thème */
         .status-badge, .priority-badge {
-            padding: 6px 14px;
+            padding: 8px 18px; /* Augmenté de 6px 14px à 8px 18px pour plus d'espace */
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             display: inline-block;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            min-width: 85px; /* Largeur minimale pour uniformiser les badges */
+            text-align: center; /* Centrer le texte dans le badge */
         }
 
-        /* Couleurs pour les statuts - Thème nude/beige */
+        /* Couleurs pour les statuts - Thème nude/beige clair */
         .status-active {
-            background-color: #8B7355; /* Brun doré pour ouvert/en cours */
+            background-color: #C4A484; /* Beige doré clair pour ouvert/en cours */
             color: #FFFFFF;
+            padding: 8px 20px; /* Padding spécifique plus généreux pour "en cours" */
         }
 
         .status-inactive {
-            background-color: #A08D80; /* Beige foncé pour fermé/résolu */
-            color: #FFFFFF;
+            background-color: #E8DDD4; /* Beige très clair pour fermé/résolu */
+            color: #8B7355;
         }
 
-        /* Couleurs pour les priorités - Tons chauds */
+        /* Couleurs pour les priorités - Tons beige clairs */
         .priority-high {
-            background-color: #B8860B; /* Or foncé pour haute priorité */
-            color: #FFFFFF;
+            background-color: #D4B896; /* Beige sable clair pour haute priorité */
+            color: #6B5B4F;
         }
 
         .priority-medium {
-            background-color: #CD853F; /* Brun sable pour priorité moyenne */
-            color: #FFFFFF;
+            background-color: #E6D7C3; /* Beige nude très doux pour priorité moyenne */
+            color: #8B7355;
         }
 
         .priority-low {
-            background-color: #D2B48C; /* Beige clair pour basse priorité */
-            color: #3F3C3A;
+            background-color: #F2EDE6; /* Beige très clair pour basse priorité */
+            color: #A08D80;
         }
 
         /* Ajustements visuels pour les tables générales */
@@ -290,7 +293,14 @@
                     </div>
                     <!-- Bouton d'ajout de ticket - seulement pour ADMIN et MANAGER -->
                     {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
-                    <button class="add-ticket-btn" onclick="window.location.href='{% url 'create_ticket' %}'">Ajouter un Ticket</button>
+                    <button class="add-ticket-btn group relative" onclick="window.location.href='{% url 'create_ticket' %}'">
+                        <span class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <span class="font-medium">Ajouter un Ticket</span>
+                        </span>
+                    </button>
                     {% endif %}
                 </div>
                 <div class="px-4 py-3">
@@ -381,8 +391,8 @@
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ticket.created_at|date:"Y-m-d" }}</td>
                                     {% if user_role == 'ADMIN' %}
                                     <td class="px-4 py-5 text-center" onclick="event.stopPropagation();">
-                                        <a href="{% url 'edit_ticket' ticket.id %}" class="text-[#A08D80] hover:underline text-sm font-medium">Edit</a> |
-                                        <a href="#" onclick="confirmDelete({{ ticket.id }})" class="text-[#A08D80] hover:underline text-sm font-medium">Delete</a>
+                                        <a href="{% url 'edit_ticket' ticket.id %}" class="text-[#A08D80] hover:underline text-sm font-medium">Modifier</a> |
+                                        <a href="#" onclick="confirmDelete({{ ticket.id }})" class="text-[#A08D80] hover:underline text-sm font-medium">Supprimer</a>
                                     </td>
                                     {% endif %}
                                 </tr>

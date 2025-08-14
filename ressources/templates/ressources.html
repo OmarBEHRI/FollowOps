@@ -204,15 +204,15 @@
             letter-spacing: 0.5px;
         }
 
-        /* Couleurs pour les statuts - Thème nude/beige */
+        /* Couleurs pour les statuts - Thème nude/beige clair */
         .status-active {
-            background-color: #8B7355; /* Brun doré pour actif */
+            background-color: #C4A484; /* Beige doré clair pour actif */
             color: #FFFFFF;
         }
 
         .status-inactive {
-            background-color: #A08D80; /* Beige foncé pour inactif */
-            color: #FFFFFF;
+            background-color: #E8DDD4; /* Beige très clair pour inactif */
+            color: #8B7355;
         }
 
         /* Styles pour la barre d'availability (sur la page Ressources) */
@@ -226,13 +226,13 @@
             width: 80px;
             height: 8px;
             border-radius: 4px;
-            background-color: #E0E0E0; /* Gris clair pour le fond */
+            background-color: #F2EDE6; /* Beige très clair pour le fond */
             overflow: hidden;
         }
 
         .availability-bar {
             height: 100%;
-            background-color: #8B7355; /* Brun doré pour la barre de disponibilité */
+            background-color: #C4A484; /* Beige doré clair pour la barre de disponibilité */
             border-radius: 4px;
         }
 
@@ -390,8 +390,20 @@
                             </thead>
                                 <tbody>
                                     {% for ressource in ressources %}
+                                    {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
                                     <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='/ressources/details/{{ ressource.id }}/'">
+                                    {% else %}
+                                    <tr class="border-t border-t-[#e3dfd3]">
+                                    {% endif %}
+                                        {% if ressource.id == user.id %}
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-center">
+                                            <a href="/ressources/details/{{ ressource.id }}/" class="text-[#A08D80] hover:underline cursor-pointer">
+                                                {{ ressource.first_name }} {{ ressource.last_name }}
+                                            </a>
+                                        </td>
+                                        {% else %}
                                         <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ ressource.first_name }} {{ ressource.last_name }}</td>
+                                        {% endif %}
                                         <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.role }}</td>
                                         {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
                                         <td class="status-cell px-4 py-5 text-center">
