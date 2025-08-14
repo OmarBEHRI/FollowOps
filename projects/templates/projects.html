@@ -453,6 +453,8 @@
                     <div class="flex min-w-72 flex-col gap-3">
                         <p class="text-[#191610] tracking-light text-[32px] font-bold leading-tight">Projets</p>
                     </div>
+                    <!-- Bouton de création de projet - seulement pour ADMIN et MANAGER -->
+                    {% if can_create_project %}
                     <button class="add-project-btn group relative" onclick="window.location.href='{% url 'create_project' %}'">
                         <span class="flex items-center space-x-2">
                             <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,6 +463,7 @@
                             <span class="font-medium">Créer un Projet</span>
                         </span>
                     </button>
+                    {% endif %}
                 </div>
                 
                 <!-- Barre de recherche comme dans la page tickets -->

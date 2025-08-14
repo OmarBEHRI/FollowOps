@@ -293,8 +293,25 @@
                                 <button id="prevMonthTicket" class="calendar-nav-button">◀</button>
                                 <h3 id="month-year-display" class="text-xl font-semibold text-[#191610]">Mois Année</h3>
                                 <div class="flex items-center gap-2">
-                                    <button id="add-activity-btn" class="px-4 py-2 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-lg hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg">+ Ajouter une activité</button>
-                                    <button id="back-to-month" class="px-4 py-2 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-lg hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg hidden">Retour au mois</button>
+                                    <button id="add-activity-btn" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20">
+                                        <span class="flex items-center space-x-2">
+                                            <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            <span class="font-medium">Ajouter une activité</span>
+                                        </span>
+                                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </button>
+                                    
+                                    <button id="back-to-month" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20 hidden">
+                                        <span class="flex items-center space-x-2">
+                                            <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                            </svg>
+                                            <span class="font-medium">Retour au mois</span>
+                                        </span>
+                                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </button>
                                     <button id="nextMonthTicket" class="calendar-nav-button">▶</button>
                                 </div>
                             </div>
@@ -826,14 +843,28 @@
     width: 100%;
     background-color: var(--bg-white);
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--calendar-border);
+    max-width: 100%;
+    margin-bottom: 2rem;
+    min-height: 400px;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background-color: var(--border-color);
+    gap: 2px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: var(--bg-light);
+    margin-bottom: 0.5rem;
+    width: 100%;
+    min-height: 600px;
 }
 
 .calendar-day-header {
@@ -848,14 +879,19 @@
 }
 
 .calendar-cell {
+    background-color: var(--bg-light);
+    min-height: 80px;
+    height: auto;
+    max-height: 120px;
+    padding: 0.25rem 0.3rem 0.1rem 0.3rem;
     display: flex;
     flex-direction: column;
-    min-height: 120px;
-    background-color: var(--bg-white);
-    padding: 0.75rem;
+    align-items: flex-start;
     position: relative;
+    border-radius: 0.25rem;
+    transition: box-shadow 0.15s;
+    overflow: hidden;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .calendar-cell:hover {
@@ -908,7 +944,6 @@
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--bg-white);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -916,26 +951,31 @@
     position: relative;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px rgba(160, 141, 128, 0.08);
 }
 
 .activity-item:hover {
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateX(2px) translateY(-1px);
+    box-shadow: 0 3px 8px rgba(160, 141, 128, 0.15);
 }
 
 .activity-item.inprogress {
-    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-    border-left-color: #8C7B71;
+    background: rgba(160, 141, 128, 0.12);
+    border-left-color: rgba(160, 141, 128, 0.7);
+    color: #5D4E37;
 }
 
 .activity-item.completed {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    border-left-color: #45a049;
+    background: rgba(139, 115, 85, 0.1);
+    border-left-color: rgba(139, 115, 85, 0.6);
+    color: #4A3728;
 }
 
 .activity-item.planned {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
-    border-left-color: #1976D2;
+    background: rgba(180, 165, 150, 0.08);
+    border-left-color: rgba(180, 165, 150, 0.5);
+    color: #6B5B4F;
 }
 
 /* Enhanced Activity Tooltip */
@@ -1115,49 +1155,57 @@
     position: relative;
     margin-bottom: 0.75rem;
     padding: 0.75rem;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 0.875rem;
-    color: var(--bg-white);
+    color: #5D4E37;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.1);
 }
 
 .day-activity:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(4px) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(160, 141, 128, 0.2);
 }
 
 .day-activity.inprogress {
-    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-    border-left-color: #8C7B71;
+    background: rgba(160, 141, 128, 0.15);
+    border-left-color: rgba(160, 141, 128, 0.8);
+    color: #5D4E37;
 }
 
 .day-activity.completed {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    border-left-color: #45a049;
+    background: rgba(139, 115, 85, 0.12);
+    border-left-color: rgba(139, 115, 85, 0.7);
+    color: #4A3728;
 }
 
 .day-activity.planned {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
-    border-left-color: #1976D2;
+    background: rgba(180, 165, 150, 0.1);
+    border-left-color: rgba(180, 165, 150, 0.6);
+    color: #6B5B4F;
 }
 
 .day-activity-title {
     font-weight: 600;
     margin-bottom: 0.25rem;
+    color: #5D4E37;
 }
 
 .day-activity-time {
     font-size: 0.75rem;
-    opacity: 0.9;
+    opacity: 0.8;
     margin-bottom: 0.25rem;
+    color: #8B7355;
 }
 
 .day-activity-description {
     font-size: 0.8rem;
     line-height: 1.4;
-    opacity: 0.95;
+    opacity: 0.85;
+    color: #6B5B4F;
 }
 
 .hidden {
