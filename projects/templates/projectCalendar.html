@@ -239,15 +239,7 @@
         width: 100%;
     }
 
-    .day-view-header {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: var(--text-color-dark);
-        margin-bottom: 1.5rem;
-        text-align: center;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--border-color);
-    }
+
 
     .day-view-content {
         display: grid;
@@ -471,7 +463,6 @@
                         <!-- Les en-têtes des jours seront générés par JavaScript -->
                     </div>
                     <div id="day-view" class="day-view hidden">
-                        <div id="day-view-header" class="day-view-header">Jour</div>
                         <div id="day-view-content" class="day-view-content">
                             <!-- Le contenu de la vue journalière sera généré par JavaScript -->
                         </div>
@@ -658,7 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const backToMonthBtn = document.getElementById('back-to-month');
     const addActivityBtn = document.getElementById('add-activity-btn');
     const dayView = document.getElementById('day-view');
-    const dayViewHeader = document.getElementById('day-view-header');
     const dayViewContent = document.getElementById('day-view-content');
     
     // Variables pour le modal d'ajout d'activité
@@ -840,14 +830,36 @@ document.addEventListener('DOMContentLoaded', function() {
         backToMonthBtn.classList.remove('hidden');
         addActivityBtn.classList.add('hidden');
 
-        // Mettre à jour l'en-tête
+        // Mettre à jour l'en-tête du calendrier pour afficher le jour actuel
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        dayViewHeader.textContent = dayDate.toLocaleDateString('fr-FR', {
+        monthYearDisplay.textContent = dayDate.toLocaleDateString('fr-FR', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
+
+        // Utiliser les activités passées en paramètre ou filtrer depuis la source globale
+        let dayActivities;
+        if (activities !== null && activities !== undefined) {
+            // Utiliser les activités passées (cas du clic initial sur une cellule)
+            dayActivities = activities;
+        } else {
+            // Filtrer depuis la source globale (cas de la navigation avec les flèches)
+            const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            dayActivities = projectActivities.filter(activity => {
+                const activityStartDate = new Date(activity.startDate);
+                const activityEndDate = new Date(activity.endDate);
+
+                // Normaliser les dates pour comparer seulement les jours (sans les heures)
+                const cellDateOnly = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+                const startDateOnly = new Date(activityStartDate.getFullYear(), activityStartDate.getMonth(), activityStartDate.getDate());
+                const endDateOnly = new Date(activityEndDate.getFullYear(), activityEndDate.getMonth(), activityEndDate.getDate());
+
+                // L'activité est affichée si le jour de la cellule est entre le début et la fin de l'activité (inclus)
+                return cellDateOnly >= startDateOnly && cellDateOnly <= endDateOnly;
+            });
+        }
 
         // Générer le contenu de la vue journalière
         dayViewContent.innerHTML = '';
@@ -862,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hourActivities.className = 'hour-activities';
 
             // Filtrer les activités pour cette heure
-            const hourActivitiesList = activities.filter(activity => {
+            const hourActivitiesList = dayActivities.filter(activity => {
                 const activityHour = new Date(activity.startDate).getHours();
                 return activityHour === hour;
             });
@@ -901,6 +913,18 @@ document.addEventListener('DOMContentLoaded', function() {
             dayViewContent.appendChild(hourLabel);
             dayViewContent.appendChild(hourActivities);
         }
+
+        // Afficher un message si aucune activité n'est trouvée
+        if (dayActivities.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-day-message';
+            emptyMessage.textContent = 'Aucune activité prévue pour cette journée';
+            emptyMessage.style.gridColumn = '1 / -1';
+            emptyMessage.style.textAlign = 'center';
+            emptyMessage.style.padding = '2rem';
+            emptyMessage.style.color = 'var(--text-color-medium)';
+            dayViewContent.appendChild(emptyMessage);
+        }
     };
 
     // Fonction pour revenir à la vue mensuelle
@@ -913,36 +937,57 @@ document.addEventListener('DOMContentLoaded', function() {
         dayView.classList.add('hidden');
         backToMonthBtn.classList.add('hidden');
         addActivityBtn.classList.remove('hidden');
+        
+        // Remettre l'affichage du mois et de l'année dans l'en-tête
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        monthYearDisplay.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     };
 
     // Événements de navigation
     prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        currentMonth = currentDate.getMonth() + 1;
-        currentYear = currentDate.getFullYear();
-        const monthName = currentDate.toLocaleDateString('fr-FR', {
-            month: 'long',
-            year: 'numeric'
-        });
-        // Capitalize first letter
-        monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
         if (isMonthView) {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            currentMonth = currentDate.getMonth() + 1;
+            currentYear = currentDate.getFullYear();
+            const monthName = currentDate.toLocaleDateString('fr-FR', {
+                month: 'long',
+                year: 'numeric'
+            });
+            // Capitalize first letter
+            monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
             renderCalendar();
+        } else {
+            // Navigation entre les jours
+            const prevDay = selectedDay - 1;
+            const prevDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), prevDay);
+            if (prevDate.getMonth() === currentDate.getMonth() && prevDay > 0) {
+                // Passer null pour forcer le filtrage dans showDayView
+                showDayView(prevDay, null);
+            }
         }
     });
 
     nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        currentMonth = currentDate.getMonth() + 1;
-        currentYear = currentDate.getFullYear();
-        const monthName = currentDate.toLocaleDateString('fr-FR', {
-            month: 'long',
-            year: 'numeric'
-        });
-        // Capitalize first letter
-        monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
         if (isMonthView) {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            currentMonth = currentDate.getMonth() + 1;
+            currentYear = currentDate.getFullYear();
+            const monthName = currentDate.toLocaleDateString('fr-FR', {
+                month: 'long',
+                year: 'numeric'
+            });
+            // Capitalize first letter
+            monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
             renderCalendar();
+        } else {
+            // Navigation entre les jours
+            const nextDay = selectedDay + 1;
+            const nextDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), nextDay);
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            if (nextDate.getMonth() === currentDate.getMonth() && nextDay <= daysInMonth) {
+                // Passer null pour forcer le filtrage dans showDayView
+                showDayView(nextDay, null);
+            }
         }
     });
 

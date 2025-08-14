@@ -163,15 +163,7 @@
             width: 100%;
         }
 
-        .day-view-header {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--text-color-dark);
-            margin-bottom: 1.5rem;
-            text-align: center;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border-color);
-        }
+
 
         .day-view-content {
             display: grid;
@@ -544,7 +536,6 @@
                             <!-- Les en-têtes des jours seront générés par JavaScript -->
                         </div>
                         <div id="day-view" class="day-view hidden">
-                            <div id="day-view-header" class="day-view-header">Jour</div>
                             <div id="day-view-content" class="day-view-content">
                                 <!-- Le contenu de la vue journalière sera généré par JavaScript -->
                             </div>
@@ -943,7 +934,6 @@
       const nextMonthBtn = document.getElementById('nextMonthResource');
       const backToMonthBtn = document.getElementById('back-to-month');
       const dayView = document.getElementById('day-view');
-      const dayViewHeader = document.getElementById('day-view-header');
       const dayViewContent = document.getElementById('day-view-content');
       
       // Variables pour le modal d'ajout d'activité
@@ -1204,9 +1194,9 @@
           addActivityBtn.style.display = 'none';
         }
         
-        // Mettre à jour l'en-tête de la vue journalière
+        // Mettre à jour l'en-tête du calendrier pour afficher le jour actuel
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        dayViewHeader.textContent = date.toLocaleDateString('fr-FR', options);
+        monthYearDisplay.textContent = date.toLocaleDateString('fr-FR', options);
         
         // Effacer le contenu précédent de la vue journalière
         dayViewContent.innerHTML = '';
@@ -1414,6 +1404,10 @@
         if (addBtn) {
           addBtn.style.display = '';
         }
+        
+        // Remettre l'affichage du mois et de l'année dans l'en-tête
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        monthYearDisplay.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
       };
 
       // Navigation entre les mois/jours
