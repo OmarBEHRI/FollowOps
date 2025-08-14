@@ -56,9 +56,11 @@ class Activity(models.Model):
         if self.start_datetime and self.end_datetime and self.start_datetime >= self.end_datetime:
             raise ValidationError({'end_datetime': 'End time must be after start time'})
             
-        # Ensure both dates are on the same day
-        if self.start_datetime and self.end_datetime and self.start_datetime.date() != self.end_datetime.date():
-            raise ValidationError('Start and end times must be on the same day')
+        # Allow multi-day activities but limit to 7 days maximum
+        if self.start_datetime and self.end_datetime:
+            duration_days = (self.end_datetime.date() - self.start_datetime.date()).days
+            if duration_days > 7:
+                raise ValidationError('Activity cannot span more than 7 days')
     
     def save(self, *args, **kwargs):
         # Calculate charge (working hours) before saving

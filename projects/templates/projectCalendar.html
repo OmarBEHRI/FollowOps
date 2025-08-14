@@ -1,425 +1,409 @@
 {% extends "projectDetailsBase.html" %}
+{% load dict_extras %}
 
 {% block extra_styles %}
 <style>
-:root {
-    --primary-color: #A08D80;
-    --secondary-color: #8C7B71;
-    --accent-color: #D4C4B0;
-    --bg-white: #FFFFFF;
-    --bg-light: #F9F8F7;
-    --text-color-dark: #191610;
-    --text-color-medium: #8C7E5A;
-    --text-color-light: #B8B4A8;
-    --border-color: #E3DFD3;
-    --button-bg-light: #F1EFE9;
-    --nav-link-color: #191610;
-}
+    :root {
+        --primary-color: #A08D80;
+        --secondary-color: #8C7B71;
+        --accent-color: #D4C4B0;
+        --bg-white: #FFFFFF;
+        --bg-light: #F9F8F7;
+        --text-color-dark: #191610;
+        --text-color-medium: #8C7E5A;
+        --text-color-light: #B8B4A8;
+        --border-color: #E3DFD3;
+        --button-bg-light: #F1EFE9;
+        --nav-link-color: #191610;
+    }
 
-/* Enhanced Calendar styles */
-.calendar-container {
-    position: relative;
-    width: 100%;
-    background-color: var(--bg-white);
-    border-radius: 12px;
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-}
+    /* Enhanced Calendar styles */
+    .calendar-container {
+        position: relative;
+        width: 100%;
+        background-color: var(--bg-white);
+        border-radius: 12px;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+    }
 
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    overflow: hidden;
-    background-color: var(--bg-light);
-    margin-bottom: 0.5rem;
-    width: 100%;
-    min-height: 600px;
-}
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background-color: var(--bg-light);
+        margin-bottom: 0.5rem;
+        width: 100%;
+        min-height: 600px;
+        aspect-ratio: 7/6;
+    }
 
-.calendar-cell {
-    background-color: var(--bg-light);
-    min-height: 80px;
-    height: auto;
-    max-height: 120px;
-    padding: 0.25rem 0.3rem 0.1rem 0.3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    position: relative;
-    border-radius: 0.25rem;
-    transition: box-shadow 0.15s;
-    overflow: hidden;
-    cursor: pointer;
-}
+    @media (max-width: 768px) {
+        .calendar-grid {
+            min-height: 500px;
+            aspect-ratio: 7/8;
+        }
+    }
 
-.calendar-day-header {
-    font-weight: 600;
-    color: var(--text-color-medium);
-    text-align: center;
-    padding: 1rem 0.5rem;
-    background-color: var(--bg-light);
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+    .calendar-cell {
+        background-color: var(--bg-light);
+        height: 120px;
+        width: 100%;
+        max-height: 120px;
+        max-width: 100%;
+        padding: 0.25rem 0.3rem 0.1rem 0.3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+        border-radius: 0.25rem;
+        transition: box-shadow 0.15s;
+        overflow: hidden;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
 
-.calendar-cell:hover {
-    background-color: var(--bg-light);
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-}
+    .calendar-day-header {
+        font-weight: 600;
+        color: var(--text-color-medium);
+        text-align: center;
+        padding: 1rem 0.5rem;
+        background-color: var(--bg-light);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-.calendar-cell.inactive {
-    background-color: #F8F6F3;
-    color: #C7B299;
-    cursor: default;
-}
+    .calendar-cell:hover {
+        background-color: var(--bg-light);
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+    }
 
-.calendar-cell.inactive:hover {
-    transform: none;
-    box-shadow: none;
-    background-color: #F8F6F3;
-}
+    .calendar-cell.inactive {
+        background-color: #F8F6F3;
+        color: #C7B299;
+        cursor: default;
+    }
 
-.calendar-cell.today {
-    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-    color: var(--bg-white);
-}
+    .calendar-cell.inactive:hover {
+        transform: none;
+        box-shadow: none;
+        background-color: #F8F6F3;
+    }
 
-.calendar-cell.today .calendar-date {
-    color: var(--bg-white);
-    font-weight: 700;
-}
+    .calendar-cell.today {
+        background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+        color: var(--bg-white);
+    }
 
-.calendar-date {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-color-dark);
-    margin-bottom: 0.5rem;
-    align-self: flex-start;
-}
+    .calendar-cell.today .calendar-date {
+        color: var(--bg-white);
+        font-weight: 700;
+    }
 
-.activities-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-    flex-grow: 1;
-}
+    .calendar-date {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-color-dark);
+        margin-bottom: 0.3rem;
+        align-self: flex-start;
+        flex-shrink: 0;
+        line-height: 1;
+    }
 
-.activity-item {
-    padding: 0.375rem 0.5rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--bg-white);
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
-}
+    .activities-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        width: 100%;
+        flex-grow: 1;
+        overflow: hidden;
+        position: relative;
+    }
 
-.activity-item:hover {
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
+    .activity-item {
+        padding: 0.25rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--bg-white);
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: relative;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+        min-height: 20px;
+        max-height: 20px;
+        line-height: 1.2;
+    }
 
-.activity-item.inprogress {
-    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-    border-left-color: #8C7B71;
-}
+    .activity-item:hover {
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
 
-.activity-item.completed {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    border-left-color: #45a049;
-}
+    .activity-item.inprogress {
+        background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+        border-left-color: #8C7B71;
+    }
 
-.activity-item.planned {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
-    border-left-color: #1976D2;
-}
+    .more-activities {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--text-color-medium);
+        text-align: center;
+        background-color: var(--bg-white);
+        border-radius: 4px;
+        padding: 0.2rem;
+        border: 1px dashed var(--border-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 0.1rem;
+        z-index: 5;
+        position: relative;
+        flex-shrink: 0;
+    }
 
+    .more-activities:hover {
+        background-color: var(--primary-color);
+        color: var(--bg-white);
+        border-color: var(--primary-color);
+    }
 
+    /* Tooltip styles */
+    .activity-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
 
-.more-activities {
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: var(--text-color-medium);
-    text-align: center;
-    background-color: var(--bg-light);
-    border-radius: 4px;
-    padding: 0.25rem;
-    border: 1px dashed var(--border-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+    .activity-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: rgba(0, 0, 0, 0.9);
+    }
 
-.more-activities:hover {
-    background-color: var(--primary-color);
-    color: var(--bg-white);
-    border-color: var(--primary-color);
-}
+    .activity-item:hover .activity-tooltip {
+        opacity: 1;
+    }
 
-/* Enhanced Day view styles */
-.day-view {
-    background-color: var(--bg-light);
-    border-radius: 12px;
-    padding: 1.5rem;
-    width: 100%;
-}
+    .activity-tooltip-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
 
-.day-view-header {
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--text-color-dark);
-    margin-bottom: 1.5rem;
-    text-align: center;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
-}
+    .activity-tooltip-info {
+        font-size: 0.7rem;
+        opacity: 0.9;
+        margin-bottom: 0.125rem;
+    }
 
-.day-view-content {
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    gap: 1rem;
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-}
+    .activity-tooltip-description {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        max-width: 200px;
+        white-space: normal;
+    }
 
-.day-view-content::-webkit-scrollbar {
-    width: 6px;
-}
+    /* Day view styles */
+    .day-view {
+        background-color: var(--bg-light);
+        border-radius: 12px;
+        padding: 1.5rem;
+        width: 100%;
+    }
 
-.day-view-content::-webkit-scrollbar-track {
-    background: var(--bg-light);
-    border-radius: 3px;
-}
+    .day-view-header {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--text-color-dark);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
 
-.day-view-content::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 3px;
-}
+    .day-view-content {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: 1rem;
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
 
-.hour-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: rgba(93, 78, 55, 0.7);
-    text-align: right;
-    padding-right: 1rem;
-    line-height: 3rem;
-    position: sticky;
-    top: 0;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(251, 250, 249, 0.9));
-    backdrop-filter: blur(5px);
-}
+    .hour-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(93, 78, 55, 0.7);
+        text-align: right;
+        padding-right: 1rem;
+        line-height: 3rem;
+    }
 
-.hour-activities {
-    position: relative;
-    min-height: 3rem;
-    border-left: 2px solid rgba(160, 141, 128, 0.3);
-    padding-left: 1rem;
-    padding-bottom: 0.5rem;
-}
+    .hour-activities {
+        position: relative;
+        min-height: 3rem;
+        border-left: 2px solid rgba(160, 141, 128, 0.3);
+        padding-left: 1rem;
+        padding-bottom: 0.5rem;
+    }
 
-.hour-activities::before {
-    content: '';
-    position: absolute;
-    left: -4px;
-    top: 1.5rem;
-    width: 6px;
-    height: 6px;
-    background: linear-gradient(45deg, rgba(160, 141, 128, 0.6), rgba(139, 115, 85, 0.8));
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px rgba(160, 141, 128, 0.2);
-}
+    .day-activity {
+        position: relative;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        color: #5D4E37;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(160, 141, 128, 0.1);
+    }
 
-.day-activity {
-    position: relative;
-    margin-bottom: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    color: #5D4E37;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.1);
-}
+    .day-activity:hover {
+        transform: translateX(4px) translateY(-2px);
+        box-shadow: 0 6px 20px rgba(160, 141, 128, 0.2);
+    }
 
-.day-activity:hover {
-    transform: translateX(4px) translateY(-2px);
-    box-shadow: 0 6px 20px rgba(160, 141, 128, 0.2);
-}
+    .day-activity-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #5D4E37;
+    }
 
-.day-activity.inprogress {
-    background: rgba(160, 141, 128, 0.15);
-    border-left-color: rgba(160, 141, 128, 0.8);
-    color: #5D4E37;
-}
+    .day-activity-time {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        margin-bottom: 0.25rem;
+        color: #8B7355;
+    }
 
-.day-activity.completed {
-    background: rgba(139, 115, 85, 0.12);
-    border-left-color: rgba(139, 115, 85, 0.7);
-    color: #4A3728;
-}
+    .day-activity-description {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        opacity: 0.85;
+        color: #6B5B4F;
+    }
 
-.day-activity.planned {
-    background: rgba(180, 165, 150, 0.1);
-    border-left-color: rgba(180, 165, 150, 0.6);
-    color: #6B5B4F;
-}
+    /* Navigation buttons */
+    .calendar-nav-button {
+        background: linear-gradient(135deg, var(--primary-color), #8C7B71);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
 
-.day-activity-title {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #5D4E37;
-}
+    .calendar-nav-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(160, 141, 128, 0.3);
+    }
 
-.day-activity-time {
-    font-size: 0.75rem;
-    opacity: 0.8;
-    margin-bottom: 0.25rem;
-    color: #8B7355;
-}
+    /* Calendar header styles */
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 1rem 0;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-.day-activity-description {
-    font-size: 0.8rem;
-    line-height: 1.4;
-    opacity: 0.85;
-    color: #6B5B4F;
-}
+    .calendar-header h3 {
+        flex: 1;
+        text-align: center;
+        margin: 0;
+        white-space: nowrap;
+        min-width: 200px;
+    }
 
-.empty-day-message {
-    text-align: center;
-    color: var(--text-color-light);
-    font-style: italic;
-    font-size: 0.8rem;
-    padding: 2rem;
-}
+    .calendar-header .flex {
+        flex-shrink: 0;
+    }
 
-/* Navigation improvements */
+    @media (max-width: 768px) {
+        .calendar-header {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
+        .calendar-header h3 {
+            order: 1;
+            width: 100%;
+        }
 
+        .calendar-header button:first-child {
+            order: 0;
+        }
 
+        .calendar-header .flex {
+            order: 2;
+            width: 100%;
+            justify-content: center;
+        }
 
-#back-to-month {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(160, 141, 128, 0.3);
-}
+        .calendar-header button:last-child {
+            order: 3;
+        }
+    }
 
-#back-to-month:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(160, 141, 128, 0.4);
-}
+    /* Modal styles */
+    .hidden {
+        display: none !important;
+    }
 
-/* Style pour le bouton Ajouter une activité */
-#add-activity-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-    min-width: 140px;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-}
+    .modal-show {
+        display: flex !important;
+    }
 
-#add-activity-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(160, 141, 128, 0.4);
-}
+    .modal-show .modal-content {
+        transform: scale(1) !important;
+        opacity: 1 !important;
+    }
 
-#add-activity-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(160, 141, 128, 0.3);
-}
-
-#add-activity-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(160, 141, 128, 0.3);
-}
-
-/* Styles pour le modal */
-.hidden {
-    display: none !important;
-}
-
-/* Animations pour le modal */
-.modal-show {
-    display: flex !important;
-}
-
-.modal-show .modal-content {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.modal-hidden {
-    display: none;
-}
-
-.modal-content {
-    transition: all 0.3s ease;
-}
-
-/* Styles pour l'en-tête du calendrier */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem 0;
-}
-
-/* Styles pour les boutons de navigation du calendrier */
-.calendar-nav-button {
-    background: linear-gradient(135deg, var(--primary-color), #8C7B71);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.calendar-nav-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(160, 141, 128, 0.3);
-}
+    .modal-content {
+        transition: all 0.3s ease;
+        transform: scale(0.95);
+        opacity: 0;
+    }
 </style>
 {% endblock %}
 
@@ -432,29 +416,56 @@
             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
                 <div class="calendar-header">
                     <button id="prevMonthProject" class="calendar-nav-button">◀</button>
-                    <h3 id="month-year-display" class="text-xl font-semibold text-[#191610]">{{ month_name }} {{ current_year }}</h3>
+                    <h3 id="month-year-display" class="text-xl font-semibold text-[#191610]">{{ month_name|capfirst }}
+                        {{ current_year }}</h3>
                     <div class="flex items-center gap-2">
-                        <button id="add-activity-btn" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20">
+                        <button id="add-activity-btn"
+                            class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20">
                             <span class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
                                 <span class="font-medium">Ajouter une activité</span>
                             </span>
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </button>
-                        <button id="back-to-month" class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20 hidden">
+                        <button id="back-to-month"
+                            class="group relative px-6 py-3 bg-gradient-to-r from-[#a08d80]/90 to-[#8b7355]/90 backdrop-blur-md text-white rounded-2xl hover:from-[#8b7355]/95 hover:to-[#a08d80]/95 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl border border-white/20 hidden">
                             <span class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1 duration-300"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7"></path>
                                 </svg>
                                 <span class="font-medium">Retour au mois</span>
                             </span>
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </button>
                         <button id="nextMonthProject" class="calendar-nav-button">▶</button>
                     </div>
                 </div>
+
+                <!-- Member Legend -->
+                <div class="mb-4 p-4 bg-[#f8f6f3] rounded-xl border border-[#e3dfd3]">
+                    <h4 class="text-sm font-semibold text-[#191610] mb-3 flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                        <span>Membres du projet</span>
+                    </h4>
+                    <div class="flex flex-wrap gap-3">
+                        {% for member in project_members %}
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                                style="background-color: {{ member_colors|get_item:member.id }}"></div>
+                            <span class="text-sm text-[#191610]">{{ member.first_name }} {{ member.last_name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <div id="calendar-container" class="calendar-container">
                     <div id="calendar-grid" class="calendar-grid">
                         <!-- Les en-têtes des jours seront générés par JavaScript -->
@@ -469,6 +480,172 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- Modal pour ajouter une activité -->
+<div id="addActivityModal"
+    class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+    <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0 modal-content max-h-[90vh] overflow-hidden flex flex-col">
+        <!-- En-tête du modal -->
+        <div class="relative bg-gradient-to-r from-[#a08d80] to-[#8b7355] rounded-t-2xl p-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white">Nouvelle Activité</h3>
+            </div>
+            <button id="closeAddActivityModal"
+                class="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Corps du formulaire -->
+        <div class="flex-1 overflow-y-auto">
+            <form id="addActivityForm" class="p-6 space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+                <!-- Titre -->
+                <div class="space-y-2">
+                    <label for="activityTitle" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <span>Titre</span>
+                    </label>
+                    <input type="text" id="activityTitle" name="title" required
+                        placeholder="Ex: Réunion équipe, Développement feature..."
+                        class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+
+                <!-- Date et heure de début -->
+                <div class="space-y-4">
+                    <div class="bg-[#f8f6f3] rounded-xl p-4 border border-[#e3dfd3]">
+                        <h4 class="text-sm font-semibold text-[#191610] mb-3 flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            <span>Début de l'activité</span>
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="startDate" class="text-sm font-medium text-[#191610]">Date de début</label>
+                                <input type="date" id="startDate" name="start_date" required
+                                    class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-white hover:border-[#a08d80]">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="startTime" class="text-sm font-medium text-[#191610]">Heure de début</label>
+                                <input type="time" id="startTime" name="start_time" required
+                                    class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-white hover:border-[#a08d80]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#f8f6f3] rounded-xl p-4 border border-[#e3dfd3]">
+                        <h4 class="text-sm font-semibold text-[#191610] mb-3 flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                                </path>
+                            </svg>
+                            <span>Fin de l'activité</span>
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="endDate" class="text-sm font-medium text-[#191610]">Date de fin</label>
+                                <input type="date" id="endDate" name="end_date" required
+                                    class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-white hover:border-[#a08d80]">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="endTime" class="text-sm font-medium text-[#191610]">Heure de fin</label>
+                                <input type="time" id="endTime" name="end_time" required
+                                    class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-white hover:border-[#a08d80]">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label for="activityDescription"
+                        class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                        <span>Description</span>
+                    </label>
+                    <textarea id="activityDescription" name="description" rows="3" required
+                        placeholder="Décrivez brièvement cette activité..."
+                        class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80] resize-none"></textarea>
+                </div>
+
+                <!-- Type d'activité -->
+                <div class="space-y-2">
+                    <label for="activityType" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
+                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                            </path>
+                        </svg>
+                        <span>Type d'activité</span>
+                    </label>
+                    <input type="text" id="activityType" name="type" required
+                        placeholder="Ex: Réunion, Développement, Tests, Documentation..."
+                        class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
+                </div>
+
+                <!-- Message d'erreur de validation -->
+                <div id="validationError"
+                    class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span id="validationErrorText">Message d'erreur</span>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div
+                    class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t border-[#e3dfd3]">
+                    <button type="button" id="cancelAddActivity"
+                        class="px-6 py-3 text-[#191610] bg-[#f1efe9] rounded-xl hover:bg-[#e3dfd3] transition-all duration-200 font-medium border-2 border-transparent hover:border-[#e3dfd3] transform hover:scale-105">
+                        <span class="flex items-center justify-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span>Annuler</span>
+                        </span>
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-xl hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <span class="flex items-center justify-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <span>Créer l'activité</span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -510,19 +687,33 @@ document.addEventListener('DOMContentLoaded', function() {
             type: "{{ activity.type|default:'meeting'|escapejs }}",
             description: "{{ activity.description|escapejs }}",
             employee: "{{ activity.employee|escapejs }}",
+            employee_id: {{ activity.employee_id }},
+            employee_color: "{{ activity.employee_color }}",
             charge: {{ activity.charge|default:0 }},
             status: "inprogress"
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     
-    // Ajouter un log pour vérifier les données
-    console.log('Activités chargées:', projectActivities);
-    
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
     // Fonction pour générer le calendrier
     const renderCalendar = () => {
+        console.log('renderCalendar called');
+        if (!calendarGrid) {
+            console.error('calendarGrid not found');
+            return;
+        }
         calendarGrid.innerHTML = '';
-        
+
         // Ajout des en-têtes des jours
         const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
         dayNames.forEach(day => {
@@ -531,70 +722,80 @@ document.addEventListener('DOMContentLoaded', function() {
             dayHeader.textContent = day;
             calendarGrid.appendChild(dayHeader);
         });
-        
+
         // Déterminer le premier jour du mois
         const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const startingDay = firstDay.getDay() || 7; // Convertir 0 (dimanche) en 7 pour le format européen
+        const startingDay = firstDay.getDay() || 7;
         const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-        
+
         // Ajouter des cellules vides pour les jours avant le premier jour du mois
         for (let i = 1; i < startingDay; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'calendar-cell inactive';
             calendarGrid.appendChild(emptyCell);
         }
-        
+
         // Ajouter les cellules pour chaque jour du mois
         const today = new Date();
+        console.log('Creating cells for', daysInMonth, 'days');
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
             cell.className = 'calendar-cell';
-            
+
             // Vérifier si c'est aujourd'hui
-            if (day === today.getDate() && 
-                currentDate.getMonth() === today.getMonth() && 
+            if (day === today.getDate() &&
+                currentDate.getMonth() === today.getMonth() &&
                 currentDate.getFullYear() === today.getFullYear()) {
                 cell.classList.add('today');
             }
-            
+
             // Ajouter la date à la cellule
             const dateSpan = document.createElement('span');
             dateSpan.className = 'calendar-date';
             dateSpan.textContent = day;
             cell.appendChild(dateSpan);
-            
+
             // Conteneur pour les activités
             const activitiesContainer = document.createElement('div');
             activitiesContainer.className = 'activities-container';
-            
-            // Vérifier les activités pour ce jour
+
+            // Vérifier les activités pour ce jour (incluant les activités multi-jours)
             const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const activitiesOnDay = projectActivities.filter(activity => {
-                // Utiliser startDate au lieu de start_date pour la cohérence
-                const activityDate = new Date(activity.startDate);
-                console.log('Comparaison:', {
-                    cellDate: cellDate.toDateString(),
-                    activityDate: activityDate.toDateString(),
-                    day: day,
-                    activityDay: activityDate.getDate(),
-                    match: activityDate.getDate() === day && 
-                           activityDate.getMonth() === currentDate.getMonth() && 
-                           activityDate.getFullYear() === currentDate.getFullYear()
-                });
-                return activityDate.getDate() === day && 
-                       activityDate.getMonth() === currentDate.getMonth() && 
-                       activityDate.getFullYear() === currentDate.getFullYear();
+                const activityStartDate = new Date(activity.startDate);
+                const activityEndDate = new Date(activity.endDate);
+
+                // Normaliser les dates pour comparer seulement les jours (sans les heures)
+                const cellDateOnly = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+                const startDateOnly = new Date(activityStartDate.getFullYear(), activityStartDate.getMonth(), activityStartDate.getDate());
+                const endDateOnly = new Date(activityEndDate.getFullYear(), activityEndDate.getMonth(), activityEndDate.getDate());
+
+                // L'activité est affichée si le jour de la cellule est entre le début et la fin de l'activité (inclus)
+                return cellDateOnly >= startDateOnly && cellDateOnly <= endDateOnly;
             });
-            
-            console.log(`Activités trouvées pour le jour ${day}:`, activitiesOnDay);
-            
+
             // Afficher les activités (maximum 3 visibles)
             const maxVisible = 3;
             activitiesOnDay.slice(0, maxVisible).forEach(activity => {
                 const activityItem = document.createElement('div');
-                activityItem.className = `activity-item ${activity.status || 'inprogress'}`;
+                activityItem.className = 'activity-item';
                 activityItem.textContent = activity.title;
-                
+
+                // Apply member-specific color to the entire activity item
+                if (activity.employee_color) {
+                    activityItem.style.background = activity.employee_color;
+                    activityItem.style.borderLeftColor = activity.employee_color;
+                    activityItem.style.border = `2px solid ${activity.employee_color}`;
+
+                    // Adjust text color based on background brightness
+                    const rgb = hexToRgb(activity.employee_color);
+                    const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+                    activityItem.style.color = brightness > 128 ? '#000000' : '#FFFFFF';
+                } else {
+                    // Fallback to default styling
+                    activityItem.className += ' inprogress';
+                }
+
                 // Ajouter tooltip
                 const tooltip = document.createElement('div');
                 tooltip.className = 'activity-tooltip';
@@ -605,10 +806,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="activity-tooltip-description">${activity.description}</div>
                 `;
                 activityItem.appendChild(tooltip);
-                
+
                 activitiesContainer.appendChild(activityItem);
             });
-            
+
             // Afficher "+ X autres" si il y a plus d'activités
             if (activitiesOnDay.length > maxVisible) {
                 const moreActivities = document.createElement('div');
@@ -616,29 +817,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 moreActivities.textContent = `+ ${activitiesOnDay.length - maxVisible} autres`;
                 activitiesContainer.appendChild(moreActivities);
             }
-            
+
             cell.appendChild(activitiesContainer);
-            
+
             // Ajouter événement de clic pour la vue journalière
             cell.addEventListener('click', () => {
                 showDayView(day, activitiesOnDay);
             });
-            
+
             calendarGrid.appendChild(cell);
         }
     };
-    
+
     // Fonction pour afficher la vue journalière
     const showDayView = (day, activities) => {
         selectedDay = day;
         isMonthView = false;
-        
+
         // Masquer la grille du calendrier et afficher la vue journalière
         calendarGrid.classList.add('hidden');
         dayView.classList.remove('hidden');
         backToMonthBtn.classList.remove('hidden');
         addActivityBtn.classList.add('hidden');
-        
+
         // Mettre à jour l'en-tête
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
         dayViewHeader.textContent = dayDate.toLocaleDateString('fr-FR', {
@@ -647,410 +848,154 @@ document.addEventListener('DOMContentLoaded', function() {
             month: 'long',
             day: 'numeric'
         });
-        
+
         // Générer le contenu de la vue journalière
         dayViewContent.innerHTML = '';
-        
+
         // Créer les créneaux horaires
         for (let hour = 9; hour <= 20; hour++) {
             const hourLabel = document.createElement('div');
             hourLabel.className = 'hour-label';
             hourLabel.textContent = `${hour}:00`;
-            
+
             const hourActivities = document.createElement('div');
             hourActivities.className = 'hour-activities';
-            
+
             // Filtrer les activités pour cette heure
             const hourActivitiesList = activities.filter(activity => {
                 const activityHour = new Date(activity.startDate).getHours();
                 return activityHour === hour;
             });
-            
+
             if (hourActivitiesList.length === 0) {
                 hourActivities.innerHTML = '';
             } else {
                 hourActivitiesList.forEach(activity => {
                     const dayActivity = document.createElement('div');
-                    dayActivity.className = `day-activity ${activity.status || 'inprogress'}`;
+                    dayActivity.className = 'day-activity';
                     dayActivity.innerHTML = `
                         <div class="day-activity-title">${activity.title}</div>
-                        <div class="day-activity-time">${new Date(activity.startDate).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})} - ${new Date(activity.endDate).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}</div>
+                        <div class="day-activity-time">${new Date(activity.startDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(activity.endDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
                         <div class="day-activity-description">${activity.description}</div>
                     `;
+
+                    // Apply member-specific color to day view activities
+                    if (activity.employee_color) {
+                        dayActivity.style.background = `${activity.employee_color}20`; // 20% opacity
+                        dayActivity.style.borderLeftColor = activity.employee_color;
+                        dayActivity.style.borderLeftWidth = '4px';
+
+                        // Adjust text color based on background brightness
+                        const rgb = hexToRgb(activity.employee_color);
+                        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+                        dayActivity.style.color = brightness > 128 ? '#000000' : '#333333';
+                    } else {
+                        // Fallback to default styling
+                        dayActivity.className += ' inprogress';
+                    }
+
                     hourActivities.appendChild(dayActivity);
                 });
             }
-            
+
             dayViewContent.appendChild(hourLabel);
             dayViewContent.appendChild(hourActivities);
         }
     };
-    
+
     // Fonction pour revenir à la vue mensuelle
     const showMonthView = () => {
         isMonthView = true;
         selectedDay = null;
-        
+
         // Afficher la grille du calendrier et masquer la vue journalière
         calendarGrid.classList.remove('hidden');
         dayView.classList.add('hidden');
         backToMonthBtn.classList.add('hidden');
         addActivityBtn.classList.remove('hidden');
     };
-    
+
     // Événements de navigation
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         currentMonth = currentDate.getMonth() + 1;
         currentYear = currentDate.getFullYear();
-        monthYearDisplay.textContent = currentDate.toLocaleDateString('fr-FR', {
+        const monthName = currentDate.toLocaleDateString('fr-FR', {
             month: 'long',
             year: 'numeric'
         });
+        // Capitalize first letter
+        monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
         if (isMonthView) {
             renderCalendar();
         }
     });
-    
+
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         currentMonth = currentDate.getMonth() + 1;
         currentYear = currentDate.getFullYear();
-        monthYearDisplay.textContent = currentDate.toLocaleDateString('fr-FR', {
+        const monthName = currentDate.toLocaleDateString('fr-FR', {
             month: 'long',
             year: 'numeric'
         });
+        // Capitalize first letter
+        monthYearDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
         if (isMonthView) {
             renderCalendar();
         }
     });
-    
+
     backToMonthBtn.addEventListener('click', showMonthView);
-    
-    // Ajouter la gestion du bouton d'ajout d'activité
-    if (addActivityBtn && addActivityModal) {
-        addActivityBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Bouton cliqué - Modal ouvert');
-            
-            // Retirer les classes de masquage et ajouter la classe d'affichage
-            addActivityModal.classList.remove('hidden', 'modal-hidden');
-            addActivityModal.classList.add('modal-show');
-            
-            // Empêcher le scroll du body
-            document.body.style.overflow = 'hidden';
-        });
-    }
-    
-    // Fermer le modal
-    function closeModal() {
-        if (addActivityModal) {
-            addActivityModal.classList.remove('modal-show');
-            addActivityModal.classList.add('modal-hidden');
-            
-            // Restaurer le scroll du body
-            document.body.style.overflow = 'auto';
-            
-            // Réinitialiser le formulaire
-            if (addActivityForm) {
-                addActivityForm.reset();
-            }
-        }
-    }
-    
-    if (closeAddActivityModal) {
-        closeAddActivityModal.addEventListener('click', closeModal);
-    }
-    
-    if (cancelAddActivity) {
-        cancelAddActivity.addEventListener('click', closeModal);
-    }
-    
-    // Fermer le modal en cliquant à l'extérieur
-    if (addActivityModal) {
-        addActivityModal.addEventListener('click', function(e) {
-            if (e.target === addActivityModal) {
-                closeModal();
-            }
-        });
-    }
-    
-    // Rendu initial
-    renderCalendar();
-});
-</script>
 
-<!-- Modal pour ajouter une activité -->
-<div id="addActivityModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0 modal-content max-h-[90vh] overflow-hidden flex flex-col">
-        <!-- En-tête du modal -->
-        <div class="relative bg-gradient-to-r from-[#a08d80] to-[#8b7355] rounded-t-2xl p-6">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-bold text-white">Nouvelle Activité</h3>
-            </div>
-            <button id="closeAddActivityModal" class="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-20">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <!-- Corps du formulaire -->
-        <div class="flex-1 overflow-y-auto">
-            <form id="addActivityForm" class="p-6 space-y-6">
-            {% csrf_token %}
-            
-            <!-- Titre -->
-            <div class="space-y-2">
-                <label for="activityTitle" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <span>Titre</span>
-                </label>
-                <input type="text" id="activityTitle" name="title" required 
-                       placeholder="Ex: Réunion équipe, Développement feature..."
-                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-            </div>
-            
-            <!-- Date -->
-            <div class="space-y-2">
-                <label for="activityDate" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <span>Date</span>
-                </label>
-                <input type="date" id="activityDate" name="date" required 
-                       class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-            </div>
-            
-            <!-- Heures de début et fin -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-2">
-                    <label for="startTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>Heure de début</span>
-                    </label>
-                    <input type="time" id="startTime" name="start_time" required 
-                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-                </div>
-                <div class="space-y-2">
-                    <label for="endTime" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                        <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>Heure de fin</span>
-                    </label>
-                    <input type="time" id="endTime" name="end_time" required 
-                           class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-                </div>
-            </div>
-            
-            <!-- Description -->
-            <div class="space-y-2">
-                <label for="activityDescription" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
-                    </svg>
-                    <span>Description</span>
-                </label>
-                <textarea id="activityDescription" name="description" rows="3" required
-                          placeholder="Décrivez brièvement cette activité..."
-                          class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80] resize-none"></textarea>
-            </div>
-            
-            <!-- Type d'activité -->
-            <div class="space-y-2">
-                <label for="activityType" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <span>Type d'activité</span>
-                </label>
-                <select id="activityType" name="type" required 
-                        class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-                    <option value="">Sélectionner un type</option>
-                    <option value="meeting">Réunion</option>
-                    <option value="development">Développement</option>
-                    <option value="testing">Tests</option>
-                    <option value="documentation">Documentation</option>
-                    <option value="review">Révision</option>
-                    <option value="support">Support</option>
-                    <option value="other">Autre</option>
-                </select>
-            </div>
-            
-            <!-- Ressource liée -->
-            <div class="space-y-2">
-                     <label for="linkedResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                         </svg>
-                         <span>Ressource liée</span>
-                     </label>
-                     <select id="linkedResource" name="linked_resource" 
-                             class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-                         <option value="">Sélectionner une ressource</option>
-                         <option value="project">Projet</option>
-                         <option value="ticket">Ticket</option>
-                     </select>
-            </div>
-            <div id="resourceListContainer" class="space-y-2" style="display: none;">
-                 <label for="specificResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
-                     <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                     </svg>
-                     <span id="resourceListLabel">Sélectionner</span>
-                 </label>
-                 <select id="specificResource" name="specific_resource" 
-                         class="w-full px-4 py-3 border-2 border-[#e3dfd3] rounded-xl focus:ring-2 focus:ring-[#a08d80] focus:border-[#a08d80] transition-all duration-200 bg-[#fbfaf9] hover:border-[#a08d80]">
-                     <option value="">Chargement...</option>
-                 </select>
-             </div>
+    // Set default values for the form
+    function setDefaultFormValues() {
+        const today = new Date();
 
-            <!-- Message d'erreur de validation -->
-            <div id="validationError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span id="validationErrorText">Message d'erreur</span>
-                </div>
-            </div>
-            
-            <!-- Boutons d'action -->
-            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t border-[#e3dfd3]">
-                <button type="button" id="cancelAddActivity" 
-                        class="px-6 py-3 text-[#191610] bg-[#f1efe9] rounded-xl hover:bg-[#e3dfd3] transition-all duration-200 font-medium border-2 border-transparent hover:border-[#e3dfd3] transform hover:scale-105">
-                    <span class="flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        <span>Annuler</span>
-                    </span>
-                </button>
-                <button type="submit" 
-                        class="px-6 py-3 bg-gradient-to-r from-[#a08d80] to-[#8b7355] text-white rounded-xl hover:from-[#8b7355] hover:to-[#a08d80] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
-                    <span class="flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        <span>Créer l'activité</span>
-                    </span>
-                </button>
-            </div>
-         </form>
-         </div>
-     </div>
- </div>
+        // Set default start date to today
+        document.getElementById('startDate').value = today.toISOString().split('T')[0];
+        // Set default end date to today (same day activity by default)
+        document.getElementById('endDate').value = today.toISOString().split('T')[0];
 
-{% endblock %}
-
-{% block active_tab %}{% endblock %}
-
-<script>
-// Code JavaScript pour gérer le modal - DOIT être après le HTML du modal
-document.addEventListener('DOMContentLoaded', function() {
-    // Variables pour le modal d'ajout d'activité
-    const addActivityBtn = document.getElementById('add-activity-btn');
-    const addActivityModal = document.getElementById('addActivityModal');
-    const closeAddActivityModal = document.getElementById('closeAddActivityModal');
-    const cancelAddActivity = document.getElementById('cancelAddActivity');
-    const addActivityForm = document.getElementById('addActivityForm');
-    const linkedResourceSelect = document.getElementById('linkedResource');
-    
-    // Charger les ressources liées au chargement de la page
-    loadLinkedResources();
-    
-    // Fonction pour charger les projets et tickets
-    function loadLinkedResources() {
-        const linkedResourceSelect = document.getElementById('linkedResource');
-        
-        // Vider le select (garder seulement l'option par défaut)
-        linkedResourceSelect.innerHTML = '<option value="">Sélectionner une ressource</option>';
-        
-        // Ajouter l'option pour le projet actuel
-        const currentProjectOption = document.createElement('option');
-        currentProjectOption.value = `project_{{ project.id }}`;
-        currentProjectOption.textContent = '{{ project.title|escapejs }} (Projet actuel)';
-        currentProjectOption.selected = true;
-        linkedResourceSelect.appendChild(currentProjectOption);
-        
-        // Créer les groupes pour organiser les options
-        const projectsGroup = document.createElement('optgroup');
-        projectsGroup.label = 'Autres Projets';
-        
-        const ticketsGroup = document.createElement('optgroup');
-        ticketsGroup.label = 'Tickets';
-        
-        // Charger les autres projets
-        fetch('/projects/api/projects/')
-            .then(response => response.json())
-            .then(projects => {
-                const otherProjects = projects.filter(project => project.id !== {{ project.id }});
-                if (otherProjects.length > 0) {
-                    otherProjects.forEach(project => {
-                        const option = document.createElement('option');
-                        option.value = `project_${project.id}`;
-                        option.textContent = project.name;
-                        projectsGroup.appendChild(option);
-                    });
-                    linkedResourceSelect.appendChild(projectsGroup);
-                }
-            })
-            .catch(error => console.error('Erreur lors du chargement des projets:', error));
-        
-        // Charger les tickets
-        fetch('/tickets/api/tickets/')
-            .then(response => response.json())
-            .then(tickets => {
-                if (tickets.length > 0) {
-                    tickets.forEach(ticket => {
-                        const option = document.createElement('option');
-                        option.value = `ticket_${ticket.id}`;
-                        option.textContent = `#${ticket.id} - ${ticket.title}`;
-                        ticketsGroup.appendChild(option);
-                    });
-                    linkedResourceSelect.appendChild(ticketsGroup);
-                }
-            })
-            .catch(error => console.error('Erreur lors du chargement des tickets:', error));
+        // Set default times
+        document.getElementById('startTime').value = '09:00';
+        document.getElementById('endTime').value = '10:00';
     }
-    
+
     // Ouvrir le modal d'ajout d'activité
     if (addActivityBtn && addActivityModal) {
-        addActivityBtn.addEventListener('click', function(e) {
+        console.log('Modal elements found, adding event listener');
+        addActivityBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Bouton cliqué - Modal ouvert');
-            
+            console.log('Add activity button clicked');
+
+            // Set default form values
+            setDefaultFormValues();
+
             // Retirer les classes de masquage et ajouter la classe d'affichage
-            addActivityModal.classList.remove('hidden', 'modal-hidden');
+            addActivityModal.classList.remove('hidden');
             addActivityModal.classList.add('modal-show');
-            
+
             // Empêcher le scroll du body
             document.body.style.overflow = 'hidden';
         });
+    } else {
+        console.error('Modal elements not found:', {
+            addActivityBtn: !!addActivityBtn,
+            addActivityModal: !!addActivityModal
+        });
     }
-    
+
     // Fermer le modal
     function closeModal() {
         if (addActivityModal) {
             addActivityModal.classList.remove('modal-show');
-            addActivityModal.classList.add('modal-hidden');
-            
+            addActivityModal.classList.add('hidden');
+
             // Restaurer le scroll du body
-            document.body.style.overflow = 'auto';
-            
+            document.body.style.overflow = '';
+
             // Réinitialiser le formulaire
             if (addActivityForm) {
                 addActivityForm.reset();
@@ -1058,156 +1003,176 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     if (closeAddActivityModal) {
         closeAddActivityModal.addEventListener('click', closeModal);
     }
-    
+
     if (cancelAddActivity) {
         cancelAddActivity.addEventListener('click', closeModal);
     }
-    
+
     // Fermer le modal en cliquant à l'extérieur
     if (addActivityModal) {
-        addActivityModal.addEventListener('click', function(e) {
+        addActivityModal.addEventListener('click', function (e) {
             if (e.target === addActivityModal) {
                 closeModal();
             }
         });
     }
-    
+
     // Gestion de la soumission du formulaire
     if (addActivityForm) {
-        addActivityForm.addEventListener('submit', function(e) {
+        addActivityForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
+            // Prevent multiple submissions
+            const submitBtn = addActivityForm.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) return;
+
             // Récupérer les données du formulaire
             const formData = new FormData(addActivityForm);
             const title = formData.get('title');
-            const date = formData.get('date');
+            const startDate = formData.get('start_date');
             const startTime = formData.get('start_time');
+            const endDate = formData.get('end_date');
             const endTime = formData.get('end_time');
             const description = formData.get('description');
             const type = formData.get('type');
-            const linkedResource = formData.get('linked_resource');
-            
+
             // Validation
-            if (!validateActivityForm(date, startTime, endTime)) {
+            if (!title || !startDate || !startTime || !endDate || !endTime || !description || !type) {
+                showValidationError('Tous les champs sont obligatoires');
                 return;
             }
-            
+
+            if (!validateActivityForm(startDate, startTime, endDate, endTime)) {
+                return;
+            }
+
             // Construire les données à envoyer
             const activityData = {
-                title: title,
+                title: `${type ? '[' + type + '] ' : ''}${title}`,
                 description: description,
                 activity_type: 'PROJECT',
-                start_datetime: `${date}T${startTime}:00`,
-                end_datetime: `${date}T${endTime}:00`,
+                start_datetime: `${startDate}T${startTime}:00`,
+                end_datetime: `${endDate}T${endTime}:00`,
                 project_id: {{ project.id }}
             };
-            
-            // Ajouter la ressource liée si sélectionnée
-            if (linkedResource) {
-                if (linkedResource.startsWith('project_')) {
-                    activityData.project_id = linkedResource.replace('project_', '');
-                } else if (linkedResource.startsWith('ticket_')) {
-                    activityData.ticket_id = linkedResource.replace('ticket_', '');
-                    activityData.activity_type = 'TICKET';
-                }
+
+    // Disable submit button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+                <span class="flex items-center justify-center space-x-2">
+                    <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Création...</span>
+                </span>
+            `;
+
+    // Get CSRF token from the form or cookie
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value || getCookie('csrftoken');
+
+    // Envoyer la requête
+    fetch(`/projects/calendar/{{ project.id }}/create-activity/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(activityData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Succès - ajouter l'activité au tableau local et recharger le calendrier
+                projectActivities.push(data.activity);
+                closeModal();
+                showNotification('Activité créée avec succès!', 'success');
+                renderCalendar();
+            } else {
+                // Erreur
+                showValidationError(data.message || 'Erreur lors de la création de l\'activité');
             }
-            
-            // Envoyer la requête
-            fetch(`/projects/calendar/{{ project.id }}/create-activity/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(activityData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Succès - ajouter l'activité au tableau local et recharger le calendrier
-                    projectActivities.push(data.activity);
-                    closeModal();
-                    showNotification('Activité créée avec succès!', 'success');
-                    renderCalendar();
-                } else {
-                    // Erreur
-                    showValidationError(data.message || 'Erreur lors de la création de l\'activité');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                showValidationError('Erreur lors de la création de l\'activité');
-            });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showValidationError('Erreur lors de la création de l\'activité: ' + error.message);
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                    <span class="flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Créer l'activité</span>
+                    </span>
+                `;
+        });
         });
     }
-    
+
     // Fonctions utilitaires
-    function validateActivityForm(date, startTime, endTime) {
-        const startDate = new Date(`${date}T${startTime}`);
-        const endDate = new Date(`${date}T${endTime}`);
-        
-        // Vérifier que la date de fin est après la date de début
-        if (endDate <= startDate) {
-            showValidationError('L\'heure de fin doit être après l\'heure de début');
+    function validateActivityForm(startDateStr, startTime, endDateStr, endTime) {
+        const startDateTime = new Date(`${startDateStr}T${startTime}`);
+        const endDateTime = new Date(`${endDateStr}T${endTime}`);
+
+        // Vérifier que la date/heure de fin est après la date/heure de début
+        if (endDateTime <= startDateTime) {
+            showValidationError('La date et heure de fin doivent être après la date et heure de début');
             return false;
         }
-        
-        // Vérifier les heures de travail (9h-20h)
-        const startHour = startDate.getHours();
-        const endHour = endDate.getHours();
-        
-        if (startHour < 9 || startHour >= 20) {
-            showValidationError('L\'heure de début doit être entre 9h00 et 20h00');
+
+        // Vérifier que l'activité ne dépasse pas 7 jours
+        const diffDays = (endDateTime - startDateTime) / (1000 * 60 * 60 * 24);
+        if (diffDays > 7) {
+            showValidationError('Une activité ne peut pas dépasser 7 jours');
             return false;
         }
-        
-        if (endHour < 9 || endHour > 20 || (endHour === 20 && endDate.getMinutes() > 0)) {
-            showValidationError('L\'heure de fin doit être entre 9h00 et 20h00');
+
+        // Vérifier les heures de travail (8h-18h) - plus flexible
+        const startHour = startDateTime.getHours();
+        const endHour = endDateTime.getHours();
+
+        if (startHour < 8 || startHour >= 18) {
+            showValidationError('L\'heure de début doit être entre 8h00 et 18h00');
             return false;
         }
-        
-        // Vérifier les jours de travail (lundi-vendredi)
-        const dayOfWeek = startDate.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-            showValidationError('Les activités ne peuvent être planifiées que du lundi au vendredi');
+
+        if (endHour < 8 || endHour > 18 || (endHour === 18 && endDateTime.getMinutes() > 0)) {
+            showValidationError('L\'heure de fin doit être entre 8h00 et 18h00');
             return false;
         }
-        
+
         return true;
     }
-    
-    function calculateWorkingHours(startDate, startTime, endDate, endTime) {
-        const start = new Date(`${startDate}T${startTime}`);
-        const end = new Date(`${endDate}T${endTime}`);
-        const diffMs = end - start;
-        return Math.round(diffMs / (1000 * 60 * 60) * 100) / 100; // Heures avec 2 décimales
-    }
-    
+
     function showValidationError(message) {
         const errorDiv = document.getElementById('validationError');
         const errorText = document.getElementById('validationErrorText');
         if (errorDiv && errorText) {
             errorText.textContent = message;
             errorDiv.classList.remove('hidden');
+            // Scroll to error message
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-    
+
     function hideValidationError() {
         const errorDiv = document.getElementById('validationError');
         if (errorDiv) {
             errorDiv.classList.add('hidden');
         }
     }
-    
+
     function showNotification(message, type = 'info') {
         // Créer la notification
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
-        
+
         if (type === 'success') {
             notification.classList.add('bg-green-500', 'text-white');
         } else if (type === 'error') {
@@ -1215,15 +1180,15 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             notification.classList.add('bg-blue-500', 'text-white');
         }
-        
+
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         // Animer l'entrée
         setTimeout(() => {
             notification.classList.remove('translate-x-full');
         }, 100);
-        
+
         // Supprimer après 3 secondes
         setTimeout(() => {
             notification.classList.add('translate-x-full');
@@ -1232,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }, 3000);
     }
-    
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -1247,58 +1212,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
+
+    // Debug logging
+    console.log('Calendar initialization:', {
+        currentMonth,
+        currentYear,
+        projectActivities: projectActivities.length,
+        calendarGrid: !!calendarGrid
+    });
     
-    // Fonction pour recharger les activités depuis le serveur
-    function reloadActivities() {
-        console.log('Rechargement des activités...');
-        fetch(`/projects/{{ project.id }}/calendar/activities/?month=${currentMonth}&year=${currentYear}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Données reçues:', data);
-                if (data.success) {
-                    // Mettre à jour les activités
-                    projectActivities.length = 0; // Vider le tableau
-                    // Utiliser directement les données reçues
-                    projectActivities.push(...data.activities);
-                    console.log('Activités mises à jour:', projectActivities);
-                    // Recharger le calendrier
-                    renderCalendar();
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors du rechargement des activités:', error);
-            });
-    }
+    // Rendu initial
+    renderCalendar();
 });
 </script>
 
 <script>
-function showTab(tabName) {
-    // Masquer tous les onglets
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => {
-        if (tab) {
-            tab.style.display = 'none';
+    function showTab(tabName) {
+        // Masquer tous les onglets
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            if (tab) {
+                tab.style.display = 'none';
+            }
+        });
+
+        // Afficher l'onglet sélectionné
+        const selectedTab = document.getElementById(tabName);
+        if (selectedTab) {
+            selectedTab.style.display = 'block';
         }
-    });
-    
-    // Afficher l'onglet sélectionné
-    const selectedTab = document.getElementById(tabName);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-    
-    // Mettre à jour les boutons d'onglets
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-        if (button) {
-            button.classList.remove('active');
+
+        // Mettre à jour les boutons d'onglets
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            if (button) {
+                button.classList.remove('active');
+            }
+        });
+
+        const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
         }
-    });
-    
-    const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
     }
-}
 </script>
+
+{% endblock %}
+
+{% block active_tab %}{% endblock %}

@@ -171,6 +171,20 @@ def projectCalendar(request, pk):
         start_datetime__month=current_month
     ).order_by('start_datetime')
     
+    # Get project members for color assignment
+    project_members = list(project.members.all())
+    member_colors = {}
+    
+    # Define a set of distinct colors for members
+    colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+        '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+    ]
+    
+    for i, member in enumerate(project_members):
+        member_colors[member.id] = colors[i % len(colors)]
+    
     # Format activities for the calendar
     calendar_activities = []
     for activity in activities:
@@ -182,6 +196,8 @@ def projectCalendar(request, pk):
             'end_date': activity.end_datetime,      # Garder l'objet datetime complet
             'type': activity.activity_type,  # Ajouter le type d'activité
             'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+            'employee_id': activity.employee.id,
+            'employee_color': member_colors.get(activity.employee.id, '#A08D80'),  # Default color
             'charge': float(activity.charge) if activity.charge else 0  # Convertir en float
         })
     
@@ -208,7 +224,9 @@ def projectCalendar(request, pk):
         'current_month': current_month,
         'current_year': current_year,
         'month_name': month_name,
-        'can_edit': can_edit
+        'can_edit': can_edit,
+        'project_members': project_members,
+        'member_colors': member_colors
     })
 
 
@@ -500,6 +518,20 @@ def get_project_activities(request, pk):
         start_datetime__month=month
     ).order_by('start_datetime')
     
+    # Get project members for color assignment
+    project_members = list(project.members.all())
+    member_colors = {}
+    
+    # Define a set of distinct colors for members
+    colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+        '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+    ]
+    
+    for i, member in enumerate(project_members):
+        member_colors[member.id] = colors[i % len(colors)]
+    
     activities_data = []
     for activity in activities:
         activities_data.append({
@@ -515,6 +547,8 @@ def get_project_activities(request, pk):
             'end_date': activity.end_datetime.isoformat(),
             'type': activity.activity_type,
             'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+            'employee_id': activity.employee.id,
+            'employee_color': member_colors.get(activity.employee.id, '#A08D80'),
             'charge': float(activity.charge) if activity.charge else 0
         })
     
@@ -550,7 +584,7 @@ def create_project_activity(request, pk):
             title=data['title'],
             description=data.get('description', ''),
             employee=user,
-            activity_type='PROJECT',
+            activity_type=data.get('activity_type', 'PROJECT'),
             start_datetime=datetime.fromisoformat(data['start_datetime']),
             end_datetime=datetime.fromisoformat(data['end_datetime']),
             project=project
@@ -571,6 +605,17 @@ def create_project_activity(request, pk):
         
         activity.save()
         
+        # Get member color for the activity
+        project_members = list(project.members.all())
+        colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+            '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+        ]
+        member_colors = {}
+        for i, member in enumerate(project_members):
+            member_colors[member.id] = colors[i % len(colors)]
+        
         return JsonResponse({
             'success': True,
             'message': 'Activité créée avec succès',
@@ -584,6 +629,8 @@ def create_project_activity(request, pk):
                 'endDate': activity.end_datetime.isoformat(),
                 'type': activity.activity_type,
                 'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+                'employee_id': activity.employee.id,
+                'employee_color': member_colors.get(activity.employee.id, '#A08D80'),
                 'charge': float(activity.charge) if activity.charge else 0,
                 'status': 'inprogress'
             }
