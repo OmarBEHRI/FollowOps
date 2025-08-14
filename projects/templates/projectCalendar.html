@@ -976,21 +976,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkedResourceSelect = document.getElementById('linkedResource');
         
         // Vider le select (garder seulement l'option par défaut)
-        linkedResourceSelect.innerHTML = '<option value="">Sélectionne une ressource</option>';
+        linkedResourceSelect.innerHTML = '<option value="">Sélectionner une ressource</option>';
+        
+        // Ajouter l'option pour le projet actuel
+        const currentProjectOption = document.createElement('option');
+        currentProjectOption.value = `project_{{ project.id }}`;
+        currentProjectOption.textContent = '{{ project.title|escapejs }} (Projet actuel)';
+        currentProjectOption.selected = true;
+        linkedResourceSelect.appendChild(currentProjectOption);
         
         // Créer les groupes pour organiser les options
         const projectsGroup = document.createElement('optgroup');
-        projectsGroup.label = 'Projets';
+        projectsGroup.label = 'Autres Projets';
         
         const ticketsGroup = document.createElement('optgroup');
         ticketsGroup.label = 'Tickets';
         
-        // Charger les projets
+        // Charger les autres projets
         fetch('/projects/api/projects/')
             .then(response => response.json())
             .then(projects => {
-                if (projects.length > 0) {
-                    projects.forEach(project => {
+                const otherProjects = projects.filter(project => project.id !== {{ project.id }});
+                if (otherProjects.length > 0) {
+                    otherProjects.forEach(project => {
                         const option = document.createElement('option');
                         option.value = `project_${project.id}`;
                         option.textContent = project.name;
@@ -1092,25 +1100,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const activityData = {
                 title: title,
                 description: description,
-                activity_type: 'PROJECT', // Corriger le nom du paramètre
+                activity_type: 'PROJECT',
                 start_datetime: `${date}T${startTime}:00`,
                 end_datetime: `${date}T${endTime}:00`,
-                project_id: {{ project.id }}, // ID du projet actuel
-                resource_id: {{ request.user.ressource.id }}, // Ajouter l'ID de la ressource
-                working_hours: calculateWorkingHours(date, startTime, date, endTime)
+                project_id: {{ project.id }}
             };
             
             // Ajouter la ressource liée si sélectionnée
             if (linkedResource) {
                 if (linkedResource.startsWith('project_')) {
-                    activityData.linked_project_id = linkedResource.replace('project_', '');
+                    activityData.project_id = linkedResource.replace('project_', '');
                 } else if (linkedResource.startsWith('ticket_')) {
-                    activityData.linked_ticket_id = linkedResource.replace('ticket_', '');
+                    activityData.ticket_id = linkedResource.replace('ticket_', '');
+                    activityData.activity_type = 'TICKET';
                 }
             }
             
             // Envoyer la requête
-            fetch('/activities/create/', {
+            fetch(`/projects/calendar/{{ project.id }}/create-activity/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1121,19 +1128,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Succès
+                    // Succès - ajouter l'activité au tableau local et recharger le calendrier
+                    projectActivities.push(data.activity);
                     closeModal();
                     showNotification('Activité créée avec succès!', 'success');
-                    // Recharger les activités au lieu de recharger la page
-                    reloadActivities();
+                    renderCalendar();
                 } else {
                     // Erreur
-                    showNotification('Erreur lors de la création de l\'activité: ' + (data.error || 'Erreur inconnue'), 'error');
+                    showValidationError(data.message || 'Erreur lors de la création de l\'activité');
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                showNotification('Erreur lors de la création de l\'activité', 'error');
+                showValidationError('Erreur lors de la création de l\'activité');
             });
         });
     }

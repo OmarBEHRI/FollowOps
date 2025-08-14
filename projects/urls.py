@@ -19,4 +19,5 @@ urlpatterns = [
     # Nouvel endpoint pour les projets de l'utilisateur
     path('api/projects/', views.get_user_projects_api, name='get_user_projects_api'),
     path('<int:pk>/calendar/activities/', views.get_project_activities, name='get_project_activities'),
-]
+    path('calendar/<int:pk>/create-activity/', views.create_project_activity, name='create_project_activity'),
+   ]

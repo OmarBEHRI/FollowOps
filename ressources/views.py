@@ -104,12 +104,15 @@ def ressourcesDetails(request, resource_id=None):
                 # Manager peut voir les ressources de ses projets + lui-même
                 from projects.models import Project
                 managed_projects = Project.objects.filter(project_manager=user)
-                if not (resource.members.filter(id__in=managed_projects).exists() or resource.id == user.id):
+                # Vérifier si la ressource est membre d'un des projets gérés par le manager
+                if not (resource.members.filter(id__in=managed_projects.values_list('id', flat=True)).exists() or resource.id == user.id):
                     return redirect('ressources')
             else:
                 # Utilisateur normal peut voir seulement les ressources de ses projets + lui-même
                 user_projects = user.members.all()
-                if not (resource.members.filter(id__in=user_projects).exists() or resource.id == user.id):
+                # Vérifier si la ressource et l'utilisateur partagent au moins un projet commun
+                shared_projects = user_projects.filter(members=resource)
+                if not (shared_projects.exists() or resource.id == user.id):
                     return redirect('ressources')
             
             # Récupérer les tickets assignés à cette ressource

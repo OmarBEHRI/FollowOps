@@ -347,7 +347,8 @@
                             </div>
                         </div>
                         
-                        <!-- Dropdown Status - HARMONISÉ avec les autres pages -->
+                        <!-- Dropdown Status - Visible seulement pour ADMIN et MANAGER -->
+                        {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
                         <div class="relative inline-block">
                             <button type="button" id="status-dropdown-btn" class="filter-btn {% if current_status %}active{% endif %}">
                                 Status {% if current_status %}({{ current_status }}){% endif %}
@@ -362,7 +363,8 @@
                                 </div>
                             </div>
                         </div>
-                                                <button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1efe9] text-[#191610]" onclick="exportRessourcesExcel()">
+                        {% endif %}
+                        <button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1efe9] text-[#191610]" onclick="exportRessourcesExcel()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
                         </button>
                         
@@ -376,39 +378,43 @@
                                 <tr class="bg-[#fbfaf9] text-left text-[#191610]">
                                     <th class="px-4 py-3 font-medium text-center">Nom</th>
                                     <th class="px-4 py-3 font-medium text-center">Rôle</th>
+                                    {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
                                     <th class="px-4 py-3 font-medium text-center">Statut</th>
                                     <th class="px-4 py-3 font-medium text-center">Disponibilité</th>
+                                    {% endif %}
                                     <th class="px-4 py-3 font-medium text-center">Compétences</th>
                                     {% if user_role == 'ADMIN' %}
                                     <th class="px-4 py-3 font-medium text-center">Actions</th>
                                     {% endif %}
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% for ressource in ressources %}
-                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='/ressources/details/{{ ressource.id }}/'">
-                                    <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ ressource.first_name }} {{ ressource.last_name }}</td>
-                                    <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.role }}</td>
-                                    <td class="status-cell px-4 py-5 text-center">
-                                        <span class="status-badge {% if ressource.status == 'Active' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ressource.status }}</span>
-                                    </td>
-                                    <td class="px-4 py-5 text-center availability-cell">
-                                        <div class="availability-bar-container">
-                                            <div class="availability-bar" style="width: {{ ressource.availability_rate|default:0 }}%;"></div>
-                                        </div>
-                                        <span class="text-[#8c7e5a] text-xs ml-2">{{ ressource.availability_rate|default:0 }}%</span>
-                                    </td>
-                                    <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.skills }}</td>
-                                    {% if user_role == 'ADMIN' %}
-                                    <td class="px-4 py-5 text-center" onclick="event.stopPropagation();">
-                                        <a href="/ressources/edit/{{ ressource.id }}/" class="text-[#A08D80] hover:underline text-sm font-medium">Modifier</a> |
-                                        <a href="#" onclick="confirmDelete({{ ressource.id }})" class="text-[#A08D80] hover:underline text-sm font-medium">Supprimer</a>
-                                    </td>
-                                    {% endif %}
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="6" class="text-center py-5">Aucune ressource trouvée.</td></tr>
-                                {% endfor %}
+                                <tbody>
+                                    {% for ressource in ressources %}
+                                    <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='/ressources/details/{{ ressource.id }}/'">
+                                        <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ ressource.first_name }} {{ ressource.last_name }}</td>
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.role }}</td>
+                                        {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
+                                        <td class="status-cell px-4 py-5 text-center">
+                                            <span class="status-badge {% if ressource.status == 'Active' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ressource.status }}</span>
+                                        </td>
+                                        <td class="px-4 py-5 text-center availability-cell">
+                                            <div class="availability-bar-container">
+                                                <div class="availability-bar" style="width: {{ ressource.availability_rate|default:0 }}%;"></div>
+                                            </div>
+                                            <span class="text-[#8c7e5a] text-xs ml-2">{{ ressource.availability_rate|default:0 }}%</span>
+                                        </td>
+                                        {% endif %}
+                                        <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.skills }}</td>
+                                        {% if user_role == 'ADMIN' %}
+                                        <td class="px-4 py-5 text-center" onclick="event.stopPropagation();">
+                                            <a href="/ressources/edit/{{ ressource.id }}/" class="text-[#A08D80] hover:underline text-sm font-medium">Modifier</a> |
+                                            <a href="#" onclick="confirmDelete({{ ressource.id }})" class="text-[#A08D80] hover:underline text-sm font-medium">Supprimer</a>
+                                        </td>
+                                        {% endif %}
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="{% if user_role == 'ADMIN' %}6{% elif user_role == 'MANAGER' %}5{% else %}3{% endif %}" class="text-center py-5">Aucune ressource trouvée.</td></tr>
+                                    {% endfor %}
                                 </tbody>
                         </table>
                     </div>

@@ -522,3 +522,75 @@ def get_project_activities(request, pk):
         'success': True,
         'activities': activities_data
     })
+
+
+@login_required
+@require_POST
+def create_project_activity(request, pk):
+    """Créer une activité pour un projet spécifique"""
+    try:
+        project = get_object_or_404(Project, pk=pk)
+        user = request.user
+        
+        # Vérifier que l'utilisateur est membre du projet ou manager/admin
+        if not (user.appRole in ['ADMIN', 'MANAGER'] or project.members.filter(id=user.id).exists()):
+            return JsonResponse({
+                'success': False,
+                'message': 'Vous n\'êtes pas autorisé à créer une activité pour ce projet'
+            }, status=403)
+        
+        data = json.loads(request.body)
+        
+        # Importer Activity ici pour éviter les imports circulaires
+        from activities.models import Activity
+        from datetime import datetime
+        
+        # Créer l'activité
+        activity = Activity(
+            title=data['title'],
+            description=data.get('description', ''),
+            employee=user,
+            activity_type='PROJECT',
+            start_datetime=datetime.fromisoformat(data['start_datetime']),
+            end_datetime=datetime.fromisoformat(data['end_datetime']),
+            project=project
+        )
+        
+        # Si l'utilisateur a sélectionné une autre ressource liée
+        if data.get('ticket_id') and data.get('activity_type') == 'TICKET':
+            from tickets.models import Ticket
+            ticket = get_object_or_404(Ticket, id=data['ticket_id'])
+            activity.ticket = ticket
+            activity.activity_type = 'TICKET'
+            activity.project = None
+        elif data.get('project_id') and int(data['project_id']) != project.id:
+            other_project = get_object_or_404(Project, id=data['project_id'])
+            # Vérifier que l'utilisateur est aussi membre de l'autre projet
+            if other_project.members.filter(id=user.id).exists():
+                activity.project = other_project
+        
+        activity.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Activité créée avec succès',
+            'activity': {
+                'id': activity.id,
+                'title': activity.title,
+                'description': activity.description,
+                'start_date': activity.start_datetime.isoformat(),
+                'end_date': activity.end_datetime.isoformat(),
+                'startDate': activity.start_datetime.isoformat(),
+                'endDate': activity.end_datetime.isoformat(),
+                'type': activity.activity_type,
+                'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+                'charge': float(activity.charge) if activity.charge else 0,
+                'status': 'inprogress'
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
