@@ -116,6 +116,20 @@ def get_ticket_activities(request, ticket_id):
         # Récupérer toutes les activités liées à ce ticket
         activities = Activity.objects.filter(ticket=ticket).order_by('start_datetime')
         
+        # Get ticket assigned members for color assignment
+        ticket_members = list(ticket.assigned_to.all())
+        member_colors = {}
+        
+        # Define a set of distinct colors for members (same as project calendar)
+        colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+            '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+        ]
+        
+        for i, member in enumerate(ticket_members):
+            member_colors[member.id] = colors[i % len(colors)]
+        
         activities_data = []
         for activity in activities:
             # Déterminer le statut basé sur les dates
@@ -136,7 +150,9 @@ def get_ticket_activities(request, ticket_id):
                 'start': activity.start_datetime.isoformat(),
                 'end': activity.end_datetime.isoformat(),
                 'status': status,
-                'employee': f"{activity.employee.first_name} {activity.employee.last_name}"
+                'employee': f"{activity.employee.first_name} {activity.employee.last_name}",
+                'employee_id': activity.employee.id,
+                'employee_color': member_colors.get(activity.employee.id, '#A08D80')  # Default color
             })
         
         return JsonResponse({

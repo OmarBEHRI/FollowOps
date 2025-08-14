@@ -315,6 +315,20 @@
                                     <button id="nextMonthTicket" class="calendar-nav-button">▶</button>
                                 </div>
                             </div>
+                            
+                            <!-- Member Legend -->
+                            <div class="mb-4 p-4 bg-[#f8f6f3] rounded-xl border border-[#e3dfd3]">
+                                <h3 class="text-[#191610] text-sm font-semibold mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-[#A08D80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M17 20H7m10 0v-2c0-5.523-3.582-10-8-10s-8 4.477-8 10v2m8-10a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Membres assignés
+                                </h3>
+                                <div id="member-legend" class="flex flex-wrap gap-2">
+                                    <!-- Member legend items will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
                             <div id="calendar-container" class="calendar-container">
                                 <div id="calendar-grid" class="calendar-grid">
                                     <!-- Les en-têtes des jours seront générés par JavaScript -->
@@ -1319,6 +1333,16 @@ document.addEventListener('DOMContentLoaded', function() {
     endTime: new Date(today.getTime() + 60 * 60000) // 1 hour later
   });
   
+  // Helper function to convert hex to RGB
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+
   // Récupérer les activités depuis l'API
   fetch('/activities/ticket/{{ ticket.id }}/activities/')
     .then(response => response.json())
@@ -1336,10 +1360,15 @@ document.addEventListener('DOMContentLoaded', function() {
             status: activity.status === 'completed' ? 'completed' : 'inprogress',
             description: `${activity.description}\nAssigné à: ${activity.employee || 'Non assigné'}`,
             employee: activity.employee || 'Non assigné',
+            employee_id: activity.employee_id,
+            employee_color: activity.employee_color,
             startTime: startTime,
             endTime: endTime
           });
         });
+        
+        // Populate member legend
+        populateMemberLegend();
         
         // Mettre à jour le calendrier avec les nouvelles activités
         renderCalendar();
@@ -1351,6 +1380,51 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Erreur lors de la récupération des activités:', error);
       renderCalendar(); // Render calendar even if API fails
     });
+
+  // Function to populate member legend
+  const populateMemberLegend = () => {
+    const memberLegend = document.getElementById('member-legend');
+    const uniqueMembers = new Map();
+    
+    // Collect unique members from ticket events
+    ticketEvents.forEach(event => {
+      if (event.employee_id && event.employee_color && event.employee) {
+        uniqueMembers.set(event.employee_id, {
+          name: event.employee,
+          color: event.employee_color
+        });
+      }
+    });
+    
+    // Clear existing legend
+    memberLegend.innerHTML = '';
+    
+    // Add legend items for each unique member
+    uniqueMembers.forEach((member, memberId) => {
+      const legendItem = document.createElement('div');
+      legendItem.className = 'flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-[#e3dfd3] shadow-sm';
+      
+      const colorDot = document.createElement('div');
+      colorDot.className = 'w-3 h-3 rounded-full border border-gray-300';
+      colorDot.style.backgroundColor = member.color;
+      
+      const memberName = document.createElement('span');
+      memberName.className = 'text-sm font-medium text-[#191610]';
+      memberName.textContent = member.name;
+      
+      legendItem.appendChild(colorDot);
+      legendItem.appendChild(memberName);
+      memberLegend.appendChild(legendItem);
+    });
+    
+    // If no members found, show a message
+    if (uniqueMembers.size === 0) {
+      const noMembersMsg = document.createElement('div');
+      noMembersMsg.className = 'text-sm text-[#8c7e5a] italic';
+      noMembersMsg.textContent = 'Aucun membre assigné aux activités';
+      memberLegend.appendChild(noMembersMsg);
+    }
+  };
 
   // Fonction pour générer le calendrier
   const renderCalendar = () => {
@@ -1439,9 +1513,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     visibleEvents.forEach(event => {
       const activityItem = document.createElement('div');
-      activityItem.className = `activity-item ${event.status}`;
+      activityItem.className = 'activity-item';
       activityItem.textContent = event.name;
       activityItem.style.cursor = 'pointer';
+      
+      // Apply member-specific color to the entire activity item
+      if (event.employee_color) {
+        activityItem.style.background = event.employee_color;
+        activityItem.style.borderLeftColor = event.employee_color;
+        activityItem.style.border = `2px solid ${event.employee_color}`;
+
+        // Adjust text color based on background brightness
+        const rgb = hexToRgb(event.employee_color);
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        activityItem.style.color = brightness > 128 ? '#000000' : '#FFFFFF';
+      } else {
+        // Fallback to default styling
+        activityItem.className += ` ${event.status}`;
+      }
       
       // Ajouter un événement de clic pour ouvrir le modal de détails
       activityItem.addEventListener('click', (e) => {
@@ -1549,7 +1638,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (hourSlot) {
           const activityEl = document.createElement('div');
-          activityEl.className = `day-activity ${activity.status}`;
+          activityEl.className = 'day-activity';
           
           const startTime = activity.startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
           const endTime = activity.endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -1559,6 +1648,21 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="day-activity-time">${startTime} - ${endTime}</div>
             <div class="day-activity-description">${activity.description}</div>
           `;
+          
+          // Apply member-specific color to day view activities
+          if (activity.employee_color) {
+            activityEl.style.background = `${activity.employee_color}20`; // 20% opacity
+            activityEl.style.borderLeftColor = activity.employee_color;
+            activityEl.style.borderLeftWidth = '4px';
+
+            // Adjust text color based on background brightness
+            const rgb = hexToRgb(activity.employee_color);
+            const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+            activityEl.style.color = brightness > 128 ? '#000000' : '#333333';
+          } else {
+            // Fallback to default styling
+            activityEl.className += ` ${activity.status}`;
+          }
           
           hourSlot.appendChild(activityEl);
         }
