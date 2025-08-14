@@ -31,36 +31,35 @@
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
+        grid-template-rows: repeat(6, 1fr);
+        gap: 1px;
         border: 1px solid var(--border-color);
         border-radius: 0.5rem;
         overflow: hidden;
-        background-color: var(--bg-light);
+        background-color: var(--border-color);
         margin-bottom: 0.5rem;
         width: 100%;
-        min-height: 600px;
-        aspect-ratio: 7/6;
+        height: 900px;
+        min-height: 900px;
     }
 
     @media (max-width: 768px) {
         .calendar-grid {
-            min-height: 500px;
-            aspect-ratio: 7/8;
+            height: 750px;
+            min-height: 750px;
         }
     }
 
     .calendar-cell {
-        background-color: var(--bg-light);
-        height: 120px;
+        background-color: var(--bg-white);
         width: 100%;
-        max-height: 120px;
-        max-width: 100%;
-        padding: 0.25rem 0.3rem 0.1rem 0.3rem;
+        height: 100%;
+        min-height: 150px;
+        padding: 0.4rem 0.5rem 0.2rem 0.5rem;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         position: relative;
-        border-radius: 0.25rem;
         transition: box-shadow 0.15s;
         overflow: hidden;
         cursor: pointer;
@@ -128,9 +127,9 @@
     }
 
     .activity-item {
-        padding: 0.25rem 0.4rem;
+        padding: 0.35rem 0.5rem;
         border-radius: 4px;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 500;
         color: var(--bg-white);
         cursor: pointer;
@@ -142,9 +141,9 @@
         border: 2px solid transparent;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         flex-shrink: 0;
-        min-height: 20px;
-        max-height: 20px;
-        line-height: 1.2;
+        min-height: 24px;
+        max-height: 24px;
+        line-height: 1.3;
     }
 
     .activity-item:hover {
