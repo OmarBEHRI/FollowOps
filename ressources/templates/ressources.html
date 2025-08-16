@@ -206,34 +206,22 @@
 
         /* Couleurs pour les statuts - Thème nude/beige clair */
         .status-active {
-            background-color: #C4A484; /* Beige doré clair pour actif */
-            color: #FFFFFF;
+            background-color: transparent;
+            color: #8c7e5a;
+            font-weight: normal;
         }
 
         .status-inactive {
-            background-color: #E8DDD4; /* Beige très clair pour inactif */
-            color: #8B7355;
+            background-color: transparent;
+            color: #8c7e5a;
+            font-weight: normal;
         }
 
-        /* Styles pour la barre d'availability (sur la page Ressources) */
-        .availability-cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .availability-bar-container {
-            width: 80px;
-            height: 8px;
-            border-radius: 4px;
-            background-color: #F2EDE6; /* Beige très clair pour le fond */
-            overflow: hidden;
-        }
-
-        .availability-bar {
-            height: 100%;
-            background-color: #C4A484; /* Beige doré clair pour la barre de disponibilité */
-            border-radius: 4px;
+        /* Removed badge styling for better readability */
+        .status-text {
+            font-size: 14px;
+            font-weight: normal;
+            color: #8c7e5a;
         }
 
         /* Ajustements visuels pour les tables générales */
@@ -406,8 +394,8 @@
                                         {% endif %}
                                         <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ressource.role }}</td>
                                         {% if user_role == 'ADMIN' or user_role == 'MANAGER' %}
-                                        <td class="status-cell px-4 py-5 text-center">
-                                            <span class="status-badge {% if ressource.status == 'Active' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ressource.status }}</span>
+                                        <td class="px-4 py-5 text-center">
+                                            <span class="status-text">{{ ressource.status }}</span>
                                         </td>
                                         <td class="px-4 py-5 text-center availability-cell">
                                             <div class="availability-bar-container">

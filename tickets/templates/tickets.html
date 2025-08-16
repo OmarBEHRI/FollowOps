@@ -170,54 +170,12 @@
             background-color: #f1efe9;
         }
 
-        /* Styles pour les badges de statut dans les tableaux */
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        /* Badges avec coins arrondis et couleurs alignées sur le thème */
-        .status-badge, .priority-badge {
-            padding: 8px 18px; /* Augmenté de 6px 14px à 8px 18px pour plus d'espace */
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            min-width: 85px; /* Largeur minimale pour uniformiser les badges */
-            text-align: center; /* Centrer le texte dans le badge */
-        }
-
-        /* Couleurs pour les statuts - Thème nude/beige clair */
-        .status-active {
-            background-color: #C4A484; /* Beige doré clair pour ouvert/en cours */
-            color: #FFFFFF;
-            padding: 8px 20px; /* Padding spécifique plus généreux pour "en cours" */
-        }
-
-        .status-inactive {
-            background-color: #E8DDD4; /* Beige très clair pour fermé/résolu */
-            color: #8B7355;
-        }
-
-        /* Couleurs pour les priorités - Tons beige clairs */
-        .priority-high {
-            background-color: #D4B896; /* Beige sable clair pour haute priorité */
-            color: #6B5B4F;
-        }
-
-        .priority-medium {
-            background-color: #E6D7C3; /* Beige nude très doux pour priorité moyenne */
-            color: #8B7355;
-        }
-
-        .priority-low {
-            background-color: #F2EDE6; /* Beige très clair pour basse priorité */
-            color: #A08D80;
+        /* Removed all badge styling for better readability */
+        /* Status and priority text styling */
+        .status-text, .priority-text {
+            font-size: 14px;
+            font-weight: normal;
+            color: #8c7e5a;
         }
 
         /* Ajustements visuels pour les tables générales */
@@ -373,11 +331,11 @@
                                 <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='{% url 'ticketDetails' ticket_id=ticket.id %}'">
                                     <td class="whitespace-nowrap px-4 py-5 font-medium text-center">#{{ ticket.id }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ ticket.title }}</td>
-                                    <td class="status-cell px-4 py-5 text-center">
-                                        <span class="status-badge {% if ticket.status == 'OPEN' or ticket.status == 'IN_PROGRESS' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ticket.get_status_display }}</span>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="status-text">{{ ticket.get_status_display }}</span>
                                     </td>
                                     <td class="px-4 py-5 text-center">
-                                        <span class="status-badge {% if ticket.priority == 'HIGH' %}priority-high{% elif ticket.priority == 'MEDIUM' %}priority-medium{% else %}priority-low{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ ticket.get_priority_display }}</span>
+                                        <span class="priority-text">{{ ticket.get_priority_display }}</span>
                                     </td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">
                                         {% if ticket.assigned_to.all %}

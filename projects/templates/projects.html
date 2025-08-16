@@ -184,35 +184,79 @@
     
     /* Couleurs pour les statuts - Thème nude/beige */
     .status-active {
-        background-color: #8B7355;
-        color: #FFFFFF;
+        background-color: transparent;
+        color: var(--primary-color);
+        font-weight: 600;
     }
     
     .status-inactive {
-        background-color: #A08D80;
-        color: #FFFFFF;
+        background-color: transparent;
+        color: var(--text-color-medium);
+        font-weight: 500;
     }
     
     /* Couleurs pour les priorités */
     .priority-high {
-        background-color: #B8860B;
-        color: #FFFFFF;
+        background-color: transparent;
+        color: #B8860B;
+        font-weight: 600;
     }
     
     .priority-medium {
-        background-color: #CD853F;
-        color: #FFFFFF;
+        background-color: transparent;
+        color: #CD853F;
+        font-weight: 600;
     }
     
     .priority-low {
-        background-color: #D2B48C;
-        color: #3F3C3A;
+        background-color: transparent;
+        color: var(--text-color-medium);
+        font-weight: 500;
     }
     
     /* Style pour les badges de type */
     .type-badge {
-        background-color: #DEB887;
-        color: #3F3C3A;
+        background-color: transparent;
+        color: var(--text-color-dark);
+        font-weight: 500;
+    }
+    
+    /* Styles de texte améliorés pour une meilleure lisibilité */
+    .status-text, .priority-text, .type-text {
+        font-size: 14px;
+        font-weight: normal;
+        color: #8c7e5a;
+    }
+    
+    /* Styles spécifiques pour chaque type de statut en mode texte */
+    .status-text.active {
+        color: #8c7e5a;
+        font-weight: normal;
+    }
+    
+    .status-text.inactive {
+        color: #8c7e5a;
+        font-weight: normal;
+    }
+    
+    .priority-text.high {
+        color: #8c7e5a;
+        font-weight: normal;
+    }
+    
+    .priority-text.medium {
+        color: #8c7e5a;
+        font-weight: normal;
+    }
+    
+    .priority-text.low {
+        color: #8c7e5a;
+        font-weight: normal;
+    }
+    
+    .type-text {
+        color: #8c7e5a;
+        font-weight: normal;
     }
     
     /* Ajustements visuels pour les tables générales */
@@ -565,12 +609,18 @@
                             <tbody id="projects-table-body">
                                 {% for project in projects %}
                                 {% if project.id %}
-                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='{% url 'projectDetails' project.id %}'"> 
+                                <tr class="border-t border-t-[#e3dfd3] cursor-pointer hover:bg-[#f1efe9]" onclick="window.location.href='{% url 'projectDetails' project.id %}'">
                                     <td class="whitespace-nowrap px-4 py-5 font-medium text-center">{{ project.title }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.description|truncatechars:50 }}</td>
-                                    <td class="px-4 py-5 text-center"><span class="status-badge type-badge rounded-full px-3 py-1 text-sm font-medium">{{ project.type }}</span></td>
-                                    <td class="status-cell px-4 py-5 text-center"><span class="status-badge {% if project.status == 'En cours' or project.status == 'Terminé' %}status-active{% else %}status-inactive{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ project.status }}</span></td>
-                                    <td class="px-4 py-5 text-center"><span class="status-badge {% if project.priority == 'Haute' %}priority-high{% elif project.priority == 'Moyenne' %}priority-medium{% else %}priority-low{% endif %} rounded-full px-3 py-1 text-sm font-medium">{{ project.priority }}</span></td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="type-text">{{ project.type }}</span>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="status-text">{{ project.status }}</span>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="priority-text">{{ project.priority }}</span>
+                                    </td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.project_manager }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">{{ project.expected_start_date|date:"d-m-Y" }} - {{ project.expected_end_date|date:"d-m-Y" }}</td>
                                     <td class="px-4 py-5 text-[#8c7e5a] text-center">
