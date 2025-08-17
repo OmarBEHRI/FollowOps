@@ -24,6 +24,10 @@ class Ressource(AbstractUser):
     phone_number = models.CharField(max_length=20)
     entry_date = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=200, null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=[
+        ('male', 'Male'),
+        ('female', 'Female')
+    ], default='male')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     email = models.EmailField(unique=True)

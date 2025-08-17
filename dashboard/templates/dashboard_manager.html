@@ -245,7 +245,7 @@
                                 </div>
                             </label>
                             <div class="profile-dropdown-container">
-                                <div class="profile-picture bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                                <div class="profile-picture bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("{% if user.gender == 'female' %}{% static 'Female.svg' %}{% else %}{% static 'Male.svg' %}{% endif %}")'></div>
                                 <div class="profile-dropdown-menu">
                                     <a href="/ressources/details/{{ user.id }}" class="profile-dropdown-item">
                                         <svg class="profile-dropdown-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -356,7 +356,7 @@
                     <div class="flex flex-col gap-4" id="activites-recentes-section">
                         {% for activity in activites_recentes %}
                         <div class="activity-item" id="activity-{{ activity.type }}-{{ forloop.counter }}">
-                            <div class="activity-avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCClaZNla2VNHXuP4EEYYlG4LkZLwYibWSxw8yzb3jGydK81D_AXUYkIFyinil-dc9nLIixSFYOYTnTHhPAgW7Rgol2xKBCRitPsQZieVpCouNpxeaDA1OI7g0YrTegaV3O8LYbFYa020XTuVl2BUh_ogXINAaMYgvy-Qf1gW_EwpSjARgbbgSpHrUHu2-NSkSyN6Hsnj4AV2VMoOKK1uqlaP9nCYh3DoUd0lAswDohEnIfDQFAkaDKUBLhl05fMAHKUp8zap8Bqv4")'></div>
+                            <div class="activity-avatar" style='background-image: url("{% if activity.author.profile_picture %}{{ activity.author.profile_picture.url }}{% elif activity.author.gender == 'female' %}{% static 'Female.svg' %}{% else %}{% static 'Male.svg' %}{% endif %}")'></div>
                             <div class="flex flex-col">
                                 <p class="activity-text">{{ activity.text }}</p>
                                 <p class="activity-time">{{ activity.created_at|timesince }} ago</p>

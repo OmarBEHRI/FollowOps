@@ -45,7 +45,8 @@ def seed_users():
             'appRole': 'ADMIN',
             'phone_number': '0123456789',
             'entry_date': timezone.now().date() - timedelta(days=365*2),
-            'location': 'Paris'
+            'location': 'Paris',
+            'gender': 'male'
         },
         {
             'email': 'manager@followops.com',
@@ -60,7 +61,8 @@ def seed_users():
             'appRole': 'MANAGER',
             'phone_number': '0123456790',
             'entry_date': timezone.now().date() - timedelta(days=365),
-            'location': 'Lyon'
+            'location': 'Lyon',
+            'gender': 'female'
         },
     ]
     
@@ -84,6 +86,7 @@ def seed_users():
         # Select random first and last names
         first_name = random.choice(arab_first_names)
         last_name = random.choice(arab_last_names)
+        gender = random.choice(['male', 'female'])
         
         users_data.append({
             'email': f'user{i}@followops.com',
@@ -98,7 +101,8 @@ def seed_users():
             'appRole': 'USER',
             'phone_number': f'01234567{i:02d}',
             'entry_date': timezone.now().date() - timedelta(days=random.randint(30, 730)),
-            'location': random.choice(locations)
+            'location': random.choice(locations),
+            'gender': gender
         })
     
     # Create users in the database
@@ -117,7 +121,8 @@ def seed_users():
             appRole=user_data['appRole'],
             phone_number=user_data['phone_number'],
             entry_date=user_data['entry_date'],
-            location=user_data['location']
+            location=user_data['location'],
+            gender=user_data['gender']
         )
         created_users.append(user)
     
