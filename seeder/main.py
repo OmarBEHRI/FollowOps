@@ -17,9 +17,14 @@ def is_database_seeded():
     Check if the database is already seeded by checking if there are users with specific emails
     that would be created during seeding.
     """
-    User = get_user_model()
-    # Check if our seed admin user exists
-    return User.objects.filter(email='admin@followops.com').exists()
+    try:
+        User = get_user_model()
+        # Check if our seed admin user exists
+        return User.objects.filter(email='admin@followops.com').exists()
+    except Exception as e:
+        # If there's any database error (like table doesn't exist), assume not seeded
+        print(f"Database not ready for seeding check: {e}")
+        return False
 
 def seed_database():
     """
