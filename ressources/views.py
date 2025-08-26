@@ -9,6 +9,7 @@ from urllib.parse import quote
 from datetime import datetime
 import json  # Ajouter cet import
 from django.http import JsonResponse
+from activities.services import AvailabilityCalculationService
 
 @login_required
 def ressources(request):
@@ -389,6 +390,251 @@ def get_resource_activities(request, resource_id):
             'success': True,
             'activities': activities_data
         })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@login_required
+def get_resource_availability(request, resource_id):
+    """API endpoint to get availability data for a specific resource"""
+    try:
+        resource = get_object_or_404(Ressource, id=resource_id)
+        
+        # Check permissions
+        user = request.user
+        if user.appRole == 'ADMIN':
+            pass  # Admin can see all
+        elif user.appRole == 'MANAGER':
+            from projects.models import Project
+            managed_projects = Project.objects.filter(project_manager=user)
+            if not (resource.members.filter(id__in=managed_projects.values_list('id', flat=True)).exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        else:
+            user_projects = user.members.all()
+            shared_projects = user_projects.filter(members=resource)
+            if not (shared_projects.exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        
+        days = int(request.GET.get('days', 30))
+        
+        # Get availability calculation
+        availability_data = AvailabilityCalculationService.calculate_availability_percentage(
+            resource_id, days
+        )
+        
+        if 'error' in availability_data:
+            return JsonResponse({'success': False, 'error': availability_data['error']})
+        
+        return JsonResponse({
+            'success': True,
+            'availability_data': availability_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@login_required
+def get_resource_hourly_breakdown(request, resource_id):
+    """API endpoint to get hourly breakdown data for charts"""
+    try:
+        resource = get_object_or_404(Ressource, id=resource_id)
+        
+        # Check permissions (same as above)
+        user = request.user
+        if user.appRole == 'ADMIN':
+            pass
+        elif user.appRole == 'MANAGER':
+            from projects.models import Project
+            managed_projects = Project.objects.filter(project_manager=user)
+            if not (resource.members.filter(id__in=managed_projects.values_list('id', flat=True)).exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        else:
+            user_projects = user.members.all()
+            shared_projects = user_projects.filter(members=resource)
+            if not (shared_projects.exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        
+        days = int(request.GET.get('days', 30))
+        
+        # Get hourly breakdown data
+        breakdown_data = AvailabilityCalculationService.get_hourly_breakdown_data(
+            resource_id, days
+        )
+        
+        if 'error' in breakdown_data:
+            return JsonResponse({'success': False, 'error': breakdown_data['error']})
+        
+        return JsonResponse({
+            'success': True,
+            'breakdown_data': breakdown_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@login_required
+def get_resource_activity_trends(request, resource_id):
+    """API endpoint to get activity trends for reporting"""
+    try:
+        resource = get_object_or_404(Ressource, id=resource_id)
+        
+        # Check permissions (same as above)
+        user = request.user
+        if user.appRole == 'ADMIN':
+            pass
+        elif user.appRole == 'MANAGER':
+            from projects.models import Project
+            managed_projects = Project.objects.filter(project_manager=user)
+            if not (resource.members.filter(id__in=managed_projects.values_list('id', flat=True)).exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        else:
+            user_projects = user.members.all()
+            shared_projects = user_projects.filter(members=resource)
+            if not (shared_projects.exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        
+        days_back = int(request.GET.get('days_back', 90))
+        
+        # Get activity trends data
+        trends_data = AvailabilityCalculationService.get_activity_trends_data(
+            resource_id, days_back
+        )
+        
+        if 'error' in trends_data:
+            return JsonResponse({'success': False, 'error': trends_data['error']})
+        
+        return JsonResponse({
+            'success': True,
+            'trends_data': trends_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@login_required
+def export_resource_activity_report(request, resource_id):
+    """Export comprehensive resource activity report to Excel including 4 months of data"""
+    try:
+        resource = get_object_or_404(Ressource, id=resource_id)
+        
+        # Check permissions
+        user = request.user
+        if user.appRole == 'ADMIN':
+            pass
+        elif user.appRole == 'MANAGER':
+            from projects.models import Project
+            managed_projects = Project.objects.filter(project_manager=user)
+            if not (resource.members.filter(id__in=managed_projects.values_list('id', flat=True)).exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        else:
+            user_projects = user.members.all()
+            shared_projects = user_projects.filter(members=resource)
+            if not (shared_projects.exists() or resource.id == user.id):
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+        
+        # Get comprehensive activity data (3 months back + 1 month forward)
+        comprehensive_data = AvailabilityCalculationService.get_comprehensive_activity_report(resource_id)
+        
+        if 'error' in comprehensive_data:
+            return JsonResponse(comprehensive_data, status=404)
+        
+        # Get current availability data for next 30 days
+        availability_data = AvailabilityCalculationService.calculate_availability_percentage(resource_id, 30)
+        
+        # Prepare data for Excel export
+        summary_data = [{
+            'Resource Name': comprehensive_data['employee_info']['name'],
+            'Email': comprehensive_data['employee_info']['email'],
+            'Role': comprehensive_data['employee_info']['role'],
+            'Report Period': f"{comprehensive_data['period']['start_date']} to {comprehensive_data['period']['end_date']}",
+            'Total Working Days (4 months)': comprehensive_data['overall_statistics']['total_working_days'],
+            'Total Hours (4 months)': comprehensive_data['overall_statistics']['total_hours'],
+            'Total Allocated Hours (4 months)': comprehensive_data['overall_statistics']['total_allocated_hours'],
+            'Overall Utilization (%)': comprehensive_data['overall_statistics']['overall_utilization'],
+            'Current Availability (%)': availability_data.get('availability_percentage', 0),
+            'Report Generated': comprehensive_data['report_generated'].strftime('%Y-%m-%d %H:%M:%S')
+        }]
+        
+        monthly_data = comprehensive_data.get('monthly_summary', [])
+        detailed_activities = comprehensive_data.get('detailed_activities', [])
+        
+        # Create Excel file
+        filename = f"comprehensive_report_{resource.first_name}_{resource.last_name}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f"attachment; filename*=UTF-8''{quote(filename)}"
+        
+        with pd.ExcelWriter(response, engine='xlsxwriter') as writer:
+            # Summary sheet
+            summary_df = pd.DataFrame(summary_data)
+            summary_df.to_excel(writer, index=False, sheet_name='Summary')
+            
+            # Monthly summary sheet
+            if monthly_data:
+                monthly_df = pd.DataFrame(monthly_data)
+                monthly_df.to_excel(writer, index=False, sheet_name='Monthly Summary')
+            
+            # Detailed activities sheet
+            if detailed_activities:
+                # Convert datetime objects to strings for Excel compatibility
+                activities_for_excel = []
+                for activity in detailed_activities:
+                    activity_copy = activity.copy()
+                    activity_copy['date'] = activity['date'].strftime('%Y-%m-%d')
+                    activity_copy['start_time'] = activity['start_time'].strftime('%H:%M')
+                    activity_copy['end_time'] = activity['end_time'].strftime('%H:%M')
+                    activities_for_excel.append(activity_copy)
+                
+                activities_df = pd.DataFrame(activities_for_excel)
+                activities_df.to_excel(writer, index=False, sheet_name='Detailed Activities')
+            
+            # Format the workbook
+            workbook = writer.book
+            
+            # Add formats
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'top',
+                'fg_color': '#D7E4BC',
+                'border': 1
+            })
+            
+            # Format all sheets
+            for sheet_name in writer.sheets:
+                worksheet = writer.sheets[sheet_name]
+                # Get the dataframe for this sheet to know column count
+                if sheet_name == 'Summary':
+                    df = summary_df
+                elif sheet_name == 'Monthly Summary' and monthly_data:
+                    df = monthly_df
+                elif sheet_name == 'Detailed Activities' and detailed_activities:
+                    df = activities_df
+                else:
+                    continue
+                
+                # Apply header format
+                for col_num, value in enumerate(df.columns.values):
+                    worksheet.write(0, col_num, value, header_format)
+                    # Auto-adjust column width
+                    worksheet.set_column(col_num, col_num, len(str(value)) + 5)
+        
+        return response
         
     except Exception as e:
         return JsonResponse({

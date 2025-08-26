@@ -397,8 +397,66 @@
                                 <p class="text-[#191610] text-2xl font-bold leading-tight">{{ completed_projects|default:"0" }}</p>
                             </div>
                             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité</p>
-                                <p class="text-[#191610] text-2xl font-bold leading-tight">{{ resource.availability_rate|default:"0" }}%</p>
+                                <p class="text-[#8c7e5a] text-sm font-medium">Taux de disponibilité (30 jours)</p>
+                                <p class="text-[#191610] text-2xl font-bold leading-tight" id="automated-availability-percentage">Calcul...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Disponibilité Automatisée -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-[#191610] text-lg font-bold leading-tight">Analyse de Disponibilité (30 prochains jours)</h2>
+                            <div class="flex items-center gap-2">
+                                <button id="export-report-btn" class="flex h-8 items-center justify-center gap-2 rounded-lg bg-[#f1efe9] px-3 text-[#191610] text-xs font-medium hover:bg-[#e8e4dc] transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="currentColor" viewBox="0 0 256 256">
+                                        <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"></path>
+                                    </svg>
+                                    Exporter Rapport
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Métriques de disponibilité -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4">
+                                <p class="text-[#8c7e5a] text-xs font-medium mb-1">Heures totales</p>
+                                <p class="text-[#191610] text-lg font-bold" id="total-working-hours">-</p>
+                            </div>
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4">
+                                <p class="text-[#8c7e5a] text-xs font-medium mb-1">Heures allouées</p>
+                                <p class="text-[#191610] text-lg font-bold" id="allocated-hours">-</p>
+                            </div>
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4">
+                                <p class="text-[#8c7e5a] text-xs font-medium mb-1">Heures disponibles</p>
+                                <p class="text-[#191610] text-lg font-bold" id="available-hours">-</p>
+                            </div>
+                            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4">
+                                <p class="text-[#8c7e5a] text-xs font-medium mb-1">Efficacité moyenne</p>
+                                <p class="text-[#191610] text-lg font-bold" id="efficiency-ratio">-</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Graphique de répartition horaire -->
+                        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-[#191610] text-base font-semibold">Répartition Quotidienne (30 jours ouvrables)</h3>
+                                <div class="flex items-center gap-4 text-xs">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                        <span class="text-[#8c7e5a]">Heures allouées</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-3 h-3 bg-green-500 rounded"></div>
+                                        <span class="text-[#8c7e5a]">Heures disponibles</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <canvas id="availability-chart" width="800" height="300" class="w-full h-64"></canvas>
+                                <div id="chart-loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
+                                    <div class="text-[#8c7e5a] text-sm">Chargement du graphique...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -481,13 +539,190 @@
         </div>
     </div>
     
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Global Search JavaScript -->
     <script src="{% static 'projects/js/global_search.js' %}?v=2"></script>
     <script src="{% static 'projects/js/profile_dropdown.js' %}"></script>
+    
+    <!-- Availability Chart JavaScript -->
     <script>
-        // Initialize Global Search
+        class AvailabilityChart {
+            constructor(resourceId) {
+                this.resourceId = resourceId;
+                this.chart = null;
+                this.init();
+            }
+            
+            async init() {
+                await this.loadAvailabilityData();
+                await this.loadHourlyBreakdown();
+                this.setupExportButton();
+            }
+            
+            async loadAvailabilityData() {
+                try {
+                    const response = await fetch(`/ressources/api/${this.resourceId}/availability/`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const availability = data.availability_data;
+                        
+                        // Update availability metrics
+                        document.getElementById('automated-availability-percentage').textContent = 
+                            `${availability.availability_percentage.toFixed(1)}%`;
+                        document.getElementById('total-working-hours').textContent = 
+                            `${availability.total_working_hours}h`;
+                        document.getElementById('allocated-hours').textContent = 
+                            `${availability.allocated_hours}h`;
+                        document.getElementById('available-hours').textContent = 
+                            `${availability.available_hours}h`;
+                        document.getElementById('efficiency-ratio').textContent = 
+                            `${availability.efficiency_ratio ? (availability.efficiency_ratio * 100).toFixed(1) : 0}%`;
+                    } else {
+                        console.error('Error loading availability data:', data.error);
+                        document.getElementById('automated-availability-percentage').textContent = 'Erreur';
+                    }
+                } catch (error) {
+                    console.error('Error fetching availability data:', error);
+                    document.getElementById('automated-availability-percentage').textContent = 'Erreur';
+                }
+            }
+            
+            async loadHourlyBreakdown() {
+                try {
+                    const response = await fetch(`/ressources/api/${this.resourceId}/hourly-breakdown/`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.renderChart(data.breakdown_data);
+                    } else {
+                        console.error('Error loading hourly breakdown:', data.error);
+                        this.showChartError();
+                    }
+                } catch (error) {
+                    console.error('Error fetching hourly breakdown:', error);
+                    this.showChartError();
+                }
+            }
+            
+            renderChart(breakdownData) {
+                const ctx = document.getElementById('availability-chart').getContext('2d');
+                
+                // Prepare data for chart - days on x-axis, hours on y-axis
+                const labels = [];
+                const allocatedHours = [];
+                const availableHours = [];
+                
+                // Process daily breakdown data
+                breakdownData.chart_data.forEach(dayData => {
+                    if (!dayData.is_weekend) { // Only show weekdays
+                        labels.push(`${dayData.day_name} ${dayData.date_label}`);
+                        allocatedHours.push(dayData.allocated_hours);
+                        availableHours.push(dayData.available_hours);
+                    }
+                });
+                
+                this.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Heures allouées',
+                                data: allocatedHours,
+                                backgroundColor: '#3B82F6',
+                                borderColor: '#2563EB',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Heures disponibles',
+                                data: availableHours,
+                                backgroundColor: '#10B981',
+                                borderColor: '#059669',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jours (30 prochains jours ouvrables)'
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Heures par jour'
+                                },
+                                beginAtZero: true,
+                                max: 10, // Max 10 hours per day
+                                grid: {
+                                    color: '#E5E7EB'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // We have custom legend
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.parsed.y}h`;
+                                    },
+                                    afterBody: function(tooltipItems) {
+                                        const dataIndex = tooltipItems[0].dataIndex;
+                                        const dayData = breakdownData.chart_data.filter(d => !d.is_weekend)[dataIndex];
+                                        return [`Utilisation: ${dayData.utilization_percentage}%`];
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+                
+                // Hide loading indicator
+                document.getElementById('chart-loading').style.display = 'none';
+            }
+            
+            showChartError() {
+                const loadingDiv = document.getElementById('chart-loading');
+                loadingDiv.innerHTML = '<div class="text-red-500 text-sm">Erreur lors du chargement du graphique</div>';
+            }
+            
+            setupExportButton() {
+                const exportBtn = document.getElementById('export-report-btn');
+                exportBtn.addEventListener('click', () => {
+                    window.open(`/ressources/api/${this.resourceId}/export-report/`, '_blank');
+                });
+            }
+        }
+        
+        // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Global Search
             new GlobalSearch('header-search-input-resource-details');
+            
+            // Initialize Availability Chart
+            const resourceId = {{ resource.id }};
+            new AvailabilityChart(resourceId);
         });
     </script>
 </body>
