@@ -32,8 +32,10 @@ echo "Waiting for database to be ready..."
 sleep 5
 echo "Running makemigrations..."
 python manage.py makemigrations
+sleep 3
 echo "Running migrations..."
 python manage.py migrate
+sleep 2
 echo "Starting Django server..."
 python manage.py runserver 0.0.0.0:8000
 EOF
