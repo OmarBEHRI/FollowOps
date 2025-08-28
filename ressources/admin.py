@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Ressource
+from .models import Ressource, PasswordResetRequest
 
 # Register the Ressource model with a custom admin class
 class RessourceAdmin(UserAdmin):
@@ -25,3 +25,28 @@ class RessourceAdmin(UserAdmin):
     )
 
 admin.site.register(Ressource, RessourceAdmin)
+
+
+class PasswordResetRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'requested_by_email', 'status', 'created_at', 'processed_by', 'processed_at')
+    list_filter = ('status', 'created_at', 'processed_at', 'new_password_sent')
+    search_fields = ('user__email', 'user__first_name', 'user__last_name', 'requested_by_email')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'processed_at')
+    
+    fieldsets = (
+        ('Request Info', {
+            'fields': ('user', 'requested_by_email', 'reason')
+        }),
+        ('Status', {
+            'fields': ('status', 'new_password_sent')
+        }),
+        ('Admin Processing', {
+            'fields': ('processed_by', 'admin_notes', 'processed_at')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at',)
+        }),
+    )
+
+admin.site.register(PasswordResetRequest, PasswordResetRequestAdmin)

@@ -259,6 +259,9 @@
                                 <a href="/ressources/" class="nav-link nav-link-active">Ressources</a>
                                 <a href="/projects/" class="nav-link">Projets</a>
                                 <a href="/tickets/" class="nav-link">Tickets</a>
+                                {% if user.appRole == 'ADMIN' %}
+                                <a href="/admin/password-resets/" class="nav-link">Mots de passe</a>
+                                {% endif %}
                             </nav>
                         </div>
                         <div class="flex items-center gap-8">
@@ -327,9 +330,9 @@
                             </button>
                             <div id="role-dropdown" class="dropdown-menu hidden">
                                 <div class="p-2">
-                                    <a href="?{% if current_status %}status={{ current_status }}{% endif %}" class="dropdown-item">Tous</a>
+                                    <a href="?{% if current_status %}status={{ current_status }}{% endif %}{% if current_availability %}&availability={{ current_availability }}{% endif %}" class="dropdown-item">Tous</a>
                                     {% for role in roles %}
-                                    <a href="?role={{ role }}{% if current_status %}&status={{ current_status }}{% endif %}" class="dropdown-item {% if current_role == role %}active{% endif %}">{{ role }}</a>
+                                    <a href="?role={{ role }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_availability %}&availability={{ current_availability }}{% endif %}" class="dropdown-item {% if current_role == role %}active{% endif %}">{{ role }}</a>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -344,9 +347,25 @@
                             </button>
                             <div id="status-dropdown" class="dropdown-menu hidden">
                                 <div class="p-2">
-                                    <a href="?{% if current_role %}role={{ current_role }}{% endif %}" class="dropdown-item">Tous</a>
+                                    <a href="?{% if current_role %}role={{ current_role }}{% endif %}{% if current_availability %}&availability={{ current_availability }}{% endif %}" class="dropdown-item">Tous</a>
                                     {% for status in statuses %}
-                                    <a href="?{% if current_role %}role={{ current_role }}&{% endif %}status={{ status }}" class="dropdown-item {% if current_status == status %}active{% endif %}">{{ status }}</a>
+                                    <a href="?{% if current_role %}role={{ current_role }}&{% endif %}status={{ status }}{% if current_availability %}&availability={{ current_availability }}{% endif %}" class="dropdown-item {% if current_status == status %}active{% endif %}">{{ status }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Availability - Visible seulement pour ADMIN et MANAGER -->
+                        <div class="relative inline-block">
+                            <button type="button" id="availability-dropdown-btn" class="filter-btn {% if current_availability %}active{% endif %}">
+                                Disponibilité {% if current_availability %}({% for key, label in availability_categories %}{% if key == current_availability %}{{ label }}{% endif %}{% endfor %}){% endif %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                            </button>
+                            <div id="availability-dropdown" class="dropdown-menu hidden">
+                                <div class="p-2">
+                                    <a href="?{% if current_role %}role={{ current_role }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}" class="dropdown-item">Tous</a>
+                                    {% for key, label in availability_categories %}
+                                    <a href="?{% if current_role %}role={{ current_role }}&{% endif %}{% if current_status %}status={{ current_status }}&{% endif %}availability={{ key }}" class="dropdown-item {% if current_availability == key %}active{% endif %}">{{ label }}</a>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -431,11 +450,14 @@
                     const roleDropdown = document.getElementById('role-dropdown');
                     const statusBtn = document.getElementById('status-dropdown-btn');
                     const statusDropdown = document.getElementById('status-dropdown');
+                    const availabilityBtn = document.getElementById('availability-dropdown-btn');
+                    const availabilityDropdown = document.getElementById('availability-dropdown');
                     
                     if (roleBtn && roleDropdown) {
                         roleBtn.addEventListener('click', function() {
                             roleDropdown.classList.toggle('hidden');
                             if (statusDropdown) statusDropdown.classList.add('hidden');
+                            if (availabilityDropdown) availabilityDropdown.classList.add('hidden');
                         });
                     }
                     
@@ -443,6 +465,15 @@
                         statusBtn.addEventListener('click', function() {
                             statusDropdown.classList.toggle('hidden');
                             if (roleDropdown) roleDropdown.classList.add('hidden');
+                            if (availabilityDropdown) availabilityDropdown.classList.add('hidden');
+                        });
+                    }
+                    
+                    if (availabilityBtn && availabilityDropdown) {
+                        availabilityBtn.addEventListener('click', function() {
+                            availabilityDropdown.classList.toggle('hidden');
+                            if (roleDropdown) roleDropdown.classList.add('hidden');
+                            if (statusDropdown) statusDropdown.classList.add('hidden');
                         });
                     }
                     
@@ -453,6 +484,9 @@
                         }
                         if (statusBtn && statusDropdown && !statusBtn.contains(event.target) && !statusDropdown.contains(event.target)) {
                             statusDropdown.classList.add('hidden');
+                        }
+                        if (availabilityBtn && availabilityDropdown && !availabilityBtn.contains(event.target) && !availabilityDropdown.contains(event.target)) {
+                            availabilityDropdown.classList.add('hidden');
                         }
                     });
                 });
@@ -465,6 +499,7 @@
                     let filename = `ressources_${dateStr}`;
                     if(params.get('role')) filename += `_role-${params.get('role')}`;
                     if(params.get('status')) filename += `_status-${params.get('status')}`;
+                    if(params.get('availability')) filename += `_availability-${params.get('availability')}`;
                     if(params.get('search')) filename += `_search-${params.get('search')}`;
                     window.location.href = `/ressources/export/?${params.toString()}&filename=${filename}`;
                 }

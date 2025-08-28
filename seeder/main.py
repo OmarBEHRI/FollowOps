@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 from django.contrib.auth import get_user_model
 
 # Import seeder modules
-from .users_seeder import seed_users
+from .users_seeder import seed_users, update_availability_rates
 from .projects_seeder import seed_projects, seed_project_activities_comments
 from .tickets_seeder import seed_tickets, seed_ticket_activities_comments
 
@@ -58,6 +58,10 @@ def seed_database():
             # Add activities and comments to tickets
             seed_ticket_activities_comments(users, tickets)
             print("✅ Added activities and comments to tickets")
+            
+            # Update availability rates based on seeded activities
+            update_availability_rates()
+            print("✅ Updated availability rates based on activities")
             
         print("✅ Database seeding completed successfully!")
         return True

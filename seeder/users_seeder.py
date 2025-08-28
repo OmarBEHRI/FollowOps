@@ -1,7 +1,50 @@
 import random
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Sum
 from ressources.models import Ressource
+from activities.models import Activity
+
+def calculate_availability_rate(user, days=30):
+    """
+    Calculate the availability rate for a user based on their activities.
+    This looks at future activities (from today onwards) and calculates availability.
+    Since seeded activities are in the past, this will return 100% for all users.
+    """
+    today = timezone.now().date()
+    end_date = today + timedelta(days=days)
+    
+    # Calculate total working hours for the period (8 hours per working day)
+    working_days = 0
+    current_date = today
+    while current_date < end_date:
+        if current_date.weekday() < 5:  # Monday = 0, Sunday = 6
+            working_days += 1
+        current_date += timedelta(days=1)
+    
+    total_working_hours = working_days * 8  # 8 hours per working day
+    
+    # Get activities for the user in the future period
+    future_activities = Activity.objects.filter(
+        employee=user,
+        start_datetime__date__gte=today,
+        start_datetime__date__lt=end_date
+    )
+    
+    # Calculate allocated hours from activities
+    allocated_hours = 0
+    for activity in future_activities:
+        duration = activity.end_datetime - activity.start_datetime
+        allocated_hours += duration.total_seconds() / 3600
+    
+    # Calculate availability percentage
+    if total_working_hours > 0:
+        available_hours = max(0, total_working_hours - allocated_hours)
+        availability_percentage = (available_hours / total_working_hours) * 100
+    else:
+        availability_percentage = 100
+    
+    return min(100, max(0, round(availability_percentage)))
 
 def seed_users():
     """
@@ -140,3 +183,22 @@ def seed_users():
         user.save()
     
     return created_users
+
+def update_availability_rates():
+    """
+    Update availability rates for all users based on their activities.
+    This should be called after all activities have been seeded.
+    """
+    users = Ressource.objects.all()
+    
+    for user in users:
+        # Calculate availability rate based on activities
+        availability_rate = calculate_availability_rate(user)
+        
+        # Update the user's availability rate
+        user.availability_rate = availability_rate
+        user.save()
+        
+        print(f"Updated availability rate for {user.first_name} {user.last_name}: {availability_rate}%")
+    
+    print(f"✅ Updated availability rates for {len(users)} users")

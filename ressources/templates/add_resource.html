@@ -247,6 +247,11 @@
                                 <a href="/ressources/" class="nav-link nav-link-active">Ressources</a>
                                 <a href="/projects/" class="nav-link">Projets</a>
                                 <a href="/tickets/" class="nav-link">Tickets</a>
+                                {% if user.appRole == 'ADMIN' %}
+                                <a href="/admin/password-resets/" class="nav-link">
+                                    <span>Mots de passe</span>
+                                </a>
+                                {% endif %}
                             </nav>
                         </div>
                     </div>

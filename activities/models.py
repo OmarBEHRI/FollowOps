@@ -72,6 +72,114 @@ class Activity(models.Model):
             self.charge = round(hours, 2)
         
         super().save(*args, **kwargs)
+        
+        # Recalculate availability rate for the employee after saving activity
+        if self.employee:
+            self._update_employee_availability_rate()
+    
+    def _update_employee_availability_rate(self):
+        """
+        Update the employee's availability rate based on their activities.
+        """
+        from datetime import timedelta
+        from django.utils import timezone
+        
+        today = timezone.now().date()
+        end_date = today + timedelta(days=30)  # Look ahead 30 days
+        
+        # Calculate total working hours for the period (8 hours per working day)
+        working_days = 0
+        current_date = today
+        while current_date < end_date:
+            if current_date.weekday() < 5:  # Monday = 0, Sunday = 6
+                working_days += 1
+            current_date += timedelta(days=1)
+        
+        total_working_hours = working_days * 8  # 8 hours per working day
+        
+        # Get activities for the employee in the future period
+        future_activities = Activity.objects.filter(
+            employee=self.employee,
+            start_datetime__date__gte=today,
+            start_datetime__date__lt=end_date
+        )
+        
+        # Calculate allocated hours from activities
+        allocated_hours = 0
+        for activity in future_activities:
+            duration = activity.end_datetime - activity.start_datetime
+            allocated_hours += duration.total_seconds() / 3600
+        
+        # Calculate availability percentage
+        if total_working_hours > 0:
+            available_hours = max(0, total_working_hours - allocated_hours)
+            availability_percentage = (available_hours / total_working_hours) * 100
+        else:
+            availability_percentage = 100
+        
+        # Update employee's availability rate
+        availability_rate = min(100, max(0, round(availability_percentage)))
+        if self.employee.availability_rate != availability_rate:
+            self.employee.availability_rate = availability_rate
+            self.employee.save(update_fields=['availability_rate'])
+    
+    def delete(self, *args, **kwargs):
+        # Store employee reference before deletion
+        employee = self.employee
+        
+        # Delete the activity
+        super().delete(*args, **kwargs)
+        
+        # Recalculate availability rate for the employee after deletion
+        if employee:
+            self._update_employee_availability_rate_for_employee(employee)
+    
+    def _update_employee_availability_rate_for_employee(self, employee):
+        """
+        Update the given employee's availability rate based on their activities.
+        Used when deleting activities.
+        """
+        from datetime import timedelta
+        from django.utils import timezone
+        
+        today = timezone.now().date()
+        end_date = today + timedelta(days=30)  # Look ahead 30 days
+        
+        # Calculate total working hours for the period (8 hours per working day)
+        working_days = 0
+        current_date = today
+        while current_date < end_date:
+            if current_date.weekday() < 5:  # Monday = 0, Sunday = 6
+                working_days += 1
+            current_date += timedelta(days=1)
+        
+        total_working_hours = working_days * 8  # 8 hours per working day
+        
+        # Get activities for the employee in the future period
+        future_activities = Activity.objects.filter(
+            employee=employee,
+            start_datetime__date__gte=today,
+            start_datetime__date__lt=end_date
+        )
+        
+        # Calculate allocated hours from activities
+        allocated_hours = 0
+        for activity in future_activities:
+            duration = activity.end_datetime - activity.start_datetime
+            allocated_hours += duration.total_seconds() / 3600
+        
+        # Calculate availability percentage
+        if total_working_hours > 0:
+            available_hours = max(0, total_working_hours - allocated_hours)
+            availability_percentage = (available_hours / total_working_hours) * 100
+        else:
+            availability_percentage = 100
+        
+        # Update employee's availability rate
+        availability_rate = min(100, max(0, round(availability_percentage)))
+        if employee.availability_rate != availability_rate:
+            employee.availability_rate = availability_rate
+            employee.save(update_fields=['availability_rate'])
     
     def __str__(self):
         return f"{self.title} - {self.employee} ({self.get_activity_type_display()})"

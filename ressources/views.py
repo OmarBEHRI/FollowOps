@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Ressource
+from .models import Ressource, PasswordResetRequest
 from activities.models import Activity  # Ajouter cet import
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -10,6 +10,12 @@ from datetime import datetime
 import json  # Ajouter cet import
 from django.http import JsonResponse
 from activities.services import AvailabilityCalculationService
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+import string
+import random
+from django.conf import settings
 
 @login_required
 def ressources(request):
@@ -70,21 +76,48 @@ def ressources(request):
     # Filtering functionality
     role_filter = request.GET.get('role', '')
     status_filter = request.GET.get('status', '')
+    availability_filter = request.GET.get('availability', '')
+    
     if role_filter:
         ressources = ressources.filter(role=role_filter)
     if status_filter:
         ressources = ressources.filter(status=status_filter)
+    
+    # Availability filtering based on availability_rate
+    if availability_filter:
+        if availability_filter == 'high':
+            # High: > 75%
+            ressources = ressources.filter(availability_rate__gt=75)
+        elif availability_filter == 'medium':
+            # Medium: >= 50% and <= 75%
+            ressources = ressources.filter(availability_rate__gte=50, availability_rate__lte=75)
+        elif availability_filter == 'low':
+            # Low: >= 25% and < 50%
+            ressources = ressources.filter(availability_rate__gte=25, availability_rate__lt=50)
+        elif availability_filter == 'none':
+            # None: < 25%
+            ressources = ressources.filter(availability_rate__lt=25)
 
     # Get unique roles and statuses for filter dropdowns
     roles = Ressource.objects.values_list('role', flat=True).distinct()
     statuses = Ressource.objects.values_list('status', flat=True).distinct()
+    
+    # Define availability categories for the dropdown
+    availability_categories = [
+        ('high', 'High (>75%)'),
+        ('medium', 'Medium (50-75%)'),
+        ('low', 'Low (25-49%)'),
+        ('none', 'None (<25%)')
+    ]
 
     return render(request, 'ressources.html', {
         'ressources': ressources,
         'roles': roles,
         'statuses': statuses,
+        'availability_categories': availability_categories,
         'current_role': role_filter,
         'current_status': status_filter,
+        'current_availability': availability_filter,
         'search_query': search_query,
         'user_role': user.appRole
     })
@@ -326,10 +359,23 @@ def export_ressources_excel(request):
         ressources = ressources.filter(query | Q(id__in=ressources_ids))
     role_filter = request.GET.get('role', '')
     status_filter = request.GET.get('status', '')
+    availability_filter = request.GET.get('availability', '')
+    
     if role_filter:
         ressources = ressources.filter(role=role_filter)
     if status_filter:
         ressources = ressources.filter(status=status_filter)
+    
+    # Availability filtering for export
+    if availability_filter:
+        if availability_filter == 'high':
+            ressources = ressources.filter(availability_rate__gt=75)
+        elif availability_filter == 'medium':
+            ressources = ressources.filter(availability_rate__gte=50, availability_rate__lte=75)
+        elif availability_filter == 'low':
+            ressources = ressources.filter(availability_rate__gte=25, availability_rate__lt=50)
+        elif availability_filter == 'none':
+            ressources = ressources.filter(availability_rate__lt=25)
     data = list(ressources.values('first_name','last_name','email','role','status','phone_number','entry_date','location','availability_rate','skills'))
     df = pd.DataFrame(data)
     filename = request.GET.get('filename')
@@ -641,3 +687,120 @@ def export_resource_activity_report(request, resource_id):
             'success': False,
             'error': str(e)
         })
+
+
+def password_reset_request(request):
+    """View for users to request password reset"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        reason = request.POST.get('reason', '')
+        
+        try:
+            user = Ressource.objects.get(email=email)
+            
+            # Create password reset request
+            reset_request = PasswordResetRequest.objects.create(
+                user=user,
+                requested_by_email=email,
+                reason=reason
+            )
+            
+            messages.success(request, 'Votre demande de réinitialisation de mot de passe a été soumise. Un administrateur la traitera bientôt.')
+            return redirect('password_reset_request')
+            
+        except Ressource.DoesNotExist:
+            messages.error(request, 'Aucun compte trouvé avec cette adresse e-mail.')
+    
+    return render(request, 'password_reset_request.html')
+
+
+@login_required
+def admin_password_resets(request):
+    """Admin view to manage password reset requests"""
+    # Only admins can access this view
+    if request.user.appRole != 'ADMIN':
+        messages.error(request, 'Accès non autorisé.')
+        return redirect('dashboard')
+    
+    # Handle form submissions
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        request_id = request.POST.get('request_id')
+        
+        try:
+            reset_request = get_object_or_404(PasswordResetRequest, id=request_id)
+            
+            if action == 'approve':
+                # Generate new password
+                new_password = generate_random_password()
+                
+                # Update user password
+                reset_request.user.set_password(new_password)
+                reset_request.user.save()
+                
+                # Send email with new password
+                try:
+                    send_password_email(reset_request.user.email, new_password)
+                    reset_request.new_password_sent = True
+                except Exception as e:
+                    messages.error(request, f'Erreur lors de l\'envoi de l\'e-mail: {str(e)}')
+                
+                # Mark request as processed
+                admin_notes = request.POST.get('admin_notes', '')
+                reset_request.mark_as_processed(request.user, admin_notes)
+                
+                messages.success(request, f'Mot de passe réinitialisé et envoyé à {reset_request.user.email}')
+                
+            elif action == 'reject':
+                admin_notes = request.POST.get('admin_notes', '')
+                reset_request.status = 'REJECTED'
+                reset_request.mark_as_processed(request.user, admin_notes)
+                
+                messages.success(request, 'Demande rejetée.')
+                
+        except Exception as e:
+            messages.error(request, f'Erreur: {str(e)}')
+    
+    # Get all password reset requests
+    pending_requests = PasswordResetRequest.objects.filter(status='PENDING')
+    processed_requests = PasswordResetRequest.objects.filter(status__in=['PROCESSED', 'REJECTED'])[:20]  # Last 20
+    
+    context = {
+        'pending_requests': pending_requests,
+        'processed_requests': processed_requests,
+    }
+    
+    return render(request, 'admin_password_resets.html', context)
+
+
+def generate_random_password(length=12):
+    """Generate a secure random password"""
+    characters = string.ascii_letters + string.digits + '!@#$%^&*'
+    return ''.join(random.choice(characters) for _ in range(length))
+
+
+def send_password_email(email, new_password):
+    """Send new password via email"""
+    subject = 'Votre nouveau mot de passe - FlowOps'
+    message = f'''
+Bonjour,
+
+Votre mot de passe a été réinitialisé par un administrateur.
+
+Votre nouveau mot de passe temporaire est: {new_password}
+
+Pour des raisons de sécurité, nous vous recommandons de :
+1. Vous connecter avec ce mot de passe temporaire
+2. Modifier immédiatement votre mot de passe dans votre profil
+
+Cordialement,
+L'équipe FlowOps
+'''
+    
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+    )

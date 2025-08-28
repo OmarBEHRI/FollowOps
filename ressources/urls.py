@@ -15,6 +15,9 @@ urlpatterns = [
     path('api/<int:resource_id>/hourly-breakdown/', views.get_resource_hourly_breakdown, name='get_resource_hourly_breakdown'),
     path('api/<int:resource_id>/activity-trends/', views.get_resource_activity_trends, name='get_resource_activity_trends'),
     path('api/<int:resource_id>/export-report/', views.export_resource_activity_report, name='export_resource_activity_report'),
+    # Password reset URLs
+    path('password-reset/', views.password_reset_request, name='password_reset_request'),
+    path('admin/password-resets/', views.admin_password_resets, name='admin_password_resets'),
 ]
 
 

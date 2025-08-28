@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from ressources.models import Ressource
 
 class Ticket(models.Model):
@@ -22,9 +23,36 @@ class Ticket(models.Model):
     created_by = models.ForeignKey(Ressource, on_delete=models.CASCADE, related_name="createdTickets")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Ouvert')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Moyenne')
+    # Real dates - automatically set based on status
+    start_date = models.DateTimeField(null=True, blank=True, verbose_name="Date de début réelle")
+    end_date = models.DateTimeField(null=True, blank=True, verbose_name="Date de fin réelle")
     comments = models.ManyToManyField('CommentTicket', related_name="ticket_comments", verbose_name="Commentaires", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Get the old status if this is an update
+        old_status = None
+        if self.pk:
+            try:
+                old_instance = Ticket.objects.get(pk=self.pk)
+                old_status = old_instance.status
+            except Ticket.DoesNotExist:
+                pass
+        
+        # Set real start date when status changes to 'En cours'
+        if old_status != 'En cours' and self.status == 'En cours' and not self.start_date:
+            self.start_date = timezone.now()
+        
+        # Set real end date when status changes to 'Résolu' or 'Fermé'
+        if old_status not in ['Résolu', 'Fermé'] and self.status in ['Résolu', 'Fermé'] and not self.end_date:
+            self.end_date = timezone.now()
+        
+        # Reset end date if status changes back from closed/resolved
+        if old_status in ['Résolu', 'Fermé'] and self.status not in ['Résolu', 'Fermé']:
+            self.end_date = None
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title}"
