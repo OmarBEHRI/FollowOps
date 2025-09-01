@@ -21,6 +21,12 @@ services:
       - .:/code
     ports:
       - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_PORT=3306
     depends_on:
       - db
 
