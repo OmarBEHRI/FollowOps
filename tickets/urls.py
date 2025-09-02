@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_resources/', views.get_resources_list, name='get_resources'),
     # Nouvel endpoint pour les tickets de l'utilisateur
     path('api/tickets/', views.get_user_tickets_api, name='get_user_tickets_api'),
+    path('api/update-field/<int:ticket_id>/', views.update_ticket_field, name='update_ticket_field'),
 ]

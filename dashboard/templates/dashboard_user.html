@@ -102,14 +102,7 @@
             font-size: 0.875rem; /* text-sm */
             color: var(--text-color-medium);
         }
-        .kpi-card .change-positive {
-            color: #28a745; /* Vert pour l'augmentation */
-            font-size: 0.875rem;
-        }
-        .kpi-card .change-negative {
-            color: #dc3545; /* Rouge pour la diminution */
-            font-size: 0.875rem;
-        }
+
 
         /* Styles pour les activités récentes */
         .activity-item {
@@ -195,6 +188,10 @@
             background-color: var(--primary-color);
         }
     </style>
+    <style id="profile-dropdown-critical-styles">
+        .profile-dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(-10px); }
+        .profile-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
     <div class="layout-container flex h-full grow flex-col">
@@ -264,22 +261,18 @@
                         <div class="kpi-card">
                             <p class="label">Projets en cours</p>
                             <p class="value">{{ projets_en_cours }}</p>
-                            <p class="change-positive">+15%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Nombres de tickets en cours</p>
                             <p class="value">{{ tickets_en_cours }}</p>
-                            <p class="change-positive">+10%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Tickets Résolus</p>
                             <p class="value">{{ tickets_resolus }}</p>
-                            <p class="change-positive">+42%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Temps moyen de résolution</p>
                             <p class="value">{{ average_resolution_time }}</p>
-                            <p class="change-positive">+50%</p>
                         </div>
                     </div>
 

@@ -33,6 +33,8 @@ class Ticket(models.Model):
     def save(self, *args, **kwargs):
         # Get the old status if this is an update
         old_status = None
+        is_new = self.pk is None
+        
         if self.pk:
             try:
                 old_instance = Ticket.objects.get(pk=self.pk)
@@ -53,9 +55,32 @@ class Ticket(models.Model):
             self.end_date = None
         
         super().save(*args, **kwargs)
+        
+        # Create status log entry for new tickets or status changes
+        if is_new or (old_status and old_status != self.status):
+            TicketStatusLog.objects.create(
+                ticket=self,
+                status=self.status,
+                changed_by=getattr(self, '_changed_by', None)
+            )
 
     def __str__(self):
         return f"{self.title}"
+
+
+class TicketStatusLog(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="status_logs")
+    status = models.CharField(max_length=20, choices=Ticket.STATUS_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    changed_by = models.ForeignKey(Ressource, on_delete=models.SET_NULL, null=True, related_name='ticket_status_changes')
+    
+    class Meta:
+        ordering = ['timestamp']
+        verbose_name = "Ticket Status Log"
+        verbose_name_plural = "Ticket Status Logs"
+    
+    def __str__(self):
+        return f"Ticket {self.ticket.id} - {self.status} at {self.timestamp}"
 
 
 class CommentTicket(models.Model):

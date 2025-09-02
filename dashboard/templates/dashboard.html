@@ -102,14 +102,7 @@
             font-size: 0.875rem; /* text-sm */
             color: var(--text-color-medium);
         }
-        .kpi-card .change-positive {
-            color: #28a745; /* Vert pour l'augmentation */
-            font-size: 0.875rem;
-        }
-        .kpi-card .change-negative {
-            color: #dc3545; /* Rouge pour la diminution */
-            font-size: 0.875rem;
-        }
+
 
         /* Styles pour les barres d'allocation */
         .allocation-bar-container {
@@ -207,6 +200,38 @@
             border-radius: 9999px;
             background-color: var(--primary-color);
         }
+        
+        /* Styles pour les boutons de sélection de période */
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .period-selector button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            color: var(--text-color-medium);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .period-selector button:hover {
+            background: var(--bg-light);
+            border-color: var(--primary-color);
+        }
+        
+        .period-selector button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+    <style id="profile-dropdown-critical-styles">
+        .profile-dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(-10px); }
+        .profile-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
     </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
@@ -277,22 +302,18 @@
                         <div class="kpi-card">
                             <p class="label">Projets en cours</p>
                             <p class="value">{{ projets_en_cours }}</p>
-                            <p class="change-positive">+10%</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="label">Taux d'occupation des ressources</p>
+                            <p class="label">Taux de disponibilité des ressources</p>
                             <p class="value">{{ taux_occupation }}%</p>
-                            <p class="change-positive">+5%</p>
                         </div>
                         <div class="kpi-card">
                             <p class="label">Taux d'avancement des projets</p>
                             <p class="value">{{ taux_avancement }}%</p>
-                            <p class="change-negative">-3%</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="label">Budget restant</p>
-                            <p class="value">{{ budget_restant }}</p>
-                            <p class="change-positive">+8%</p>
+                            <p class="label">Total des ressources</p>
+                            <p class="value">{{ total_ressources }}</p>
                         </div>
                     </div>
 
@@ -305,9 +326,30 @@
                             </div>
                         </div>
                         <div class="graph-card">
-                            <h2 class="text-base font-semibold text-color-dark mb-4">Tickets créés vs. Tickets résolus</h2>
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-base font-semibold text-color-dark">Tickets créés vs. Tickets résolus</h2>
+                                <div class="btn-group btn-group-sm" role="group" id="periodSelector">
+                                    <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 active" data-period="month">Dernier Mois</button>
+                                    <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="year">Dernière Année</button>
+                                    <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="all">Tout le Temps</button>
+                                </div>
+                            </div>
                             <div class="relative h-64 w-full"> <canvas id="lineChart"></canvas>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Evolution Chart -->
+                    <div class="graph-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-base font-semibold text-color-dark">Évolution des Projets</h2>
+                            <div class="btn-group btn-group-sm" role="group" id="projectPeriodSelector">
+                                <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 active" data-period="month">Dernier Mois</button>
+                                <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="year">Dernière Année</button>
+                                <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="all">Tout le Temps</button>
+                            </div>
+                        </div>
+                        <div class="relative h-64 w-full"> <canvas id="projectChart"></canvas>
                         </div>
                     </div>
 
@@ -457,103 +499,290 @@
             }
         });
 
+        // Données des graphiques pour toutes les périodes
+        const ticketDataMonth = {{ ticket_curve_month|safe }};
+        const ticketDataYear = {{ ticket_curve_year|safe }};
+        const ticketDataAll = {{ ticket_curve_all|safe }};
+        
         // Graphique linéaire - Tickets créés vs. Tickets résolus
         const lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-                datasets: [{
-                    label: 'Tickets Créés',
-                    data: [65, 59, 80, 81, 56, 55, 60], // Données d'exemple
-                    borderColor: nudeColors[0], // Couleur principale
-                    backgroundColor: 'rgba(160, 141, 128, 0.3)', // Couleur principale avec transparence pour le fond
-                    fill: true,
-                    tension: 0.4, // Courbe plus douce
-                    pointBackgroundColor: nudeColors[0],
-                    pointBorderColor: 'var(--bg-white)',
-                    pointBorderWidth: 2,
-                    pointRadius: 5, // Taille des points
-                    pointHoverRadius: 7
-                }, {
-                    label: 'Tickets Résolus',
-                    data: [28, 48, 40, 49, 76, 37, 70], // Données d'exemple
-                    borderColor: nudeColors[1], // Deuxième couleur de la palette
-                    backgroundColor: 'rgba(110, 104, 100, 0.3)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: nudeColors[1],
-                    pointBorderColor: 'var(--bg-white)',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom', // Légende en bas pour le linéaire
-                        labels: {
-                            color: 'var(--text-color-dark)',
-                            font: {
-                                size: 12,
-                                weight: '500'
-                            },
-                            boxWidth: 20,
-                            padding: 15
-                        }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'var(--text-color-dark)',
-                        titleColor: 'var(--bg-white)',
-                        bodyColor: 'var(--bg-white)',
-                        padding: 10,
-                        bodyFont: {
-                            size: 14
-                        }
-                    },
-                    title: {
-                        display: false, // Le titre est maintenant dans le HTML
-                    }
+        let currentChart = null;
+        
+        function createTicketChart(data) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            currentChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Tickets Créés',
+                        data: data.created_data,
+                        borderColor: nudeColors[0], // Couleur principale
+                        backgroundColor: 'rgba(160, 141, 128, 0.3)', // Couleur principale avec transparence pour le fond
+                        fill: true,
+                        tension: 0.4, // Courbe plus douce
+                        pointBackgroundColor: nudeColors[0],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5, // Taille des points
+                        pointHoverRadius: 7
+                    }, {
+                        label: 'Tickets Résolus',
+                        data: data.resolved_data,
+                        borderColor: nudeColors[1], // Deuxième couleur de la palette
+                        backgroundColor: 'rgba(110, 104, 100, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[1],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
                 },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: 'var(--text-color-medium)',
-                            font: {
-                                size: 12
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', // Légende en bas pour le linéaire
+                            labels: {
+                                color: 'var(--text-color-dark)',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                boxWidth: 20,
+                                padding: 15
                             }
                         },
-                        grid: {
-                            color: 'var(--border-color)', // Couleur de la grille
-                            drawBorder: false // Ne pas dessiner la bordure de l'axe
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: 'var(--text-color-medium)',
-                            font: {
-                                size: 12
-                            },
-                            callback: function(value) {
-                                return value; // Garde les valeurs entières
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'var(--text-color-dark)',
+                            titleColor: 'var(--bg-white)',
+                            bodyColor: 'var(--bg-white)',
+                            padding: 10,
+                            bodyFont: {
+                                size: 14
                             }
                         },
-                        grid: {
-                            color: 'var(--border-color)',
-                            drawBorder: false
+                        title: {
+                            display: false, // Le titre est maintenant dans le HTML
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'var(--border-color)', // Couleur de la grille
+                                drawBorder: false // Ne pas dessiner la bordure de l'axe
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value; // Garde les valeurs entières
+                                }
+                            },
+                            grid: {
+                                color: 'var(--border-color)',
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 2 // Épaisseur des lignes
                         }
                     }
+                }
+            });
+        }
+        
+        // Initialiser le graphique avec les données du mois
+        createTicketChart(ticketDataMonth);
+        
+        // Gestionnaire d'événements pour les boutons de période
+        document.getElementById('periodSelector').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                // Retirer la classe active de tous les boutons
+                document.querySelectorAll('#periodSelector button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Ajouter la classe active au bouton cliqué
+                e.target.classList.add('active');
+                
+                // Mettre à jour le graphique selon la période sélectionnée
+                const period = e.target.getAttribute('data-period');
+                switch(period) {
+                    case 'month':
+                        createTicketChart(ticketDataMonth);
+                        break;
+                    case 'year':
+                        createTicketChart(ticketDataYear);
+                        break;
+                    case 'all':
+                        createTicketChart(ticketDataAll);
+                        break;
+                }
+            }
+        });
+        
+        // Données des projets pour toutes les périodes
+        const projectDataMonth = {{ project_curve_month|safe }};
+        const projectDataYear = {{ project_curve_year|safe }};
+        const projectDataAll = {{ project_curve_all|safe }};
+        
+        // Graphique linéaire - Évolution des projets
+        const projectCtx = document.getElementById('projectChart').getContext('2d');
+        let currentProjectChart = null;
+        
+        function createProjectChart(data) {
+            if (currentProjectChart) {
+                currentProjectChart.destroy();
+            }
+            
+            currentProjectChart = new Chart(projectCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Projets Créés',
+                        data: data.created_data,
+                        borderColor: nudeColors[2],
+                        backgroundColor: 'rgba(212, 204, 193, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[2],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }, {
+                         label: 'Projets Terminés',
+                         data: data.finished_data,
+                        borderColor: nudeColors[3],
+                        backgroundColor: 'rgba(156, 149, 145, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[3],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
                 },
-                elements: {
-                    line: {
-                        borderWidth: 2 // Épaisseur des lignes
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--text-color-dark)',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                boxWidth: 20,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'var(--text-color-dark)',
+                            titleColor: 'var(--bg-white)',
+                            bodyColor: 'var(--bg-white)',
+                            padding: 10,
+                            bodyFont: {
+                                size: 14
+                            }
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'var(--border-color)',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            grid: {
+                                color: 'var(--border-color)',
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 2
+                        }
                     }
+                }
+            });
+        }
+        
+        // Initialiser le graphique des projets avec les données du mois
+        createProjectChart(projectDataMonth);
+        
+        // Gestionnaire d'événements pour les boutons de période des projets
+        document.getElementById('projectPeriodSelector').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                // Retirer la classe active de tous les boutons
+                document.querySelectorAll('#projectPeriodSelector button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Ajouter la classe active au bouton cliqué
+                e.target.classList.add('active');
+                
+                // Mettre à jour le graphique selon la période sélectionnée
+                const period = e.target.getAttribute('data-period');
+                switch(period) {
+                    case 'month':
+                        createProjectChart(projectDataMonth);
+                        break;
+                    case 'year':
+                        createProjectChart(projectDataYear);
+                        break;
+                    case 'all':
+                        createProjectChart(projectDataAll);
+                        break;
                 }
             }
         });

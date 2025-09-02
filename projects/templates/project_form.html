@@ -514,6 +514,39 @@
                 </div>
               </div>
               
+              <!-- Sous-section: Budget (Admin/Manager seulement) -->
+              {% if user.appRole == 'ADMIN' or user.appRole == 'MANAGER' %}
+              <div>
+                <h3 class="text-lg font-semibold text-[#3F3C3A] mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#A08D80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                  Budget alloué
+                </h3>
+                <div class="bg-[#FBF9F7] p-4 rounded-lg border border-[#EBE5E0]">
+                  <div class="planning-field-container">
+                    <div class="member-search-container">
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="id_budget" 
+                                name="budget"
+                                placeholder="Ex: 50000.00"
+                                class="member-search-input"
+                                value="{{ form.budget.value|default:'' }}"
+                                step="0.01"
+                                min="0"
+                            >
+                            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              
               <!-- Sous-section: Planification temporelle -->
               <div>
                 <h3 class="text-lg font-semibold text-[#3F3C3A] mb-4 flex items-center gap-2">

@@ -102,14 +102,7 @@
             font-size: 0.875rem; /* text-sm */
             color: var(--text-color-medium);
         }
-        .kpi-card .change-positive {
-            color: #28a745; /* Vert pour l'augmentation */
-            font-size: 0.875rem;
-        }
-        .kpi-card .change-negative {
-            color: #dc3545; /* Rouge pour la diminution */
-            font-size: 0.875rem;
-        }
+
 
         /* Styles pour les barres d'allocation */
         .allocation-bar-container {
@@ -207,6 +200,44 @@
             border-radius: 9999px;
             background-color: var(--primary-color);
         }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .period-selector button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            color: var(--text-color-medium);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .period-selector button:hover {
+            background: var(--bg-light);
+            border-color: var(--primary-color);
+        }
+        
+        .period-selector button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+    <style id="profile-dropdown-critical-styles">
+        .profile-dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(-10px); }
+        .profile-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
     </style>
 </head>
 <body class="relative flex size-full min-h-screen flex-col bg-[#fbfaf9] group/design-root overflow-x-hidden font-['Inter','Noto_Sans',sans-serif]">
@@ -277,22 +308,18 @@
                         <div class="kpi-card" id="kpi-projets-en-cours">
                             <p class="label">Projets en cours</p>
                             <p class="value">{{ projets_en_cours }}</p>
-                            <p class="change-positive">+15%</p>
                         </div>
                         <div class="kpi-card" id="kpi-ressources-disponibles">
                             <p class="label">Ressources disponibles</p>
                             <p class="value">{{ ressources_disponibles }}</p>
-                            <p class="change-positive">+10%</p>
                         </div>
                         <div class="kpi-card" id="kpi-tickets-ouverts">
                             <p class="label">Tickets ouverts</p>
                             <p class="value">{{ tickets_ouverts }}</p>
-                            <p class="change-negative">-5%</p>
                         </div>
                         <div class="kpi-card" id="kpi-taux-avancement">
                             <p class="label">Taux d'avancement moyen</p>
                             <p class="value">{{ taux_avancement_moyen }}%</p>
-                            <p class="change-positive">+8%</p>
                         </div>
                     </div>
 
@@ -301,19 +328,36 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="graph-card">
                             <h2 class="text-base font-semibold text-color-dark mb-4">Répartition des tickets par statut</h2>
-                            {% if repartition_tickets_par_statut %}
                             <div class="relative h-64 w-full"> <canvas id="pieChart"></canvas>
                             </div>
-                            {% else %}
-                            <div class="relative h-64 w-full flex items-center justify-center">
-                                <p class="text-[#8c7e5a] text-sm">Aucun ticket trouvé</p>
-                            </div>
-                            {% endif %}
                         </div>
                         <div class="graph-card">
-                            <h2 class="text-base font-semibold text-color-dark mb-4">Tickets créés vs. Tickets résolus</h2>
+                            <div class="chart-header">
+                                <h2 class="text-base font-semibold text-color-dark mb-4">Tickets créés vs. Tickets résolus</h2>
+                                <div id="periodSelector" class="period-selector">
+                                    <button data-period="month" class="active">Dernier Mois</button>
+                                    <button data-period="year">Dernière Année</button>
+                                    <button data-period="all">Tout le Temps</button>
+                                </div>
+                            </div>
                             <div class="relative h-64 w-full"> <canvas id="lineChart"></canvas>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Evolution Chart -->
+                    <h1 class="text-[#191610] text-xl font-bold leading-tight">Évolution des Projets</h1>
+                    <div class="graph-card">
+                        <div class="chart-header">
+                            <h2 class="text-base font-semibold text-color-dark mb-4">Projets créés vs. Projets terminés</h2>
+                            <div id="projectPeriodSelector" class="period-selector">
+                                <button data-period="month" class="active">Dernier Mois</button>
+                                <button data-period="year" class="">Dernière Année</button>
+                                <button data-period="all" class="">Tout le Temps</button>
+                            </div>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="projectChart"></canvas>
                         </div>
                     </div>
 
@@ -373,6 +417,7 @@
                         </div>
                         {% endfor %}
                     </div>
+
                 </div>
             </main>
         </div>
@@ -396,118 +441,291 @@
         Chart.defaults.color = 'var(--text-color-medium)'; // Couleur par défaut pour les textes des graphiques
 
         // Graphique circulaire - Répartition des tickets par statut
-        {% if repartition_tickets_par_statut %}
         const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: [{% for status, data in repartition_tickets_par_statut.items %}'{{ status }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-                datasets: [{
-                    data: [{% for status, data in repartition_tickets_par_statut.items %}{{ data.percentage }}{% if not forloop.last %}, {% endif %}{% endfor %}], // Données dynamiques
-                    backgroundColor: [
-                        nudeColors[0], // Premier statut
-                        nudeColors[1], // Deuxième statut
-                        nudeColors[2], // Troisième statut
-                        nudeColors[3]  // Quatrième statut
-                    ],
-                    borderColor: 'var(--bg-white)', // Bordure blanche pour une meilleure séparation
-                    borderWidth: 2,
-                    hoverOffset: 4 // Effet de survol
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, // Permet de mieux contrôler la taille
-                plugins: {
-                    legend: {
-                        position: 'right', // Légende à droite pour le circulaire
-                        labels: {
-                            color: 'var(--text-color-dark)',
-                            font: {
-                                size: 12,
-                                weight: '500' // Poids de la police pour la légende
+        
+        // Get ticket stats from Django context
+        const ticketStats = {{ ticket_stats_json|safe }};
+        console.log('Debug - ticketStats:', ticketStats);
+        
+        // Check if there are any tickets
+        if (!ticketStats || Object.keys(ticketStats).length === 0) {
+            console.log('No ticket data found');
+            // Show "No data" message
+            const pieChartContainer = document.getElementById('pieChart').parentNode;
+            pieChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun ticket trouvé</p>';
+        } else {
+            console.log('Creating pie chart with data');
+            const labels = Object.keys(ticketStats);
+            const data = labels.map(label => ticketStats[label].percentage);
+            console.log('Labels:', labels, 'Data:', data);
+            
+            const backgroundColors = nudeColors.slice(0, labels.length);
+            
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: 'var(--bg-white)',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: 'var(--text-color-dark)',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                boxWidth: 20,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'var(--text-color-dark)',
+                            titleColor: 'var(--bg-white)',
+                            bodyColor: 'var(--bg-white)',
+                            padding: 10,
+                            bodyFont: {
+                                size: 14
                             },
-                            boxWidth: 20, // Taille des carrés de couleur
-                            padding: 15 // Espacement entre les éléments de légende
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                        const count = ticketStats[context.label].count;
+                                        label += count + ' tickets (' + context.parsed + '%)';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        title: {
+                            display: false
                         }
                     },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: 'var(--text-color-dark)', // Fond de l'infobulle
-                        titleColor: 'var(--bg-white)', // Couleur du titre de l'infobulle
-                        bodyColor: 'var(--bg-white)', // Couleur du corps de l'infobulle
-                        padding: 10,
-                        bodyFont: {
-                            size: 14
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Project chart initialization
+        const projectCurveMonth = {{ project_curve_month|safe }};
+        const projectCurveYear = {{ project_curve_year|safe }};
+        const projectCurveAll = {{ project_curve_all|safe }};
+        
+        if (projectCurveMonth && projectCurveMonth.labels && projectCurveMonth.labels.length > 0) {
+        // Use the data we already loaded
+        const projectDataMonth = projectCurveMonth;
+        const projectDataYear = projectCurveYear;
+        const projectDataAll = projectCurveAll;
+        
+        // Project evolution chart
+        const projectCtx = document.getElementById('projectChart').getContext('2d');
+        let currentProjectChart = null;
+        
+        function createProjectChart(data) {
+            if (currentProjectChart) {
+                currentProjectChart.destroy();
+            }
+            
+            currentProjectChart = new Chart(projectCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Projets Créés',
+                        data: data.created_data,
+                        borderColor: nudeColors[2],
+                        backgroundColor: 'rgba(212, 204, 193, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[2],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }, {
+                         label: 'Projets Terminés',
+                         data: data.finished_data,
+                        borderColor: nudeColors[3],
+                        backgroundColor: 'rgba(156, 149, 145, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[3],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--text-color-dark)',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                boxWidth: 20,
+                                padding: 15
+                            }
                         },
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                const ticketData = {
-                                    {% for status, data in repartition_tickets_par_statut.items %}
-                                    '{{ status }}': { count: {{ data.count }}, percentage: {{ data.percentage }} }{% if not forloop.last %},{% endif %}
-                                    {% endfor %}
-                                };
-                                if (label) {
-                                    label += ': ';
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'var(--text-color-dark)',
+                            titleColor: 'var(--bg-white)',
+                            bodyColor: 'var(--bg-white)',
+                            padding: 10,
+                            bodyFont: {
+                                size: 14
+                            }
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
                                 }
-                                if (context.parsed !== null && ticketData[context.label]) {
-                                    const count = ticketData[context.label].count;
-                                    label += count + ' tickets (' + context.parsed + '%)';
+                            },
+                            grid: {
+                                color: 'var(--border-color)',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'var(--text-color-medium)',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value;
                                 }
-                                return label;
+                            },
+                            grid: {
+                                color: 'var(--border-color)',
+                                drawBorder: false
                             }
                         }
                     },
-                    title: {
-                        display: false, // Le titre est maintenant dans le HTML
-                    }
-                },
-                layout: {
-                    padding: {
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0
+                    elements: {
+                        line: {
+                            borderWidth: 2
+                        }
                     }
                 }
-            }
+            });
+        }
+        
+        // Initialize project chart with month data
+        createProjectChart(projectDataMonth);
+        
+        // Project chart period selector event handlers
+        document.querySelectorAll('#projectPeriodSelector button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('#projectPeriodSelector button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const period = this.getAttribute('data-period');
+                switch(period) {
+                    case 'month':
+                        createProjectChart(projectDataMonth);
+                        break;
+                    case 'year':
+                        createProjectChart(projectDataYear);
+                        break;
+                    case 'all':
+                        createProjectChart(projectDataAll);
+                        break;
+                }
+            });
         });
-        {% endif %}
+        } else {
+            // Show "No data" message for line chart
+            const lineChartContainer = document.getElementById('lineChart').parentNode;
+            lineChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun ticket trouvé</p>';
+        }
 
+        // Ticket chart initialization
+        const ticketCurveMonth = {{ ticket_curve_month|safe }};
+        const ticketCurveYear = {{ ticket_curve_year|safe }};
+        const ticketCurveAll = {{ ticket_curve_all|safe }};
+        
+        if (ticketCurveMonth && ticketCurveMonth.labels && ticketCurveMonth.labels.length > 0) {
+        // Use the data we already loaded
+        const ticketDataMonth = ticketCurveMonth;
+        const ticketDataYear = ticketCurveYear;
+        const ticketDataAll = ticketCurveAll;
+        
         // Graphique linéaire - Tickets créés vs. Tickets résolus
         const lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-                datasets: [{
-                    label: 'Tickets Créés',
-                    data: [65, 59, 80, 81, 56, 55, 60], // Données d'exemple
-                    borderColor: nudeColors[0], // Couleur principale
-                    backgroundColor: 'rgba(160, 141, 128, 0.3)', // Couleur principale avec transparence pour le fond
-                    fill: true,
-                    tension: 0.4, // Courbe plus douce
-                    pointBackgroundColor: nudeColors[0],
-                    pointBorderColor: 'var(--bg-white)',
-                    pointBorderWidth: 2,
-                    pointRadius: 5, // Taille des points
-                    pointHoverRadius: 7
-                }, {
-                    label: 'Tickets Résolus',
-                    data: [28, 48, 40, 49, 76, 37, 70], // Données d'exemple
-                    borderColor: nudeColors[1], // Deuxième couleur de la palette
-                    backgroundColor: 'rgba(110, 104, 100, 0.3)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: nudeColors[1],
-                    pointBorderColor: 'var(--bg-white)',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
+        let currentChart = null;
+        
+        function createTicketChart(data) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            currentChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Tickets Créés',
+                        data: data.created_data,
+                        borderColor: nudeColors[0],
+                        backgroundColor: 'rgba(160, 141, 128, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[0],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }, {
+                        label: 'Tickets Résolus',
+                        data: data.resolved_data,
+                        borderColor: nudeColors[1],
+                        backgroundColor: 'rgba(110, 104, 100, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: nudeColors[1],
+                        pointBorderColor: 'var(--bg-white)',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -573,8 +791,40 @@
                         borderWidth: 2 // Épaisseur des lignes
                     }
                 }
-            }
+            }});
+        }
+        
+        // Initialize ticket chart with month data
+        createTicketChart(ticketDataMonth);
+        
+        // Ticket chart period selector event handlers
+        document.querySelectorAll('#periodSelector button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Retirer la classe active de tous les boutons
+                document.querySelectorAll('#periodSelector button').forEach(btn => btn.classList.remove('active'));
+                // Ajouter la classe active au bouton cliqué
+                this.classList.add('active');
+                
+                // Mettre à jour le graphique selon la période sélectionnée
+                const period = this.getAttribute('data-period');
+                switch(period) {
+                    case 'month':
+                        createTicketChart(ticketDataMonth);
+                        break;
+                    case 'year':
+                        createTicketChart(ticketDataYear);
+                        break;
+                    case 'all':
+                        createTicketChart(ticketDataAll);
+                        break;
+                }
+            });
         });
+        } else {
+            // Show "No data" message for project chart
+            const projectChartContainer = document.getElementById('projectChart').parentNode;
+            projectChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun projet trouvé</p>';
+        }
         
         // Initialize Global Search
         document.addEventListener('DOMContentLoaded', function() {

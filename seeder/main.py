@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from .users_seeder import seed_users, update_availability_rates
 from .projects_seeder import seed_projects, seed_project_activities_comments
 from .tickets_seeder import seed_tickets, seed_ticket_activities_comments
+from .status_logs_seeder import seed_status_logs
 
 def is_database_seeded():
     """
@@ -58,6 +59,10 @@ def seed_database():
             # Add activities and comments to tickets
             seed_ticket_activities_comments(users, tickets)
             print("✅ Added activities and comments to tickets")
+            
+            # Seed status logs for tickets and projects
+            ticket_logs, project_logs = seed_status_logs(users, projects, tickets)
+            print(f"✅ Created {len(ticket_logs)} ticket status logs and {len(project_logs)} project status logs")
             
             # Update availability rates based on seeded activities
             update_availability_rates()

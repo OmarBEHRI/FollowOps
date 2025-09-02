@@ -8,12 +8,9 @@ from tickets.models import Ticket
 
 # Supprimer ou assouplir les validations restrictives
 def validate_working_hours(value):
-    """Validate that the time is within working hours (8:00 - 18:00) - assoupli"""
-    working_start = time(8, 0)
-    working_end = time(18, 0)
-    
-    if value.time() < working_start or value.time() > working_end:
-        raise ValidationError('Time must be within working hours (8:00 - 18:00)')
+    """Previously enforced 8:00 - 18:00; now no-op to allow flexible scheduling."""
+    # Intentionally allow any time; keep function to avoid breaking validators reference
+    return
 
 # Supprimer complètement la validation des jours ouvrables
 # def validate_working_day(value):

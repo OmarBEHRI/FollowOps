@@ -64,19 +64,28 @@ def seed_tickets(users, projects):
         # Get project members for assignment
         members = list(project.members.all())
         
-        # Create 2-4 tickets per project
-        num_tickets = random.randint(2, 4)
+        # Create 4-8 tickets per project for better visualization
+        num_tickets = random.randint(4, 8)
         for _ in range(num_tickets):
             # Select a random ticket template
             template = random.choice(ticket_templates)
+            
+            # Create tickets with dates spanning from Sept 2024 to Sept 2025
+            start_seed_date = datetime(2024, 9, 2, tzinfo=timezone.get_current_timezone())
+            end_seed_date = datetime(2025, 9, 2, tzinfo=timezone.get_current_timezone())
+            
+            # Random date between Sept 2024 and Sept 2025
+            days_range = (end_seed_date - start_seed_date).days
+            random_days = random.randint(0, days_range)
+            ticket_date = start_seed_date + timedelta(days=random_days)
             
             # Create the ticket
             ticket = Ticket.objects.create(
                 title=template['title'],
                 description=template['description'],
                 status=template['status'],
-                created_by=random.choice(members),  # Ajouter cette ligne
-                created_at=project.start_date + timedelta(days=random.randint(1, max(2, (timezone.now().date() - project.start_date).days)))
+                created_by=random.choice(members),
+                created_at=ticket_date
             )
             
             # Assign 1-3 members to the ticket
@@ -124,19 +133,31 @@ def seed_ticket_activities_comments(users, tickets):
         if not assignees:  # Skip if no assignees
             continue
             
-        # Add 1-3 activities per ticket
-        num_activities = random.randint(1, 3)
+        # Add 2-5 activities per ticket, focusing on September 2025
+        num_activities = random.randint(2, 5)
         for _ in range(num_activities):
-            # Random date after ticket creation
-            days_since_creation = (timezone.now().date() - ticket.created_at.date()).days
-            if days_since_creation <= 0:
-                days_since_creation = 1
-                
-            activity_date = ticket.created_at.date() + timedelta(days=random.randint(0, days_since_creation))
+            # Focus on September 2025 for current month visibility
+            september_start = datetime(2025, 9, 1).date()
+            september_end = datetime(2025, 9, 30).date()
+            
+            # 70% chance for September 2025, 30% for other dates
+            if random.random() < 0.7:
+                # September 2025 activities
+                activity_date = september_start + timedelta(days=random.randint(0, 29))
+            else:
+                # Random date after ticket creation
+                days_since_creation = (timezone.now().date() - ticket.created_at.date()).days
+                if days_since_creation <= 0:
+                    days_since_creation = 1
+                    
+                activity_date = ticket.created_at.date() + timedelta(days=random.randint(0, days_since_creation))
             
             # Make sure it's a weekday (0-4 is Monday to Friday)
             while activity_date.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
                 activity_date = activity_date + timedelta(days=1)
+                # If we go past September, wrap back to the beginning
+                if activity_date > september_end and activity_date.month == 10:
+                    activity_date = september_start + timedelta(days=random.randint(0, 6))
             
             # Random start time between 9:00 and 16:00
             start_hour = random.randint(9, 16)

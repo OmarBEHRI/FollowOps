@@ -349,6 +349,70 @@ def get_resources_list(request):
     return JsonResponse({'success': False, 'error': 'Type de ressource invalide'})
 
 
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def update_ticket_field(request, ticket_id):
+    """API endpoint to update ticket status or priority inline"""
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    user = request.user
+    
+    # Check permissions
+    if not (user.appRole == 'ADMIN' or (user.appRole == 'MANAGER' and ticket.created_by == user)):
+        return JsonResponse({
+            'success': False,
+            'error': 'You do not have permission to edit this ticket'
+        }, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        field = data.get('field')
+        value = data.get('value')
+        
+        if field not in ['status', 'priority']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid field specified'
+            }, status=400)
+        
+        # Validate the value against model choices
+        if field == 'status':
+            valid_choices = [choice[0] for choice in Ticket.STATUS_CHOICES]
+        elif field == 'priority':
+            valid_choices = [choice[0] for choice in Ticket.PRIORITY_CHOICES]
+        
+        if value not in valid_choices:
+            return JsonResponse({
+                'success': False,
+                'error': f'Invalid {field} value'
+            }, status=400)
+        
+        # Update the field
+        setattr(ticket, field, value)
+        ticket.save()
+        
+        # Get display value
+        if field == 'status':
+            display_value = ticket.get_status_display()
+        elif field == 'priority':
+            display_value = ticket.get_priority_display()
+        
+        return JsonResponse({
+            'success': True,
+            'field': field,
+            'value': value,
+            'display_value': display_value,
+            'message': f'Ticket {field} updated successfully'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
 @login_required
 def get_user_tickets_api(request):
     """API endpoint pour récupérer les tickets de l'utilisateur connecté"""

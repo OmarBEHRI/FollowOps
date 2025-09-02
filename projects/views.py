@@ -144,7 +144,8 @@ def projectMembers(request, pk):
             'email': member.email,
             'phone': member.phone_number,
             'status': member.status,
-            'location': member.location
+            'location': member.location,
+            'gender': member.gender
         }
         members_info.append(member_info)
     
@@ -172,12 +173,10 @@ def projectCalendar(request, pk):
     current_month = current_date.month
     current_year = current_date.year
     
-    # Get all activities for this project in the current month
+    # Get all activities for this project (not limited to current month)
     from activities.models import Activity
     activities = Activity.objects.filter(
-        project=project,
-        start_datetime__year=current_year,
-        start_datetime__month=current_month
+        project=project
     ).order_by('start_datetime')
     
     # Get project members for color assignment
@@ -575,8 +574,8 @@ def create_project_activity(request, pk):
         project = get_object_or_404(Project, pk=pk)
         user = request.user
         
-        # Vérifier que l'utilisateur est membre du projet ou manager/admin
-        if not (user.appRole in ['ADMIN', 'MANAGER'] or project.members.filter(id=user.id).exists()):
+        # Vérifier que l'utilisateur est membre du projet uniquement (pas d'exception admin/manager)
+        if not project.members.filter(id=user.id).exists():
             return JsonResponse({
                 'success': False,
                 'message': 'Vous n\'êtes pas autorisé à créer une activité pour ce projet'
@@ -603,6 +602,12 @@ def create_project_activity(request, pk):
         if data.get('ticket_id') and data.get('activity_type') == 'TICKET':
             from tickets.models import Ticket
             ticket = get_object_or_404(Ticket, id=data['ticket_id'])
+            # Vérifier que l'utilisateur est assigné à ce ticket
+            if not ticket.assigned_to.filter(id=user.id).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Vous n\'êtes pas autorisé à créer une activité pour ce ticket'
+                }, status=403)
             activity.ticket = ticket
             activity.activity_type = 'TICKET'
             activity.project = None
@@ -700,15 +705,76 @@ def project_search_suggestions(request):
         suggestions.append({
             'id': project.id,
             'title': project.title,
-            'description': project.description[:80] + '...' if len(project.description) > 80 else project.description,
+            'description': project.description[:100] + '...' if len(project.description) > 100 else project.description,
+            'url': f'/projects/details/{project.id}/',
             'status': project.status,
             'priority': project.priority,
-            'manager': f"{project.project_manager.first_name} {project.project_manager.last_name}",
-            'relevance': relevance,
-            'url': f'/projects/details/{project.id}/'
+            'relevance': relevance
         })
     
     # Sort by relevance score
     suggestions.sort(key=lambda x: x['relevance'], reverse=True)
     
     return JsonResponse({'suggestions': suggestions})
+
+
+@login_required
+@require_POST
+def update_project_field(request, pk):
+    """API endpoint to update project status or priority inline"""
+    project = get_object_or_404(Project, pk=pk)
+    user = request.user
+    
+    # Check permissions
+    if not (user.appRole == 'ADMIN' or (user.appRole == 'MANAGER' and project.project_manager == user)):
+        return JsonResponse({
+            'success': False,
+            'error': 'You do not have permission to edit this project'
+        }, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        field = data.get('field')
+        value = data.get('value')
+        
+        if field not in ['status', 'priority']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid field specified'
+            }, status=400)
+        
+        # Validate the value against model choices
+        if field == 'status':
+            valid_choices = [choice[0] for choice in Project._meta.get_field('status').choices]
+        elif field == 'priority':
+            valid_choices = [choice[0] for choice in Project._meta.get_field('priority').choices]
+        
+        if value not in valid_choices:
+            return JsonResponse({
+                'success': False,
+                'error': f'Invalid {field} value'
+            }, status=400)
+        
+        # Update the field
+        setattr(project, field, value)
+        project.save()
+        
+        # Get display value
+        if field == 'status':
+            display_value = project.get_status_display()
+        elif field == 'priority':
+            display_value = project.get_priority_display()
+        
+        return JsonResponse({
+            'success': True,
+            'field': field,
+            'value': value,
+            'display_value': display_value,
+            'message': f'Project {field} updated successfully'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

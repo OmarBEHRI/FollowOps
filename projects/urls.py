@@ -21,4 +21,5 @@ urlpatterns = [
     path('<int:pk>/calendar/activities/', views.get_project_activities, name='get_project_activities'),
     path('calendar/<int:pk>/create-activity/', views.create_project_activity, name='create_project_activity'),
     path('api/search-suggestions/', views.project_search_suggestions, name='project_search_suggestions'),
+    path('api/update-field/<int:pk>/', views.update_project_field, name='update_project_field'),
    ]

@@ -521,20 +521,7 @@ class ProjectCalendar {
             return false;
         }
 
-        // Check working hours (8h-18h) - more flexible
-        const startHour = startDateTime.getHours();
-        const endHour = endDateTime.getHours();
-
-        if (startHour < 8 || startHour >= 18) {
-            this.showValidationError('L\'heure de début doit être entre 8h00 et 18h00');
-            return false;
-        }
-
-        if (endHour < 8 || endHour > 18 || (endHour === 18 && endDateTime.getMinutes() > 0)) {
-            this.showValidationError('L\'heure de fin doit être entre 8h00 et 18h00');
-            return false;
-        }
-
+        // Suppression de la contrainte d'heures de travail (8h-18h)
         return true;
     }
 

@@ -29,6 +29,7 @@ class Project(models.Model):
     end_date = models.DateField(null=True, blank=True, verbose_name="Date de fin réelle")
     members = models.ManyToManyField('ressources.Ressource', related_name='members', verbose_name="Membres du projet")
     estimated_charges = models.IntegerField(verbose_name="Charges estimées (en jours ou heures)")
+    budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="Budget alloué")
     progress = models.IntegerField(verbose_name="Avancement (%)")
     tags = models.ManyToManyField('Tag', related_name='projects', verbose_name="Tags ou categories")
     comments = models.ManyToManyField('CommentProject', related_name="project_comments", verbose_name="Commentaires", blank=True)
@@ -38,6 +39,8 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         # Get the old status if this is an update
         old_status = None
+        is_new = self.pk is None
+        
         if self.pk:
             try:
                 old_instance = Project.objects.get(pk=self.pk)
@@ -63,6 +66,37 @@ class Project(models.Model):
             self.end_date = None
         
         super().save(*args, **kwargs)
+        
+        # Create status log entry for new projects or status changes
+        if is_new or (old_status and old_status != self.status):
+            ProjectStatusLog.objects.create(
+                project=self,
+                status=self.status,
+                changed_by=getattr(self, '_changed_by', None)
+            )
+
+
+class ProjectStatusLog(models.Model):
+    STATUS_CHOICES = [
+        ('À initier', 'À initier'),
+        ('En cours', 'En cours'),
+        ('Terminé', 'Terminé'),
+        ('Suspendu', 'Suspendu'),
+        ('Annulé', 'Annulé'),
+    ]
+    
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="status_logs")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    changed_by = models.ForeignKey('ressources.Ressource', on_delete=models.SET_NULL, null=True, related_name='project_status_changes')
+    
+    class Meta:
+        ordering = ['timestamp']
+        verbose_name = "Project Status Log"
+        verbose_name_plural = "Project Status Logs"
+    
+    def __str__(self):
+        return f"Project {self.project.id} - {self.status} at {self.timestamp}"
 
 
 class Tag(models.Model):

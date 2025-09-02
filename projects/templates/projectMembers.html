@@ -1,4 +1,5 @@
 {% extends "projectDetailsBase.html" %}
+{% load static %}
 
 {% block breadcrumb_title %}Membres du projet{% endblock %}
 
@@ -32,7 +33,7 @@
       {% for member in members %}
         <a href="/ressources/details/{{ member.id }}/" class="member-card" style="background: #fff; border-bottom: 2px solid #eae6df; padding: 1.5rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: flex-start; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(160,141,128,0.1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 16px rgba(160,141,128,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(160,141,128,0.1)';">
           <div class="member-header" style="display: flex; align-items: center; width: 100%; margin-bottom: 1.5rem;">
-              <img class="member-photo" src="https://randomuser.me/api/portraits/{% if forloop.counter|divisibleby:2 %}men{% else %}women{% endif %}/{{ forloop.counter|add:30 }}.jpg" alt="{{ member.name }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eae6df;">
+              <div class="member-photo bg-center bg-no-repeat aspect-square bg-cover rounded-full" style='width: 80px; height: 80px; margin-right: 1rem; border: 2px solid #eae6df; background-image: url("{% if member.gender == 'female' %}{% static 'Female.svg' %}{% else %}{% static 'Male.svg' %}{% endif %}");'></div>
               <div class="member-info" style="flex: 1;">
                 <div class="member-name" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; color: #191610;">{{ member.name }}</div>
                 <div class="member-role" style="font-size: 1rem; color: #6E6864; margin-bottom: 0.3rem;">{{ member.role }}</div>

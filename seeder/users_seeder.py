@@ -56,13 +56,17 @@ def seed_users():
     if User.objects.filter(email='admin@followops.com').exists():
         print("Users already exist, skipping user creation")
         return list(User.objects.all())
-    # Define Arab first names and last names for realistic data
-    arab_first_names = [
+    # Define Arab first names separated by gender for realistic data
+    arab_male_first_names = [
         'Mohammed', 'Ahmed', 'Ali', 'Omar', 'Youssef', 'Ibrahim', 'Mustafa', 'Hassan',
         'Khalid', 'Abdullah', 'Samir', 'Tariq', 'Adel', 'Karim', 'Jamal', 'Nasser',
-        'Walid', 'Mahmoud', 'Faisal', 'Ziad', 'Fatima', 'Aisha', 'Layla', 'Noor',
-        'Amina', 'Mariam', 'Zahra', 'Huda', 'Zainab', 'Samira', 'Leila', 'Rania',
-        'Yasmin', 'Sara', 'Nadia', 'Dalia', 'Farida', 'Salma', 'Rana', 'Hanan'
+        'Walid', 'Mahmoud', 'Faisal', 'Ziad'
+    ]
+    
+    arab_female_first_names = [
+        'Fatima', 'Aisha', 'Layla', 'Noor', 'Amina', 'Mariam', 'Zahra', 'Huda',
+        'Zainab', 'Samira', 'Leila', 'Rania', 'Yasmin', 'Sara', 'Nadia', 'Dalia',
+        'Farida', 'Salma', 'Rana', 'Hanan'
     ]
     
     arab_last_names = [
@@ -121,20 +125,22 @@ def seed_users():
     statuses = ['CDI', 'CDD', 'Stagiaire', 'Alternant', 'Prestataire']
     locations = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Toulouse', 'Nantes', 'Strasbourg']
     
-    # Generate 10 regular users
-    for i in range(1, 11):
+    # Generate 5 male users and 5 female users
+    user_counter = 1
+    
+    # Generate 5 male users
+    for i in range(5):
         role = random.choice(roles)
         skills_list = random.sample(skills_by_role[role], min(3, len(skills_by_role[role])))
         
-        # Select random first and last names
-        first_name = random.choice(arab_first_names)
+        # Select random male first name and last name
+        first_name = random.choice(arab_male_first_names)
         last_name = random.choice(arab_last_names)
-        gender = random.choice(['male', 'female'])
         
         users_data.append({
-            'email': f'user{i}@followops.com',
-            'username': f'user{i}',
-            'password': f'user{i}123',
+            'email': f'user{user_counter}@followops.com',
+            'username': f'user{user_counter}',
+            'password': f'user{user_counter}123',
             'first_name': first_name,
             'last_name': last_name,
             'role': role,
@@ -142,11 +148,39 @@ def seed_users():
             'availability_rate': random.randint(50, 100),
             'status': random.choice(statuses),
             'appRole': 'USER',
-            'phone_number': f'01234567{i:02d}',
+            'phone_number': f'01234567{user_counter:02d}',
             'entry_date': timezone.now().date() - timedelta(days=random.randint(30, 730)),
             'location': random.choice(locations),
-            'gender': gender
+            'gender': 'male'
         })
+        user_counter += 1
+    
+    # Generate 5 female users
+    for i in range(5):
+        role = random.choice(roles)
+        skills_list = random.sample(skills_by_role[role], min(3, len(skills_by_role[role])))
+        
+        # Select random female first name and last name
+        first_name = random.choice(arab_female_first_names)
+        last_name = random.choice(arab_last_names)
+        
+        users_data.append({
+            'email': f'user{user_counter}@followops.com',
+            'username': f'user{user_counter}',
+            'password': f'user{user_counter}123',
+            'first_name': first_name,
+            'last_name': last_name,
+            'role': role,
+            'skills': ', '.join(skills_list),
+            'availability_rate': random.randint(50, 100),
+            'status': random.choice(statuses),
+            'appRole': 'USER',
+            'phone_number': f'01234567{user_counter:02d}',
+            'entry_date': timezone.now().date() - timedelta(days=random.randint(30, 730)),
+            'location': random.choice(locations),
+            'gender': 'female'
+        })
+        user_counter += 1
     
     # Create users in the database
     created_users = []

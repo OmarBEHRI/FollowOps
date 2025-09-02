@@ -26,7 +26,7 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['title', 'description', 'type', 'status', 'priority', 
                  'project_manager', 'expected_start_date', 'expected_end_date',
-                 'estimated_charges', 'progress', 'members', 'tags']  # Ajout de 'members' et 'tags'
+                 'estimated_charges', 'budget', 'progress', 'members', 'tags']  # Ajout de 'members', 'budget' et 'tags'
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control h-32'}),
@@ -41,6 +41,12 @@ class ProjectForm(forms.ModelForm):
                 'min': '0',
                 'step': '1',
                 'placeholder': 'Ex: 10 jours ou 80 heures'
+            }),
+            'budget': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Ex: 50000.00'
             }),
             'progress': forms.NumberInput(attrs={
                 'class': 'form-control',

@@ -2,42 +2,79 @@
 
 {% block content %}
     <!-- Informations générales -->
-    <div class="flex flex-col gap-4">
-        <h2 class="text-[#191610] text-lg font-bold leading-tight">Informations générales</h2>
-        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
-            <div class="grid grid-cols-2 gap-6">
+    <div class="flex flex-col gap-6">
+        <h2 class="text-[#191610] text-xl font-bold leading-tight tracking-tight">Informations générales</h2>
+        <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-8 shadow-sm">
+            <div class="grid grid-cols-2 gap-8">
                 <!-- Colonne gauche -->
                 <div>
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Type</p>
-                    <p class="text-[#191610] text-base mb-4">{{ project.type }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Type</p>
+                    <p class="text-[#191610] text-lg font-medium mb-6">{{ project.type }}</p>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Priorité</p>
-                    <div class="mb-4">
-                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_priority_display }}</span>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Priorité</p>
+                    <div class="mb-6">
+                        {% if can_edit %}
+                            <div class="inline-edit-container relative">
+                                <span id="priority-display" class="inline-edit-badge rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610] cursor-pointer hover:bg-[#e9e5db] transition-colors duration-200" 
+                                      data-field="priority" data-value="{{ project.priority }}" title="Click to edit">
+                                    {{ project.get_priority_display }}
+                                    <svg class="inline w-3 h-3 ml-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                    </svg>
+                                </span>
+                                <select id="priority-select" class="hidden inline-edit-select absolute top-0 left-0 rounded-full bg-white border border-[#d4ccc1] px-3 py-1 text-sm font-medium text-[#191610] focus:outline-none focus:ring-2 focus:ring-[#a08d80] focus:border-transparent">
+                                    <option value="Basse" {% if project.priority == 'Basse' %}selected{% endif %}>Basse</option>
+                                    <option value="Moyenne" {% if project.priority == 'Moyenne' %}selected{% endif %}>Moyenne</option>
+                                    <option value="Haute" {% if project.priority == 'Haute' %}selected{% endif %}>Haute</option>
+                                    <option value="Critique" {% if project.priority == 'Critique' %}selected{% endif %}>Critique</option>
+                                </select>
+                            </div>
+                        {% else %}
+                            <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_priority_display }}</span>
+                        {% endif %}
                     </div>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de début prévue</p>
-                    <p class="text-[#191610] text-base mb-4">{{ project.expected_start_date|date:"d/m/Y" }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Date de début prévue</p>
+                    <p class="text-[#191610] text-lg font-medium mb-6">{{ project.expected_start_date|date:"d/m/Y" }}</p>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de début réelle</p>
-                    <p class="text-[#191610] text-base">{{ project.start_date|date:"d/m/Y"|default:"Non définie" }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Date de début réelle</p>
+                    <p class="text-[#191610] text-lg font-medium">{{ project.start_date|date:"d/m/Y"|default:"Non définie" }}</p>
                 </div>
                 
                 <!-- Colonne droite -->
                 <div>
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Statut</p>
-                    <div class="mb-4">
-                        <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_status_display }}</span>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Statut</p>
+                    <div class="mb-6">
+                        {% if can_edit %}
+                            <div class="inline-edit-container relative">
+                                <span id="status-display" class="inline-edit-badge rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610] cursor-pointer hover:bg-[#e9e5db] transition-colors duration-200" 
+                                      data-field="status" data-value="{{ project.status }}" title="Click to edit">
+                                    {{ project.get_status_display }}
+                                    <svg class="inline w-3 h-3 ml-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                    </svg>
+                                </span>
+                                <select id="status-select" class="hidden inline-edit-select absolute top-0 left-0 rounded-full bg-white border border-[#d4ccc1] px-3 py-1 text-sm font-medium text-[#191610] focus:outline-none focus:ring-2 focus:ring-[#a08d80] focus:border-transparent">
+                                    <option value="À initier" {% if project.status == 'À initier' %}selected{% endif %}>À initier</option>
+                                    <option value="En cours" {% if project.status == 'En cours' %}selected{% endif %}>En cours</option>
+                                    <option value="Terminé" {% if project.status == 'Terminé' %}selected{% endif %}>Terminé</option>
+                                    <option value="Suspendu" {% if project.status == 'Suspendu' %}selected{% endif %}>Suspendu</option>
+                                    <option value="Annulé" {% if project.status == 'Annulé' %}selected{% endif %}>Annulé</option>
+                                </select>
+                            </div>
+                        {% else %}
+                            <span class="rounded-full bg-[#f1efe9] px-3 py-1 text-sm font-medium text-[#191610]">{{ project.get_status_display }}</span>
+                        {% endif %}
                     </div>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Chef de projet</p>
-                    <p class="text-[#191610] text-base mb-4">{{ project.project_manager.first_name }} {{ project.project_manager.last_name }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Chef de projet</p>
+                    <p class="text-[#191610] text-lg font-medium mb-6">{{ project.project_manager.first_name }} {{ project.project_manager.last_name }}</p>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de fin prévue</p>
-                    <p class="text-[#191610] text-base mb-4">{{ project.expected_end_date|date:"d/m/Y" }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Date de fin prévue</p>
+                    <p class="text-[#191610] text-lg font-medium mb-6">{{ project.expected_end_date|date:"d/m/Y" }}</p>
                     
-                    <p class="text-[#8c7e5a] text-sm font-medium mb-1">Date de fin réelle</p>
-                    <p class="text-[#191610] text-base">{{ project.end_date|date:"d/m/Y"|default:"En cours" }}</p>
+                    <p class="text-[#8c7e5a] text-sm font-semibold mb-2 uppercase tracking-wide">Date de fin réelle</p>
+                    <p class="text-[#191610] text-lg font-medium">{{ project.end_date|date:"d/m/Y"|default:"En cours" }}</p>
                 </div>
             </div>
         </div>
@@ -46,7 +83,7 @@
     <!-- Charge estimée -->
     <div class="flex flex-col gap-4">
         <h2 class="text-[#191610] text-lg font-bold leading-tight">Charge estimée</h2>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid {% if can_edit %}grid-cols-3{% else %}grid-cols-2{% endif %} gap-4">
             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
                 <p class="text-[#8c7e5a] text-sm font-medium">Heures totales estimées</p>
                 <p class="text-[#191610] text-2xl font-bold leading-tight">{{ project.estimated_charges }}</p>
@@ -55,6 +92,18 @@
                 <p class="text-[#8c7e5a] text-sm font-medium">Membres assignés</p>
                 <p class="text-[#191610] text-2xl font-bold leading-tight">{{ project.members.count }}</p>
             </div>
+            {% if can_edit %}
+            <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-4 flex flex-col items-center justify-center">
+                <p class="text-[#8c7e5a] text-sm font-medium">Budget alloué</p>
+                <p class="text-[#191610] text-2xl font-bold leading-tight">
+                    {% if project.budget %}
+                        {{ project.budget|floatformat:2 }} €
+                    {% else %}
+                        Non défini
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
         </div>
     </div>
     
@@ -267,4 +316,191 @@
             });
         });
     </script>
+
+    <!-- Inline Edit JavaScript -->
+    <script>
+    class InlineEditor {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            // Add event listeners for all inline edit badges
+            document.querySelectorAll('.inline-edit-badge').forEach(badge => {
+                badge.addEventListener('click', (e) => this.startEdit(e));
+            });
+
+            // Add event listeners for all inline edit selects
+            document.querySelectorAll('.inline-edit-select').forEach(select => {
+                select.addEventListener('change', (e) => this.saveEdit(e));
+                select.addEventListener('blur', (e) => this.cancelEdit(e));
+                select.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.cancelEdit(e);
+                    }
+                });
+            });
+        }
+
+        startEdit(event) {
+            const badge = event.currentTarget;
+            const field = badge.dataset.field;
+            const select = document.getElementById(`${field}-select`);
+            
+            if (select) {
+                badge.classList.add('hidden');
+                select.classList.remove('hidden');
+                select.focus();
+            }
+        }
+
+        cancelEdit(event) {
+            const select = event.currentTarget;
+            const field = select.id.replace('-select', '');
+            const badge = document.getElementById(`${field}-display`);
+            
+            if (badge) {
+                select.classList.add('hidden');
+                badge.classList.remove('hidden');
+                // Reset select to original value
+                select.value = badge.dataset.value;
+            }
+        }
+
+        async saveEdit(event) {
+            const select = event.currentTarget;
+            const field = select.id.replace('-select', '');
+            const badge = document.getElementById(`${field}-display`);
+            const newValue = select.value;
+            const oldValue = badge.dataset.value;
+
+            // Don't save if value hasn't changed
+            if (newValue === oldValue) {
+                this.cancelEdit(event);
+                return;
+            }
+
+            try {
+                // Show loading state
+                select.disabled = true;
+                
+                const response = await fetch(`/projects/api/update-field/{{ project.id }}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        field: field,
+                        value: newValue
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update the badge
+                    badge.dataset.value = newValue;
+                    badge.innerHTML = `${data.display_value}
+                        <svg class="inline w-3 h-3 ml-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                        </svg>`;
+                    
+                    // Hide select and show badge
+                    select.classList.add('hidden');
+                    badge.classList.remove('hidden');
+                    
+                    // Show success toast
+                    this.showToast(data.message, 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to update');
+                }
+            } catch (error) {
+                console.error('Error updating field:', error);
+                this.showToast('Error updating ' + field + ': ' + error.message, 'error');
+                // Reset to original value
+                select.value = oldValue;
+            } finally {
+                select.disabled = false;
+            }
+        }
+
+        getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                   document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ||
+                   document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+        }
+
+        showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    }
+
+    // Initialize inline editor when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        new InlineEditor();
+    });
+    </script>
+
+    <!-- Enhanced CSS for inline editing -->
+    <style>
+        .inline-edit-container {
+            min-height: 32px; /* Ensure consistent height */
+        }
+        
+        .inline-edit-badge {
+            transition: all 0.2s ease;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+        
+        .inline-edit-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(160, 141, 128, 0.15);
+        }
+        
+        .inline-edit-select {
+            min-width: 120px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+        
+        .inline-edit-select:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(160, 141, 128, 0.15);
+        }
+        
+        /* Enhanced badge styling with better typography */
+        .inline-edit-badge,
+        .inline-edit-select {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
 {% endblock %}
