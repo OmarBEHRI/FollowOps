@@ -369,16 +369,28 @@
                                 </div>
                             </div>
                             
-                            <!-- Member Legend -->
-                            <div class="mb-4 p-4 bg-[#f8f6f3] rounded-xl border border-[#e3dfd3]">
-                                <h3 class="text-[#191610] text-sm font-semibold mb-3 flex items-center">
-                                    <svg class="w-4 h-4 mr-2 text-[#A08D80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M17 20H7m10 0v-2c0-5.523-3.582-10-8-10s-8 4.477-8 10v2m8-10a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <!-- Hidden member legend for JavaScript reference -->
+                            <div id="member-legend" style="display: none;">
+                                <!-- Member legend items will be populated by JavaScript -->
+                            </div>
+
+                            <!-- Member Filter Section (only show if more than 1 member) -->
+                            <div id="member-filter-section" class="mb-4 p-4 bg-[#f8f6f3] rounded-xl border border-[#e3dfd3]" style="display: none;">
+                                <h4 class="text-sm font-semibold text-[#191610] mb-3 flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                        </path>
                                     </svg>
-                                    Membres assignés
-                                </h3>
-                                <div id="member-legend" class="flex flex-wrap gap-2">
-                                    <!-- Member legend items will be populated by JavaScript -->
+                                    <span>Filtrer par membre</span>
+                                </h4>
+                                <div id="member-filter-checkboxes" class="flex flex-wrap gap-3 mb-3">
+                                    <!-- Member filter checkboxes will be populated by JavaScript -->
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="toggle-all-members-btn" class="px-3 py-1 text-xs bg-[#a08d80] text-white rounded-lg hover:bg-[#8b7355] transition-colors" data-state="all-selected">
+                                        Tout désélectionner
+                                    </button>
                                 </div>
                             </div>
                             
@@ -781,7 +793,7 @@
                          <option value="other">Autre</option>
                      </select>
                  </div>
-                 <div class="space-y-2">
+                 <div class="space-y-2" style="display: none;">
                      <label for="linkedResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
                          <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
@@ -797,7 +809,7 @@
                  </div>
              </div>
              
-             <!-- Liste dynamique des ressources -->
+             <!-- Liste dynamique des ressources (hidden) -->
              <div id="resourceListContainer" class="space-y-2" style="display: none;">
                  <label for="specificResource" class="flex items-center space-x-2 text-sm font-semibold text-[#191610]">
                      <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1489,9 +1501,11 @@ document.addEventListener('DOMContentLoaded', function() {
       renderCalendar(); // Render calendar even if API fails
     });
 
-  // Function to populate member legend
+  // Function to populate member legend and filter checkboxes
   const populateMemberLegend = () => {
     const memberLegend = document.getElementById('member-legend');
+    const memberFilterSection = document.getElementById('member-filter-section');
+    const memberFilterCheckboxes = document.getElementById('member-filter-checkboxes');
     const uniqueMembers = new Map();
     
     // Collect unique members from ticket events
@@ -1504,11 +1518,28 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Clear existing legend
-    memberLegend.innerHTML = '';
+    // Initialize selectedMemberIds if empty
+    if (selectedMemberIds.size === 0) {
+      uniqueMembers.forEach((member, memberId) => {
+        selectedMemberIds.add(parseInt(memberId));
+      });
+      saveSelectedMembers();
+    }
     
-    // Add legend items for each unique member
+    // Clear existing legend and filter checkboxes
+    memberLegend.innerHTML = '';
+    memberFilterCheckboxes.innerHTML = '';
+    
+    // Show/hide filter section based on member count
+    if (uniqueMembers.size > 1) {
+      memberFilterSection.style.display = 'block';
+    } else {
+      memberFilterSection.style.display = 'none';
+    }
+    
+    // Add legend items and filter checkboxes for each unique member
     uniqueMembers.forEach((member, memberId) => {
+      // Create legend item
       const legendItem = document.createElement('div');
       legendItem.className = 'flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-[#e3dfd3] shadow-sm';
       
@@ -1523,6 +1554,31 @@ document.addEventListener('DOMContentLoaded', function() {
       legendItem.appendChild(colorDot);
       legendItem.appendChild(memberName);
       memberLegend.appendChild(legendItem);
+      
+      // Create filter checkbox if more than 1 member
+      if (uniqueMembers.size > 1) {
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.className = 'flex items-center space-x-2 cursor-pointer';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'member-filter-checkbox rounded border-[#a08d80] text-[#a08d80] focus:ring-[#a08d80]';
+        checkbox.dataset.memberId = memberId;
+        checkbox.checked = selectedMemberIds.has(parseInt(memberId));
+        
+        const filterColorDot = document.createElement('div');
+        filterColorDot.className = 'w-3 h-3 rounded-full border border-white shadow-sm';
+        filterColorDot.style.backgroundColor = member.color;
+        
+        const filterMemberName = document.createElement('span');
+        filterMemberName.className = 'text-sm text-[#191610]';
+        filterMemberName.textContent = member.name;
+        
+        checkboxLabel.appendChild(checkbox);
+        checkboxLabel.appendChild(filterColorDot);
+        checkboxLabel.appendChild(filterMemberName);
+        memberFilterCheckboxes.appendChild(checkboxLabel);
+      }
     });
     
     // If no members found, show a message
@@ -1531,6 +1587,78 @@ document.addEventListener('DOMContentLoaded', function() {
       noMembersMsg.className = 'text-sm text-[#8c7e5a] italic';
       noMembersMsg.textContent = 'Aucun membre assigné aux activités';
       memberLegend.appendChild(noMembersMsg);
+    }
+    
+    // Attach event listeners for member filtering
+    attachMemberFilterListeners();
+  };
+  
+  // Function to attach member filter event listeners
+  const attachMemberFilterListeners = () => {
+    const checkboxes = document.querySelectorAll('.member-filter-checkbox');
+    const toggleAllBtn = document.getElementById('toggle-all-members-btn');
+    
+    // Checkbox change events
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const memberId = parseInt(checkbox.dataset.memberId);
+        if (checkbox.checked) {
+          selectedMemberIds.add(memberId);
+        } else {
+          selectedMemberIds.delete(memberId);
+        }
+        updateToggleButtonState();
+        saveSelectedMembers();
+        rerenderCurrentView();
+      });
+    });
+    
+    // Toggle all button
+    if (toggleAllBtn) {
+      toggleAllBtn.addEventListener('click', () => {
+        const currentState = toggleAllBtn.dataset.state;
+        if (currentState === 'all-selected') {
+          // Deselect all
+          checkboxes.forEach(cb => {
+            cb.checked = false;
+          });
+          selectedMemberIds.clear();
+          toggleAllBtn.textContent = 'Tout sélectionner';
+          toggleAllBtn.dataset.state = 'none-selected';
+          toggleAllBtn.className = 'px-3 py-1 text-xs bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors';
+        } else {
+          // Select all
+          checkboxes.forEach(cb => {
+            cb.checked = true;
+            selectedMemberIds.add(parseInt(cb.dataset.memberId));
+          });
+          toggleAllBtn.textContent = 'Tout désélectionner';
+          toggleAllBtn.dataset.state = 'all-selected';
+          toggleAllBtn.className = 'px-3 py-1 text-xs bg-[#a08d80] text-white rounded-lg hover:bg-[#8b7355] transition-colors';
+        }
+        saveSelectedMembers();
+        rerenderCurrentView();
+      });
+    }
+  };
+
+  // Function to update toggle button state based on checkbox states
+  const updateToggleButtonState = () => {
+    const checkboxes = document.querySelectorAll('.member-filter-checkbox');
+    const toggleAllBtn = document.getElementById('toggle-all-members-btn');
+    if (!toggleAllBtn) return;
+    
+    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const totalCount = checkboxes.length;
+    
+    if (checkedCount === totalCount) {
+      toggleAllBtn.textContent = 'Tout désélectionner';
+      toggleAllBtn.dataset.state = 'all-selected';
+      toggleAllBtn.className = 'px-3 py-1 text-xs bg-[#a08d80] text-white rounded-lg hover:bg-[#8b7355] transition-colors';
+    } else {
+      toggleAllBtn.textContent = 'Tout sélectionner';
+      toggleAllBtn.dataset.state = 'none-selected';
+      toggleAllBtn.className = 'px-3 py-1 text-xs bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors';
     }
   };
 
@@ -1609,8 +1737,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calendarGrid.appendChild(cell);
     
-    // Ajouter les événements pour ce jour
-    const eventsForDay = ticketEvents.filter(event => new Date(event.date).toDateString() === currentDay.toDateString());
+    // Ajouter les événements pour ce jour (filtered by selected members)
+    const eventsForDay = ticketEvents.filter(event => {
+      const matchesDate = new Date(event.date).toDateString() === currentDay.toDateString();
+      const matchesMember = selectedMemberIds.size > 0 && (!event.employee_id || selectedMemberIds.has(parseInt(event.employee_id)));
+      return matchesDate && matchesMember;
+    });
     
     // Trier les événements par heure de début
     eventsForDay.sort((a, b) => a.startTime - b.startTime);
@@ -1711,11 +1843,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Effacer le contenu précédent de la vue journalière
     dayViewContent.innerHTML = '';
     
-    // Générer des créneaux horaires (8h à 20h)
-    for (let hour = 8; hour <= 20; hour++) {
+    // Générer des créneaux horaires (0h à 23h)
+    for (let hour = 0; hour <= 23; hour++) {
       const hourLabel = document.createElement('div');
       hourLabel.className = 'hour-label';
-      hourLabel.textContent = `${hour}:00`;
+      const displayHour = hour === 0 ? '12:00 AM' : hour < 12 ? `${hour}:00 AM` : hour === 12 ? '12:00 PM' : `${hour - 12}:00 PM`;
+      hourLabel.textContent = displayHour;
       
       const hourActivities = document.createElement('div');
       hourActivities.className = 'hour-activities';
@@ -1725,10 +1858,12 @@ document.addEventListener('DOMContentLoaded', function() {
       dayViewContent.appendChild(hourActivities);
     }
     
-    // Ajouter les activités à la vue journalière
-    const dayActivities = ticketEvents.filter(event => 
-      new Date(event.date).toDateString() === date.toDateString()
-    );
+    // Ajouter les activités à la vue journalière (filtered by selected members)
+    const dayActivities = ticketEvents.filter(event => {
+      const matchesDate = new Date(event.date).toDateString() === date.toDateString();
+      const matchesMember = selectedMemberIds.size > 0 && (!event.employee_id || selectedMemberIds.has(parseInt(event.employee_id)));
+      return matchesDate && matchesMember;
+    });
     
     // Trier les activités par heure de début
     dayActivities.sort((a, b) => a.startTime - b.startTime);
@@ -1841,6 +1976,38 @@ document.addEventListener('DOMContentLoaded', function() {
   // Ouvrir le modal
   if (addActivityBtn) {
     addActivityBtn.addEventListener('click', () => {
+      // Auto-populate form fields for ticket context
+      const activityTypeSelect = document.getElementById('activityType');
+      const linkedResourceSelect = document.getElementById('linkedResource');
+      const specificResourceSelect = document.getElementById('specificResource');
+      const resourceListContainer = document.getElementById('resourceListContainer');
+      const resourceListLabel = document.getElementById('resourceListLabel');
+      
+      // Set default activity type to 'development' for tickets
+      if (activityTypeSelect) {
+        activityTypeSelect.value = 'development';
+      }
+      
+      // Auto-select 'ticket' as linked resource
+      if (linkedResourceSelect) {
+        linkedResourceSelect.value = 'ticket';
+        
+        // Show the specific resource container
+        if (resourceListContainer) {
+          resourceListContainer.style.display = 'block';
+        }
+        
+        // Update label
+        if (resourceListLabel) {
+          resourceListLabel.textContent = 'Sélectionner un ticket';
+        }
+        
+        // Auto-select current ticket
+        if (specificResourceSelect) {
+          specificResourceSelect.innerHTML = `<option value="{{ ticket.id }}" selected>{{ ticket.title }}</option>`;
+        }
+      }
+      
       addActivityModal.classList.remove('hidden');
       // Masquer la barre de navigation
       const header = document.querySelector('header');

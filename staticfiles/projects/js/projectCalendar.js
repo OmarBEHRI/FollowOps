@@ -246,10 +246,11 @@ class ProjectCalendar {
         this.dayViewContent.innerHTML = '';
 
         // Create time slots
-        for (let hour = 9; hour <= 20; hour++) {
+        for (let hour = 0; hour <= 23; hour++) {
             const hourLabel = document.createElement('div');
             hourLabel.className = 'hour-label';
-            hourLabel.textContent = `${hour}:00`;
+            const displayHour = hour === 0 ? '12:00 AM' : hour < 12 ? `${hour}:00 AM` : hour === 12 ? '12:00 PM' : `${hour - 12}:00 PM`;
+            hourLabel.textContent = displayHour;
 
             const hourActivities = document.createElement('div');
             hourActivities.className = 'hour-activities';

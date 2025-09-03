@@ -1225,11 +1225,12 @@
         // Effacer le contenu précédent de la vue journalière
         dayViewContent.innerHTML = '';
         
-        // Générer des créneaux horaires (8h à 20h)
-        for (let hour = 8; hour <= 20; hour++) {
+        // Générer des créneaux horaires (0h à 23h)
+        for (let hour = 0; hour <= 23; hour++) {
           const hourLabel = document.createElement('div');
           hourLabel.className = 'hour-label';
-          hourLabel.textContent = `${hour}:00`;
+          const displayHour = hour === 0 ? '12:00 AM' : hour < 12 ? `${hour}:00 AM` : hour === 12 ? '12:00 PM' : `${hour - 12}:00 PM`;
+          hourLabel.textContent = displayHour;
           
           const hourActivities = document.createElement('div');
           hourActivities.className = 'hour-activities';

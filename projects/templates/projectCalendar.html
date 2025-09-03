@@ -457,6 +457,8 @@
                     </div>
                 </div>
 
+
+
                 <div id="calendar-container" class="calendar-container">
                     <div id="calendar-grid" class="calendar-grid">
                         <!-- Les en-têtes des jours seront générés par JavaScript -->
@@ -684,24 +686,9 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endfor %}
     ];
     
-    // Initialize member filtering variables
+    // Show all members (no filtering)
     const allMemberIds = [{% for member in project_members %}{{ member.id }}{% if not forloop.last %}, {% endif %}{% endfor %}];
-    const storageKey = 'projectCalendar_selectedMembers_{{ project.id }}';
-    let selectedMemberIds = new Set();
-    
-    // Load saved member filters from localStorage
-    try {
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            selectedMemberIds = new Set(JSON.parse(saved));
-        } else {
-            // Default to all members selected
-            selectedMemberIds = new Set(allMemberIds);
-        }
-    } catch (e) {
-        // Fallback to all members selected
-        selectedMemberIds = new Set(allMemberIds);
-    }
+    let selectedMemberIds = new Set(allMemberIds);
     
     // Debug logging for activities
     console.log('=== PROJECT CALENDAR DEBUG ===');
@@ -791,8 +778,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(`Day ${day} (${cellDateOnly.toDateString()}): Activity "${activity.title}" from ${startDateOnly.toDateString()} to ${endDateOnly.toDateString()} - In range: ${isInRange}`);
                 }
 
-                // L'activité est affichée si le jour de la cellule est entre le début et la fin de l'activité (inclus)
-                return isInRange;
+                // L'activité est affichée si le jour de la cellule est entre le début et la fin de l'activité (inclus) ET si le membre est sélectionné
+                return isInRange && selectedMemberIds.has(activity.employee_id);
             });
             
             // Log activities found for this day
@@ -895,10 +882,11 @@ document.addEventListener('DOMContentLoaded', function() {
         dayViewContent.innerHTML = '';
 
         // Créer les créneaux horaires
-        for (let hour = 9; hour <= 20; hour++) {
+        for (let hour = 0; hour <= 23; hour++) {
             const hourLabel = document.createElement('div');
             hourLabel.className = 'hour-label';
-            hourLabel.textContent = `${hour}:00`;
+            const displayHour = hour === 0 ? '12:00 AM' : hour < 12 ? `${hour}:00 AM` : hour === 12 ? '12:00 PM' : `${hour - 12}:00 PM`;
+            hourLabel.textContent = displayHour;
 
             const hourActivities = document.createElement('div');
             hourActivities.className = 'hour-activities';
@@ -1035,6 +1023,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set default times
         document.getElementById('startTime').value = '09:00';
         document.getElementById('endTime').value = '10:00';
+        
+        // Auto-populate activity type for project context
+        const activityTypeInput = document.getElementById('activityType');
+        if (activityTypeInput) {
+            activityTypeInput.value = 'Développement';
+        }
     }
 
     // Ouvrir le modal d'ajout d'activité
@@ -1317,60 +1311,13 @@ document.addEventListener('DOMContentLoaded', function() {
             activeButton.classList.add('active');
         }
     }
-    function saveMemberFilters() {
-        try { localStorage.setItem(storageKey, JSON.stringify([...selectedMemberIds])); } catch (e) {}
-    };
 
-    function syncMemberFilterUI() {
-        const checkboxes = document.querySelectorAll('.member-filter-checkbox');
-        checkboxes.forEach(cb => {
-            const id = parseInt(cb.dataset.memberId);
-            cb.checked = selectedMemberIds.has(id);
-        });
-    };
 
-    function attachMemberFilterListeners() {
-        const checkboxes = document.querySelectorAll('.member-filter-checkbox');
-        const selectAllBtn = document.getElementById('select-all-members-btn');
-        const clearAllBtn = document.getElementById('clear-all-members-btn');
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                const id = parseInt(cb.dataset.memberId);
-                if (cb.checked) {
-                    selectedMemberIds.add(id);
-                } else {
-                    selectedMemberIds.delete(id);
-                }
-                saveMemberFilters();
-                if (isMonthView) {
-                    renderCalendar();
-                } else {
-                    showDayView(selectedDay);
-                }
-            });
-        });
-
-        if (selectAllBtn) {
-            selectAllBtn.addEventListener('click', () => {
-                selectedMemberIds = new Set(allMemberIds);
-                saveMemberFilters();
-                syncMemberFilterUI();
-                if (isMonthView) { renderCalendar(); } else { showDayView(selectedDay); }
-            });
-        }
-        if (clearAllBtn) {
-            clearAllBtn.addEventListener('click', () => {
-                selectedMemberIds.clear();
-                saveMemberFilters();
-                syncMemberFilterUI();
-                if (isMonthView) { renderCalendar(); } else { showDayView(selectedDay); }
-            });
-        }
-
-        // Ensure UI matches stored state on load
-        syncMemberFilterUI();
-    };
+        // Show all members by default (no filtering UI)
+        
+        // Initial calendar render
+        renderCalendar();
+    });
 </script>
 
 {% endblock %}
