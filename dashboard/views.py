@@ -12,6 +12,62 @@ from collections import defaultdict
 import json
 import calendar
 
+def get_active_tickets_count_at_date(target_date, user=None):
+    """Count tickets that were active (Ouvert or En cours) at a specific date"""
+    # Get all tickets that existed at the target date
+    if user:
+        tickets = Ticket.objects.filter(
+            created_at__lte=target_date,
+            created_by=user
+        )
+    else:
+        tickets = Ticket.objects.filter(
+            created_at__lte=target_date
+        )
+    
+    active_count = 0
+    
+    for ticket in tickets:
+        # Get the latest status log for this ticket up to the target date
+        latest_log = TicketStatusLog.objects.filter(
+            ticket=ticket,
+            timestamp__lte=target_date
+        ).order_by('-timestamp').first()
+        
+        # If there's a status log and it's active status, count it
+        if latest_log and latest_log.status in ['Ouvert', 'En cours']:
+            active_count += 1
+    
+    return active_count
+
+def get_active_projects_count_at_date(target_date, user=None):
+    """Count projects that were active (À initier or En cours) at a specific date"""
+    # Get all projects that existed at the target date
+    if user:
+        projects = Project.objects.filter(
+            created_at__lte=target_date,
+            project_manager=user
+        )
+    else:
+        projects = Project.objects.filter(
+            created_at__lte=target_date
+        )
+    
+    active_count = 0
+    
+    for project in projects:
+        # Get the latest status log for this project up to the target date
+        latest_log = ProjectStatusLog.objects.filter(
+            project=project,
+            timestamp__lte=target_date
+        ).order_by('-timestamp').first()
+        
+        # If there's a status log and it's active status, count it
+        if latest_log and latest_log.status in ['À initier', 'En cours']:
+            active_count += 1
+    
+    return active_count
+
 @login_required
 def dashboard(request):
     # Get the current user
@@ -32,7 +88,7 @@ def dashboard(request):
         return render(request, 'dashboard_user.html', context)  # User dashboard
 
 def get_ticket_curve_data(user=None, period='month'):
-    """Generate ticket creation vs resolution curve data from status logs"""
+    """Generate active tickets evolution curve data (Ouvert + En cours only)"""
     end_date = timezone.now()
     
     # Determine date range and grouping based on period
@@ -71,44 +127,9 @@ def get_ticket_curve_data(user=None, period='month'):
             date_format = '%Y-%m'
             label_format = '%b %Y'
     
-    # Initialize data structures
-    created_data = defaultdict(int)
-    resolved_data = defaultdict(int)
-    
-    # Get ticket status logs within the date range
-    if user:
-        ticket_logs = TicketStatusLog.objects.filter(
-            timestamp__gte=start_date,
-            timestamp__lte=end_date,
-            ticket__created_by=user
-        ).select_related('ticket').order_by('timestamp')
-    else:
-        ticket_logs = TicketStatusLog.objects.filter(
-            timestamp__gte=start_date,
-            timestamp__lte=end_date
-        ).select_related('ticket').order_by('timestamp')
-    
-    # Process logs to count creations and resolutions
-    for log in ticket_logs:
-        date_key = log.timestamp.strftime(date_format)
-        
-        # Count ticket creations (first log entry for each ticket)
-        if log.status == 'Ouvert':
-            first_log = TicketStatusLog.objects.filter(
-                ticket=log.ticket
-            ).order_by('timestamp').first()
-            
-            if first_log and first_log.id == log.id:
-                created_data[date_key] += 1
-        
-        # Count ticket resolutions
-        elif log.status in ['Résolu', 'Fermé']:
-            resolved_data[date_key] += 1
-    
     # Generate labels and data arrays
     labels = []
-    created_values = []
-    resolved_values = []
+    active_values = []
     
     if period == 'month':
         # Generate daily labels for the last 30 days
@@ -117,9 +138,11 @@ def get_ticket_curve_data(user=None, period='month'):
             date_key = date.strftime(date_format)
             label = date.strftime(label_format)
             
+            # Count active tickets at this date
+            active_count = get_active_tickets_count_at_date(date, user)
+            
             labels.append(label)
-            created_values.append(created_data[date_key])
-            resolved_values.append(resolved_data[date_key])
+            active_values.append(active_count)
     elif period == 'year':
         # Generate monthly labels for the last 12 months
         for i in range(11, -1, -1):
@@ -127,9 +150,11 @@ def get_ticket_curve_data(user=None, period='month'):
             date_key = date.strftime(date_format)
             label = date.strftime(label_format)
             
+            # Count active tickets at this date
+            active_count = get_active_tickets_count_at_date(date, user)
+            
             labels.append(label)
-            created_values.append(created_data[date_key])
-            resolved_values.append(resolved_data[date_key])
+            active_values.append(active_count)
     else:  # all_time
         # Generate labels based on time span and format
         if date_format == '%Y':  # Yearly format
@@ -137,18 +162,30 @@ def get_ticket_curve_data(user=None, period='month'):
             end_year = end_date.year
             for year in range(start_year, end_year + 1):
                 date_key = str(year)
+                date = datetime(year, 12, 31, tzinfo=timezone.get_current_timezone())
+                
+                # Count active tickets at this date
+                active_count = get_active_tickets_count_at_date(date, user)
+                
                 labels.append(date_key)
-                created_values.append(created_data[date_key])
-                resolved_values.append(resolved_data[date_key])
+                active_values.append(active_count)
         else:  # Monthly format
             current_date = start_date.replace(day=1)  # Start from first day of month
             while current_date <= end_date:
                 date_key = current_date.strftime(date_format)
                 label = current_date.strftime(label_format)
                 
+                # Count active tickets at end of this month
+                if current_date.month == 12:
+                    end_of_month = current_date.replace(year=current_date.year + 1, month=1, day=1) - timedelta(days=1)
+                else:
+                    next_month = current_date.replace(month=current_date.month + 1, day=1)
+                    end_of_month = next_month - timedelta(days=1)
+                
+                active_count = get_active_tickets_count_at_date(end_of_month, user)
+                
                 labels.append(label)
-                created_values.append(created_data[date_key])
-                resolved_values.append(resolved_data[date_key])
+                active_values.append(active_count)
                 
                 # Move to next month
                 if current_date.month == 12:
@@ -158,12 +195,12 @@ def get_ticket_curve_data(user=None, period='month'):
     
     return {
         'labels': labels,
-        'created_data': created_values,
-        'resolved_data': resolved_values
+        'created_data': active_values,  # Keep same key for compatibility
+        'resolved_data': [0] * len(active_values)  # Empty array for compatibility
     }
 
 def get_project_curve_data(user=None, period='month'):
-    """Generate project creation vs completion curve data from status logs"""
+    """Generate active projects evolution curve data (À initier + En cours only)"""
     end_date = timezone.now()
     
     # Determine date range and grouping based on period
@@ -202,44 +239,9 @@ def get_project_curve_data(user=None, period='month'):
             date_format = '%Y-%m'
             label_format = '%b %Y'
     
-    # Initialize data structures
-    created_data = defaultdict(int)
-    finished_data = defaultdict(int)
-    
-    # Get project status logs within the date range
-    if user:
-        project_logs = ProjectStatusLog.objects.filter(
-            timestamp__gte=start_date,
-            timestamp__lte=end_date,
-            project__project_manager=user
-        ).select_related('project').order_by('timestamp')
-    else:
-        project_logs = ProjectStatusLog.objects.filter(
-            timestamp__gte=start_date,
-            timestamp__lte=end_date
-        ).select_related('project').order_by('timestamp')
-    
-    # Process logs to count creations and completions
-    for log in project_logs:
-        date_key = log.timestamp.strftime(date_format)
-        
-        # Count project creations (first log entry for each project)
-        if log.status == 'À initier':
-            first_log = ProjectStatusLog.objects.filter(
-                project=log.project
-            ).order_by('timestamp').first()
-            
-            if first_log and first_log.id == log.id:
-                created_data[date_key] += 1
-        
-        # Count project completions
-        elif log.status == 'Terminé':
-            finished_data[date_key] += 1
-    
     # Generate labels and data arrays
     labels = []
-    created_values = []
-    finished_values = []
+    active_values = []
     
     if period == 'month':
         # Generate daily labels for the last 30 days
@@ -248,9 +250,11 @@ def get_project_curve_data(user=None, period='month'):
             date_key = date.strftime(date_format)
             label = date.strftime(label_format)
             
+            # Count active projects at this date
+            active_count = get_active_projects_count_at_date(date, user)
+            
             labels.append(label)
-            created_values.append(created_data[date_key])
-            finished_values.append(finished_data[date_key])
+            active_values.append(active_count)
     elif period == 'year':
         # Generate monthly labels for the last 12 months
         for i in range(11, -1, -1):
@@ -258,9 +262,11 @@ def get_project_curve_data(user=None, period='month'):
             date_key = date.strftime(date_format)
             label = date.strftime(label_format)
             
+            # Count active projects at this date
+            active_count = get_active_projects_count_at_date(date, user)
+            
             labels.append(label)
-            created_values.append(created_data[date_key])
-            finished_values.append(finished_data[date_key])
+            active_values.append(active_count)
     else:  # all_time
         # Generate labels based on time span and format
         if date_format == '%Y':  # Yearly format
@@ -268,18 +274,30 @@ def get_project_curve_data(user=None, period='month'):
             end_year = end_date.year
             for year in range(start_year, end_year + 1):
                 date_key = str(year)
+                date = datetime(year, 12, 31, tzinfo=timezone.get_current_timezone())
+                
+                # Count active projects at this date
+                active_count = get_active_projects_count_at_date(date, user)
+                
                 labels.append(date_key)
-                created_values.append(created_data[date_key])
-                finished_values.append(finished_data[date_key])
+                active_values.append(active_count)
         else:  # Monthly format
             current_date = start_date.replace(day=1)  # Start from first day of month
             while current_date <= end_date:
                 date_key = current_date.strftime(date_format)
                 label = current_date.strftime(label_format)
                 
+                # Count active projects at end of this month
+                if current_date.month == 12:
+                    end_of_month = current_date.replace(year=current_date.year + 1, month=1, day=1) - timedelta(days=1)
+                else:
+                    next_month = current_date.replace(month=current_date.month + 1, day=1)
+                    end_of_month = next_month - timedelta(days=1)
+                
+                active_count = get_active_projects_count_at_date(end_of_month, user)
+                
                 labels.append(label)
-                created_values.append(created_data[date_key])
-                finished_values.append(finished_data[date_key])
+                active_values.append(active_count)
                 
                 # Move to next month
                 if current_date.month == 12:
@@ -289,8 +307,8 @@ def get_project_curve_data(user=None, period='month'):
     
     return {
         'labels': labels,
-        'created_data': created_values,
-        'finished_data': finished_values
+        'created_data': active_values,  # Keep same key for compatibility
+        'finished_data': [0] * len(active_values)  # Empty array for compatibility
     }
 
 def get_admin_dashboard_data():

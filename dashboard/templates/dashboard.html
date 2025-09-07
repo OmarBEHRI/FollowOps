@@ -241,10 +241,10 @@
                 <header class="flex flex-col px-10 py-3">
                     <div class="flex items-center justify-between whitespace-nowrap pb-3">
                         <div class="flex items-center gap-4 text-[#191610] flex-1">
-                            <div class="size-4">
-                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
-                            </div>
-                            <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6">FlowOps</h2>
+                            
+                            <a href="#" class="text-lg font-bold leading-tight tracking-[-0.015em] mr-6 text-decoration-none">
+          <span style="color: #2c2c2c;">Follow</span><span style="color: #a06217;">Ops</span>
+        </a>
                             <nav class="flex items-center gap-4">
                                 <a href="/dashboard/" class="nav-link nav-link-active">
                                     <span>Tableau de bord</span>
@@ -327,7 +327,7 @@
                         </div>
                         <div class="graph-card">
                             <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-base font-semibold text-color-dark">Tickets créés vs. Tickets résolus</h2>
+                                <h2 class="text-base font-semibold text-color-dark">Évolution des tickets ouverts/en cours</h2>
                                 <div class="btn-group btn-group-sm" role="group" id="periodSelector">
                                     <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 active" data-period="month">Dernier Mois</button>
                                     <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="year">Dernière Année</button>
@@ -342,7 +342,7 @@
                     <!-- Project Evolution Chart -->
                     <div class="graph-card">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-base font-semibold text-color-dark">Évolution des Projets</h2>
+                            <h2 class="text-base font-semibold text-color-dark">Évolution des projets à initier/en cours</h2>
                             <div class="btn-group btn-group-sm" role="group" id="projectPeriodSelector">
                                 <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 active" data-period="month">Dernier Mois</button>
                                 <button type="button" class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-period="year">Dernière Année</button>
@@ -504,7 +504,7 @@
         const ticketDataYear = {{ ticket_curve_year|safe }};
         const ticketDataAll = {{ ticket_curve_all|safe }};
         
-        // Graphique linéaire - Tickets créés vs. Tickets résolus
+        // Graphique linéaire - Évolution des tickets ouverts/en cours
         const lineCtx = document.getElementById('lineChart').getContext('2d');
         let currentChart = null;
         
@@ -518,7 +518,7 @@
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Tickets Créés',
+                        label: 'Tickets Actifs',
                         data: data.created_data,
                         borderColor: nudeColors[0], // Couleur principale
                         backgroundColor: 'rgba(160, 141, 128, 0.3)', // Couleur principale avec transparence pour le fond
@@ -528,18 +528,6 @@
                         pointBorderColor: 'var(--bg-white)',
                         pointBorderWidth: 2,
                         pointRadius: 5, // Taille des points
-                        pointHoverRadius: 7
-                    }, {
-                        label: 'Tickets Résolus',
-                        data: data.resolved_data,
-                        borderColor: nudeColors[1], // Deuxième couleur de la palette
-                        backgroundColor: 'rgba(110, 104, 100, 0.3)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: nudeColors[1],
-                        pointBorderColor: 'var(--bg-white)',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
                         pointHoverRadius: 7
                     }]
                 },
@@ -648,7 +636,7 @@
         const projectDataYear = {{ project_curve_year|safe }};
         const projectDataAll = {{ project_curve_all|safe }};
         
-        // Graphique linéaire - Évolution des projets
+        // Graphique linéaire - Évolution des projets à initier/en cours
         const projectCtx = document.getElementById('projectChart').getContext('2d');
         let currentProjectChart = null;
         
@@ -662,25 +650,13 @@
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Projets Créés',
+                        label: 'Projets Actifs',
                         data: data.created_data,
                         borderColor: nudeColors[2],
                         backgroundColor: 'rgba(212, 204, 193, 0.3)',
                         fill: true,
                         tension: 0.4,
                         pointBackgroundColor: nudeColors[2],
-                        pointBorderColor: 'var(--bg-white)',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }, {
-                         label: 'Projets Terminés',
-                         data: data.finished_data,
-                        borderColor: nudeColors[3],
-                        backgroundColor: 'rgba(156, 149, 145, 0.3)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: nudeColors[3],
                         pointBorderColor: 'var(--bg-white)',
                         pointBorderWidth: 2,
                         pointRadius: 5,

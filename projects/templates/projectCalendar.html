@@ -402,7 +402,6 @@
 <div class="min-h-screen flex flex-col">
     <!-- Main Content -->
     <main class="flex-1 w-full py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Calendrier des activités du projet -->
         <div class="flex flex-col gap-4">
             <div class="rounded-xl border border-[#e3dfd3] bg-[#fbfaf9] p-6">
                 <div class="calendar-header">
@@ -436,24 +435,22 @@
                     </div>
                 </div>
 
-                <!-- Member Legend -->
-                <div class="mb-4 p-4 bg-[#f8f6f3] rounded-xl border border-[#e3dfd3]">
+                <!-- Hidden member legend for JavaScript reference (optional) -->
+                <div id="project-member-legend" style="display: none;"></div>
+
+                <!-- Member Filter Section (only show if more than 1 member) -->
+                <div id="project-member-filter-section" class="mb-4" style="display: none;">
                     <h4 class="text-sm font-semibold text-[#191610] mb-3 flex items-center space-x-2">
                         <svg class="w-4 h-4 text-[#a08d80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                         </svg>
-                        <span>Membres du projet</span>
+                        <span>Filtrer par membre</span>
                     </h4>
-                    <div class="flex flex-wrap gap-3">
-                        {% for member in project_members %}
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-                                style="background-color: {{ member_colors|get_item:member.id }}"></div>
-                            <span class="text-sm text-[#191610]">{{ member.first_name }} {{ member.last_name }}</span>
-                        </div>
-                        {% endfor %}
+                    <div id="project-member-filter-checkboxes" class="flex flex-wrap gap-3 mb-3">
+                        <!-- Member filter checkboxes will be populated by JavaScript -->
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="project-toggle-all-members-btn" class="px-3 py-1 text-xs bg-[#a08d80] text-white rounded-lg hover:bg-[#8b7355] transition-colors" data-state="all-selected">Tout désélectionner</button>
                     </div>
                 </div>
 
@@ -686,9 +683,123 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endfor %}
     ];
     
-    // Show all members (no filtering)
+    // Members data provided by server (id, first_name + last_name)
+    const projectMembersData = [
+        {% for member in project_members %}
+        { id: {{ member.id }}, name: "{{ member.first_name|default_if_none:''|escapejs }} {{ member.last_name|default_if_none:''|escapejs }}" }
+        {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // List of all member ids
     const allMemberIds = [{% for member in project_members %}{{ member.id }}{% if not forloop.last %}, {% endif %}{% endfor %}];
-    let selectedMemberIds = new Set(allMemberIds);
+
+    // Build a map of member info (merge any missing info from activities later)
+    const membersMap = new Map();
+    projectMembersData.forEach(m => {
+        membersMap.set(m.id, { name: m.name || `Membre ${m.id}`, color: m.color || null });
+    });
+
+    // Merge color/name from activities when available
+    projectActivities.forEach(act => {
+        const existing = membersMap.get(act.employee_id);
+        if (!existing) {
+            membersMap.set(act.employee_id, { name: act.employee || `Membre ${act.employee_id}`, color: act.employee_color || null });
+        } else {
+            if (!existing.name && act.employee) existing.name = act.employee;
+            if (!existing.color && act.employee_color) existing.color = act.employee_color;
+        }
+    });
+
+    // Persistent selection per project
+    const projectStorageKey = `projectCalendar_selectedMemberIds_project_{{ project.id }}`;
+    let initialSelection = allMemberIds;
+    try {
+        const saved = JSON.parse(localStorage.getItem(projectStorageKey));
+        if (Array.isArray(saved)) {
+            // Preserve empty selection if user intentionally deselected all
+            initialSelection = saved.map(Number).filter(id => allMemberIds.includes(id));
+        }
+    } catch (e) {
+        // Fallback to all selected
+        initialSelection = allMemberIds;
+    }
+    let selectedMemberIds = new Set(initialSelection);
+
+    // Setup Member Filter UI
+    const filterSection = document.getElementById('project-member-filter-section');
+    const filterCheckboxesContainer = document.getElementById('project-member-filter-checkboxes');
+    const toggleAllBtn = document.getElementById('project-toggle-all-members-btn');
+
+    function updateProjectToggleButtonState() {
+        if (!toggleAllBtn) return;
+        const total = allMemberIds.length;
+        const selected = selectedMemberIds.size;
+        if (selected === total) {
+            toggleAllBtn.textContent = 'Tout désélectionner';
+            toggleAllBtn.setAttribute('data-state', 'all-selected');
+            toggleAllBtn.classList.remove('bg-[#8b7355]');
+            toggleAllBtn.classList.add('bg-[#a08d80]');
+        } else {
+            toggleAllBtn.textContent = 'Tout sélectionner';
+            toggleAllBtn.setAttribute('data-state', 'none-selected');
+            toggleAllBtn.classList.remove('bg-[#a08d80]');
+            toggleAllBtn.classList.add('bg-[#8b7355]');
+        }
+    }
+
+    function attachProjectMemberFilterListeners() {
+        if (!filterCheckboxesContainer || !toggleAllBtn) return;
+        filterCheckboxesContainer.querySelectorAll('input.member-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const id = parseInt(cb.getAttribute('data-member-id'));
+                if (cb.checked) selectedMemberIds.add(id); else selectedMemberIds.delete(id);
+                localStorage.setItem(projectStorageKey, JSON.stringify(Array.from(selectedMemberIds)));
+                updateProjectToggleButtonState();
+                if (isMonthView) renderCalendar(); else showDayView(selectedDay);
+            });
+        });
+        toggleAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const state = toggleAllBtn.getAttribute('data-state');
+            if (state === 'all-selected') {
+                selectedMemberIds = new Set();
+                filterCheckboxesContainer.querySelectorAll('input.member-checkbox').forEach(cb => cb.checked = false);
+                toggleAllBtn.setAttribute('data-state', 'none-selected');
+            } else {
+                selectedMemberIds = new Set(allMemberIds);
+                filterCheckboxesContainer.querySelectorAll('input.member-checkbox').forEach(cb => cb.checked = true);
+                toggleAllBtn.setAttribute('data-state', 'all-selected');
+            }
+            localStorage.setItem(projectStorageKey, JSON.stringify(Array.from(selectedMemberIds)));
+            updateProjectToggleButtonState();
+            if (isMonthView) renderCalendar(); else showDayView(selectedDay);
+        });
+    }
+
+    function populateProjectMemberFilterUI() {
+        if (!filterSection || !filterCheckboxesContainer || !toggleAllBtn) return;
+        // Show section only when more than one member
+        filterSection.style.display = allMemberIds.length > 1 ? '' : 'none';
+        filterCheckboxesContainer.innerHTML = '';
+        allMemberIds.forEach(id => {
+            const info = membersMap.get(id) || { name: `Membre ${id}`, color: null };
+            const colorDot = info.color ? `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${info.color};margin-right:8px;border:1px solid #ddd;"></span>` : '';
+            const checkboxId = `project-member-checkbox-${id}`;
+            const wrapper = document.createElement('label');
+            wrapper.className = 'inline-flex items-center gap-2';
+            wrapper.innerHTML = `
+                <input type="checkbox" id="${checkboxId}" data-member-id="${id}" class="member-checkbox" ${selectedMemberIds.has(id) ? 'checked' : ''} />
+                <span class="flex items-center text-sm text-[#191610]">${colorDot}${info.name}</span>
+            `;
+            filterCheckboxesContainer.appendChild(wrapper);
+        });
+        attachProjectMemberFilterListeners();
+        updateProjectToggleButtonState();
+    }
+
+    // Initialize UI
+    populateProjectMemberFilterUI();
     
     // Debug logging for activities
     console.log('=== PROJECT CALENDAR DEBUG ===');
